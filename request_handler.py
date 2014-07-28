@@ -656,3 +656,4 @@ http_tbl_realname = {'A' : 'a_record',
 http_opt_str2int = {'add':msg.g_opt_add, 'del':msg.g_opt_del}
 http_type_to_proxy_header = {'record':msg.g_pack_head_init_dns, 'domain':msg.g_pack_head_init_view}
 
+
