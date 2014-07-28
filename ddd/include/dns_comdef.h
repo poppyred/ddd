@@ -3,7 +3,7 @@
 
 #define UDP_HEAD_LEN    (42)
 
-#define CACHE_OPTION_ADD    (1)
+#define CACHE_OPTION_REF    (1)
 #define CACHE_OPTION_DEL    (2)
 
 #define VIEW_OPTION_ADD    (1)

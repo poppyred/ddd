@@ -49,7 +49,7 @@ void dns_ext_cache_destroy();
 * @author hezuoxiang      @date 2013/07/22
 **/
 int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
-        int pkt_len);
+        int pkt_len,unsigned short type);
 
 /**
 * @brief   删除域名劫持
@@ -62,7 +62,7 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 * @see     
 * @author hezuoxiang      @date 2013/07/22
 **/
-int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id);
+int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id,unsigned short type);
 
 /**
 * @brief   删除域名劫持
@@ -74,7 +74,7 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id);
 * @see     
 * @author hezuoxiang      @date 2013/07/22
 **/
-int dns_ext_cache_del(char *domain,int domain_len);
+int dns_ext_cache_del(char *domain,int domain_len,unsigned short type);
 
 
 /**
@@ -88,17 +88,7 @@ int dns_ext_cache_del(char *domain,int domain_len);
 * @see     
 * @author hyb      @date 2013/07/22
 **/
-int dns_ext_cache_get(char *pkt,char *domain,int domain_len,ushort view_id);
-
-/**
-* @brief   遍历内存中所有域名信息，计算node数目
-* @return node 数目
-* @remark null
-* @see     
-* @author hezuoxiang      @date 2013/07/22
-**/
-
-int dns_ext_cache_node_count();
+int dns_ext_cache_get(char *pkt,char *domain,int domain_len,ushort view_id,unsigned short type);
 
 
 /**

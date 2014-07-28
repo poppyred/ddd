@@ -29,9 +29,6 @@ h_hash_st *g_cname_table = NULL;
 h_hash_st *g_any_table = NULL;
 
 
-
-
-
 volatile int g_list_statu = 0;
 
 /*功能开关*/
@@ -619,7 +616,7 @@ static int dns_edit_ttl_check(char* result, int total_len, unsigned short ttl)
 * @see     
 * @author hyb      @date 2013/07/10
 **/
-int dns_cache_get(char* domain, int domain_len, int view_id, char* answer,
+int dns_cache_get(char* answer, char* domain, int domain_len, int view_id, 
         unsigned short type)
 {  
     if (g_cache_off)

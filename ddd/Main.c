@@ -382,7 +382,7 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 
 
 	struct sockaddr_in *dst = (struct sockaddr_in *)client;
-	size = dns_cache_get(domain,len,view_id,txdata->pdata,type);
+	size = dns_cache_get(txdata->pdata,domain,len,view_id,type);
 	if (likely(size > 0))
 	{
 
@@ -410,11 +410,9 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 	}
 
     
-    size = dns_ext_cache_get(txdata->pdata,domain,len,view_id);
-    hyb_debug("i m here:view:%d domain:%s size:%d \n ",view_id,domain,size);
+    size = dns_ext_cache_get(txdata->pdata,domain,len,view_id,type);
 	if (likely(size > 0))
 	{
-        hyb_debug("i m here:view:%d domain:%s\n",view_id,domain);
 		memcpy(txdata->pdata, &qid , 2);
 		txdata->dmac = &smac;
 		txdata->dstip = dst->sin_addr.s_addr;
@@ -457,10 +455,12 @@ static int answer_to_cache(char*domain, unsigned int view_id, char*answer, int a
     
     if (*domain == '*')
     {
-        ret = dns_ext_cache_set(domain,domainlen,view_id,answer,answer_len);
+        //hyb_debug("dns_ext_cache_set:%s type:%d view:%d\n",domain,type,view_id);
+        ret = dns_ext_cache_set(domain,domainlen,view_id,answer,answer_len,type);
     }
     else
     {
+        //hyb_debug("dns_cache_set:%s type:%d view:%d\n ",domain,type,view_id);
         ret = dns_cache_set(domain,domainlen,view_id,answer,answer_len,type);
     }
 	return ret;
@@ -754,11 +754,11 @@ void handle_answer_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *
                 if (head->rcode == 0)
                 {
                     answer_to_cache(domain,view_id,recvmsg,recvlen,type);  
-                    answer_to_mgr("dns_reply",CACHE_OPTION_ADD,type,view_id,domain,MGR_ANSWER_SUCCESS);
+                    answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_SUCCESS);
                 }
                 else
                 {
-                    answer_to_mgr("dns_reply",CACHE_OPTION_ADD,type,view_id,domain,MGR_ANSWER_EXIST);
+                    answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_NOEXIST);
                 }
 
             }

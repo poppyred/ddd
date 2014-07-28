@@ -42,7 +42,12 @@ static int g_extche_view_node_size;
 static char * g_extche_view_node_output;
 
 //红黑树
-h_rbtree_st * g_extche_tree;
+h_rbtree_st * g_a_tree;
+h_rbtree_st * g_aaaa_tree;
+h_rbtree_st * g_mx_tree;
+h_rbtree_st * g_ns_tree;
+h_rbtree_st * g_cname_tree;
+h_rbtree_st * g_txt_tree;
 
 
 struct list_head g_extche_delete_list;
@@ -116,6 +121,46 @@ typedef struct extend_syn
 }st_extend_syn;
 
 static int domain_to_q_name(char*domain,int len,char*qname);
+
+
+static h_rbtree_st* tree_select(unsigned short type)
+{
+    h_rbtree_st * select_table = NULL;
+    
+    switch(type)
+    {
+    case 0x0001:
+        select_table = g_a_tree;
+        break;
+        
+    case 0x0002:
+        select_table = g_ns_tree;
+        break;
+        
+    case 0x0005:
+        select_table = g_cname_tree;
+        break;
+        
+    case 0x000F:
+        select_table = g_mx_tree;
+        break;
+        
+    case 0x0010:
+        select_table = g_txt_tree;
+        break;
+
+    case 0x001c:
+        select_table = g_aaaa_tree;
+        break;
+        
+    default:
+        break; 
+    }
+
+    return select_table;
+}
+
+
 
 //红黑树比较函数
 static int extche_member_compare(const void *key1, uint32_t domain_len1,const void *key2, uint32_t domain_len2)
@@ -312,12 +357,19 @@ FAILED:
 }
 
 static
-st_extche_view_node * get_extend_veiw_node(char * domain,int domain_len,ushort view_id)
+st_extche_view_node * get_extche_veiw_node(char * domain,int domain_len,ushort view_id,unsigned short type)
 {
 	st_extend_view_array *temp = NULL;
 	st_extche_view_node*node = NULL;
 
-	if(h_rbtree_search(g_extche_tree,domain,domain_len,(void **)&temp) != 0)
+
+    h_rbtree_st * tree = tree_select(type);
+    if (!tree)
+    {
+        return NULL;
+    }
+        
+	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
 	{
 		/*hash find failed*/
 		//he_debug("[get_extend_veiw_node] extend not exist,get_extend_veiw_node failed!\n");
@@ -394,18 +446,52 @@ int extend_view_count(const void *key, int klen, void *val, void *data)
 **/
 int dns_ext_cache_init()
 {
-	g_extche_tree = NULL;
 
     INIT_LIST_HEAD(&g_extche_delete_list);
-    g_extche_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (g_extche_tree)
+    g_a_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_a_tree)
     {
-        he_debug("[dns extend init sucess!]\n");
+        he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
-        return 0;
+        return -1;
+    }
+    g_aaaa_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_aaaa_tree)
+    {
+        he_debug("[dns extend init fail!]\n");
+        //extend_syn_from_mysql();
+        return -1;
+    }
+    g_cname_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_cname_tree)
+    {
+        he_debug("[dns extend init fail!]\n");
+        //extend_syn_from_mysql();
+        return -1;
+    }
+    g_txt_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_txt_tree)
+    {
+        he_debug("[dns extend init fail!]\n");
+        //extend_syn_from_mysql();
+        return -1;
+    }
+    g_mx_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_mx_tree)
+    {
+        he_debug("[dns extend init fail!]\n");
+        //extend_syn_from_mysql();
+        return -1;
+    }
+    g_ns_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
+    if (!g_ns_tree)
+    {
+        he_debug("[dns extend init fail!]\n");
+        //extend_syn_from_mysql();
+        return -1;
     }
 
-    return -1;
+    return 0;
 }
 
 
@@ -420,12 +506,42 @@ void dns_ext_cache_destroy()
 {
 	st_extche_view_node *pos =NULL;
     st_extche_view_node *n =NULL;
-    if (g_extche_tree)
+    
+    if (g_a_tree)
     {
-        h_rbtree_destroy(g_extche_tree);
-        g_extche_tree = NULL;
+        h_rbtree_destroy(g_a_tree);
+        g_a_tree = NULL;
     }   
-	
+
+    if (g_aaaa_tree)
+    {
+        h_rbtree_destroy(g_aaaa_tree);
+        g_aaaa_tree = NULL;
+    }
+    
+    if (g_cname_tree)
+    {
+        h_rbtree_destroy(g_cname_tree);
+        g_cname_tree = NULL;
+    }
+    
+    if (g_mx_tree)
+    {
+        h_rbtree_destroy(g_mx_tree);
+        g_mx_tree = NULL;
+    } 
+    
+    if (g_ns_tree)
+    {
+        h_rbtree_destroy(g_ns_tree);
+        g_ns_tree = NULL;
+    } 
+
+    if (g_txt_tree)
+    {
+        h_rbtree_destroy(g_txt_tree);
+        g_txt_tree = NULL;
+    } 
     list_for_each_entry_safe(pos,n,&g_extche_delete_list,list)
     {
     	list_del(&pos->list);
@@ -445,7 +561,7 @@ void dns_ext_cache_destroy()
 * @author hezuoxiang      @date 2013/07/22
 **/
 int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
-        int pkt_len)
+        int pkt_len,unsigned short type)
 {
 	if(domain == NULL)
 	{
@@ -456,7 +572,13 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 	st_extend_view_array *temp = NULL;
     st_extend_view_array *new_domain = NULL;
 
-	if(h_rbtree_search(g_extche_tree,domain,domain_len,(void **)&temp) != 0)
+    h_rbtree_st * tree = tree_select(type);
+    if (!tree)
+    {
+        return -1;
+    }
+
+	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
 	{
 		/*rbtree find failed*/
 		new_domain = (st_extend_view_array *)h_malloc(sizeof(st_extend_view_array));
@@ -466,7 +588,7 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 			return -1;
         }
         /*这里根据匹配规则，对域名作缩减*/
-		(void)h_rbtree_insert(g_extche_tree,domain+2 ,domain_len-2 ,(void *)new_domain);
+		(void)h_rbtree_insert(tree,domain+2 ,domain_len-2 ,(void *)new_domain);
         
 		if(extche_view_create(new_domain,domain,domain_len,view_id,pkt,pkt_len) != 0)
 		{
@@ -487,7 +609,8 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 			return -1;
 		}
 	}
-	he_debug("create extend[%s]->view[%d]\n",domain,view_id);
+    
+	hyb_debug("[set extche sucess!] - [%s]-[view_id:%d]-[type:%d]\n",domain,view_id,type);
 	return 0;
 }
 
@@ -502,7 +625,7 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 * @see     
 * @author hezuoxiang      @date 2013/07/22
 **/
-int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id)
+int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id,unsigned short type)
 {
 	st_extend_view_array *temp = NULL;
 	st_extche_view_node*node = NULL;
@@ -513,7 +636,14 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id)
 		return -1;
 	}
 
-	if(h_rbtree_search(g_extche_tree,domain,domain_len,(void **)&temp) != 0)
+    h_rbtree_st * tree = tree_select(type);
+    if (!tree)
+    {
+        return -1;
+
+    }
+
+	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
 	{
 		/*rbtree find failed*/
 		he_debug("[drop extend failed!] extend not exist,get_extend_veiw_node failed!\n");
@@ -545,7 +675,7 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id)
 * @see     
 * @author hezuoxiang      @date 2013/07/22
 **/
-int dns_ext_cache_del(char *domain,int domain_len)
+int dns_ext_cache_del(char *domain,int domain_len,unsigned short type)
 {
 	int i;
 	st_extend_view_array *temp = NULL;
@@ -556,8 +686,14 @@ int dns_ext_cache_del(char *domain,int domain_len)
 		he_debug("[delete extend failed!] illegal input,dns_domain_create failed!\n");
 		return -1;
 	}
+    
+    h_rbtree_st * tree = tree_select(type);
+    if (!tree)
+    {
+        return -1;
+    }
 
-	if(h_rbtree_search(g_extche_tree,domain,domain_len,(void **)&temp) != 0)
+	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
 	{
 		/*hash find failed*/
 		he_debug("[delete extend failed!] domain not exist,get_domain_veiw_node failed!\n");
@@ -579,7 +715,7 @@ int dns_ext_cache_del(char *domain,int domain_len)
 	    
 	}
 
-	h_rbtree_delete(g_extche_tree,domain,domain_len);
+	h_rbtree_delete(tree,domain,domain_len);
 	he_debug("delete extend[%s]->view[all]\n",domain);
 	
 	return 0;
@@ -625,11 +761,12 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 * @see     
 * @author hyb      @date 2013/07/22
 **/
-int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id)
+int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id,
+        unsigned short type)
 {
 	st_extche_view_node*node = NULL;
 	
-	node = get_extend_veiw_node(domain,domain_len,view_id);
+	node = get_extche_veiw_node(domain,domain_len,view_id, type);
 	if(likely(node == NULL))
 	{
 		//he_debug("[dns_extend_get] view not exist,dns_extend_get failed!\n");
@@ -656,9 +793,6 @@ int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id)
     
     memcpy(packet,use_domain,use_domainlen);
 
-    //hyb_debug("extdomain:%s len:%d\n",ext_domain,ext_domainlen);
-    //hyb_debug("usedomain:%s len:%d\n",use_domain,use_domainlen);
-
     packet += use_domainlen;
 
     memcpy(packet,node->payload,node->payload_size);
@@ -672,6 +806,7 @@ int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id)
     }
 
    
+   // hyb_debug("[set extche sucess!] - [%s]-[view_id:%d]-[type:%d]\n",domain,view_id,type);
     
 	return (node->payload_size+12+use_domainlen);
     
@@ -679,23 +814,7 @@ int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id)
 }
 
 
-/**
-* @brief   遍历内存中所有域名信息，计算node数目
-* @return node 数目
-* @remark null
-* @see     
-* @author hezuoxiang      @date 2013/07/22
-**/
-
-int dns_ext_cache_node_count()
-{
-	int errno;
-	g_extche_view_node_num = 0;
-	(void)h_rbtree_walk(g_extche_tree,NULL,extend_view_count);
-	return g_extche_view_node_num;
-}
-
-
+#if 0
 /**
 * @brief   遍历内存中所有域名信息，生成内存状态输出
 * @return 0 - 成功  /  -1 - 失败
@@ -724,7 +843,7 @@ int dns_ext_cache_node_display(char*output,int max_len)
 	}
 	return 0;
 }
-
+#endif
 
 
 /**

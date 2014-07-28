@@ -11,6 +11,8 @@
 #include "dns_tool.h"
 #include "dns_pkt.h"
 #include "dns_cache.h"
+#include "dns_extche.h"
+
 #include <assert.h>
 #include "libbase.h"
 #include "cJSON.h"
@@ -844,7 +846,16 @@ void dns_msg_cache_request(char *domain,int view_id,int type)
 void dns_msg_cache_delete(char *domain,int view_id,int type)
 {
     int ret = 0;
-    ret = dns_cache_delete(domain,strlen(domain),view_id,type);
+    if (*domain == '*')
+    {
+        ret = dns_ext_cache_drop(domain+2,strlen(domain)-2,view_id,type);
+    }
+    else
+    {
+        ret = dns_cache_delete(domain,strlen(domain),view_id,type);
+    }
+
+    
     if (ret)
     {
         /*answer fail*/
@@ -926,7 +937,7 @@ int dns_msg_cache_analyze(char *msg)
 
         switch(opt_id)
         {
-        case CACHE_OPTION_ADD:
+        case CACHE_OPTION_REF:
             dns_msg_cache_request(domain_str,view_id,type_id);
             break;
             
@@ -1009,7 +1020,7 @@ int dns_msg_view_analyze(char *msg)
             
             if (dns_mask_insert(ip, mask_num, view_id))
             {
-                answer_to_mgr("view_reply",VIEW_OPTION_ADD,0,view_id,mask_str,MGR_ANSWER_EXIST);
+                answer_to_mgr("view_reply",VIEW_OPTION_ADD,0,view_id,mask_str,MGR_ANSWER_NOEXIST);
             }
             else
             {

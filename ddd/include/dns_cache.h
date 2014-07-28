@@ -67,7 +67,7 @@ int dns_cache_set(char *domain,int domain_len,unsigned int view_id,char* answer,
 * @see     
 * @author hyb      @date 2013/07/10
 **/
-int dns_cache_get(char* domain,int domain_len,int view_id,char* answer,
+int dns_cache_get(char* answer,char* domain,int domain_len,int view_id,
     unsigned short type);
 
 

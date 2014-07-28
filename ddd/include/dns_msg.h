@@ -54,7 +54,7 @@
 
 #define MGR_ANSWER_SUCCESS (0)
 #define MGR_ANSWER_FAILED  (1)
-#define MGR_ANSWER_EXIST  (2)
+#define MGR_ANSWER_NOEXIST  (2)
 
 
 
