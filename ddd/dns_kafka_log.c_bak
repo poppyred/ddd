@@ -1,0 +1,144 @@
+#include <ctype.h>
+#include <signal.h>
+#include <string.h>
+#include <errno.h>
+
+#include "dns_kafka_log.h"
+
+
+/***********************************************/
+//function:				kafka_log_init
+//description:			初始化kafka client
+//arguments:
+//		brokers:		kafka服务器的连接地址
+//
+//return:
+//						成功：rd_kafka_t指针
+//						失败：NULL指针
+/***********************************************/
+rd_kafka_t * kafka_log_init(char *brokers)
+{
+	rd_kafka_t *rk;
+	char errstr[512];
+	const char *debug = NULL;
+	rd_kafka_conf_t *conf;
+
+	if(!(conf = rd_kafka_conf_new()))
+	{
+		goto INIT_ERROR;
+	}
+	
+	rd_kafka_conf_set(conf, "queue.buffering.max.messages", QUEUE_BUF_MAX_MSG,NULL, 0);
+	rd_kafka_conf_set(conf, "message.send.max.retries", "3", NULL, 0);
+	rd_kafka_conf_set(conf, "retry.backoff.ms", "500", NULL, 0);
+
+	/* Create Kafka handle */
+	if (!(rk = rd_kafka_new(RD_KAFKA_PRODUCER, conf,errstr, sizeof(errstr)))) 
+	{
+		goto INIT_ERROR;
+	}
+
+	if (debug)
+	{
+		rd_kafka_set_log_level(rk, 7);
+	}
+		
+	/* Add broker(s) */
+	if (rd_kafka_brokers_add(rk, brokers) < 1) 
+	{
+		goto INIT_ERROR;
+	}
+	
+	return rk;
+	
+INIT_ERROR:
+	fprintf(stderr,"%% Failed to create Kafka producer: %s\n",strerror(errno));
+	return NULL;
+}
+
+/***********************************************/
+//function:				kafka_log_set_topic
+//description:			设置日志发送的topic
+//arguments:
+//		rk:		由kafka_log_init返回的指针
+//		topic:	topic的名称
+//
+//return:
+//						成功：rd_kafka_topic_t指针
+//						失败：NULL指针
+/***********************************************/
+rd_kafka_topic_t * kafka_log_set_topic(rd_kafka_t * rk,char*topic)
+{
+	rd_kafka_topic_t *rkt;
+	rd_kafka_topic_conf_t *topic_conf;
+	
+	if(!(topic_conf = rd_kafka_topic_conf_new()))
+	{
+		fprintf(stderr,"%% Failed to create Kafka producer: %s\n",strerror(errno));
+		return NULL;
+	}
+	rd_kafka_topic_conf_set(topic_conf, "message.timeout.ms", "5000",NULL, 0);
+	/* Explicitly create topic to avoid per-msg lookups. */
+	rkt = rd_kafka_topic_new(rk, topic, topic_conf);
+	return rkt;
+}
+
+/***********************************************/
+//function:				kafka_log_send
+//description:			发送一条日志
+//arguments:
+//		rkt:	由kafka_log_set_topic返回的指针
+//		msg:	日志内容
+//		msglen:	日志内容长度
+//
+//return:
+//						成功：0
+//						失败：-1
+/***********************************************/
+int kafka_log_send(rd_kafka_topic_t *rkt,char*msg,uint msglen)
+{
+	while(rd_kafka_produce(rkt,RD_KAFKA_PARTITION_UA,0,msg, msglen,NULL,0,NULL) == -1) 
+	{
+		if (errno != ENOBUFS)
+		{
+			printf("produce error: %s%s\n",strerror(errno),errno==ENOBUFS ?"(backpressure)":"");
+			return -1;
+		}
+	}
+	return 0;
+}
+
+/*
+int main()
+{
+	char *msgpattern = "hezuoxiang kafka log testing!";
+	int msgsize = strlen(msgpattern);
+	rd_kafka_t * rk;
+	rd_kafka_topic_t *rkt;
+		
+	rk = kafka_log_init(SAMPLE_BROKERS);
+	if(rk == NULL)
+	{
+		return -1;
+	}
+
+	rkt = kafka_log_set_topic(rk,SAMPLE_TOPIC);
+	if(rk == NULL)
+	{
+		return -1;
+	}
+	
+	while (1) 
+	{
+		//Send/Produce message.
+		kafka_log_send(rkt,msgpattern,msgsize);
+		rd_kafka_poll(rk, 0);
+		usleep(1);
+	}
+
+	//Destroy the handle
+	rd_kafka_destroy(rk);
+	
+	return 0;
+}
+*/

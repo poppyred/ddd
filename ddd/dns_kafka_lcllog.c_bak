@@ -1,0 +1,237 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include "libbase.h"
+#include "dns_kafka_lcllog.h"
+#include "dns_kafka_log.h"
+#include "dns_comdef.h"
+
+#define ERRDST_LCLLOG_FORMAT    	"error\t%s\t%ld\t%s\t%d\t%s"
+#define ANSWER_LCLLOG_FORMAT    	"client\t%s\tA\t%ld\t%d\t%s\t%s"
+#define QUERY_LCLLOG_FORMAT    		"client\t%s\tQ\t%ld\t%d\t%s\t%d"
+#define REQUEST_LCLLOG_FORMAT    	"server\t%s\t%ld\t%s\t%d\t%s\t%s\t%s"
+
+
+#define	DNS_KAFKA_RECORD_TOPIC		"dns_kafka_record"
+
+#define MAX_THREAD_NUM	(64)
+#define MAX_BUFFER_SIZE	QUEUE_BUF_MAX_MSG_INT
+#define MAX_BUFFER_LEN	(128)
+
+extern time_t global_now;
+static char hostname[256];
+
+typedef struct kafka_log_struct
+{
+	rd_kafka_t * rk;
+	rd_kafka_topic_t * rkt;
+	int index;
+	char bufs[MAX_BUFFER_SIZE][MAX_BUFFER_LEN];
+}kafka_log_struct_st;
+
+static kafka_log_struct_st * global_rks[MAX_THREAD_NUM];
+
+void dns_kafka_lcllog_init()
+{
+	memset(global_rks,0,sizeof(global_rks));
+	gethostname(hostname, sizeof(hostname));
+}
+
+void dns_kafka_lcllog_errdst(int pid,int view,char *domain,int sip)
+{
+	char srcip[16];
+	if(global_rks[pid] == NULL)
+	{
+		global_rks[pid] = malloc(sizeof(kafka_log_struct_st));
+		if(global_rks[pid] == NULL)
+		{
+			goto ERROR_INIT;
+		}
+		
+		global_rks[pid]->rk = kafka_log_init(SAMPLE_BROKERS);
+		if(global_rks[pid]->rk == NULL)
+		{
+			goto ERROR_INIT;
+		}
+	}
+	
+	if(global_rks[pid]->rkt == NULL)
+	{
+		global_rks[pid]->rkt = kafka_log_set_topic(global_rks[pid]->rk,DNS_KAFKA_RECORD_TOPIC);
+		if(global_rks[pid]->rkt == NULL)
+		{
+			return;
+		}
+	}
+	
+	inet_ntop(AF_INET, (void *)&sip,srcip,16);
+	int size = sprintf_n(global_rks[pid]->bufs[global_rks[pid]->index],MAX_BUFFER_LEN,ERRDST_LCLLOG_FORMAT,hostname,global_now,srcip,view,domain);
+	kafka_log_send(global_rks[pid]->rkt,global_rks[pid]->bufs[global_rks[pid]->index],size);
+	global_rks[pid]->index = (global_rks[pid]->index+1)%MAX_BUFFER_SIZE;
+	rd_kafka_poll(global_rks[pid]->rk, 0);
+	return;
+    
+ERROR_INIT:
+	if(global_rks[pid] != NULL)
+	{
+		if(global_rks[pid]->rk != NULL)
+		{
+			rd_kafka_destroy(global_rks[pid]->rk);
+		}
+		
+		free(global_rks[pid]);
+		global_rks[pid] = NULL;
+		return;
+	}
+}
+
+void dns_kafka_lcllog_answer(int pid,int view,char *domain,int server)
+{
+	char serverip[16];
+	if(global_rks[pid] == NULL)
+	{
+		global_rks[pid] = malloc(sizeof(kafka_log_struct_st));
+		if(global_rks[pid] == NULL)
+		{
+			goto ERROR_INIT;
+		}
+		
+		global_rks[pid]->rk = kafka_log_init(SAMPLE_BROKERS);
+		if(global_rks[pid]->rk == NULL)
+		{
+			goto ERROR_INIT;
+		}
+	}
+	
+	if(global_rks[pid]->rkt == NULL)
+	{
+		global_rks[pid]->rkt = kafka_log_set_topic(global_rks[pid]->rk,DNS_KAFKA_RECORD_TOPIC);
+		if(global_rks[pid]->rkt == NULL)
+		{
+			return;
+		}
+	}
+	
+	inet_ntop(AF_INET, (void *)&server,serverip,16);
+	int size = sprintf_n(global_rks[pid]->bufs[global_rks[pid]->index],MAX_BUFFER_LEN,ANSWER_LCLLOG_FORMAT,hostname,global_now,view,domain,serverip);
+	kafka_log_send(global_rks[pid]->rkt,global_rks[pid]->bufs[global_rks[pid]->index],size);
+	global_rks[pid]->index = (global_rks[pid]->index+1)%MAX_BUFFER_SIZE;
+	rd_kafka_poll(global_rks[pid]->rk, 0);
+	return;
+    
+ERROR_INIT:
+	if(global_rks[pid] != NULL)
+	{
+		if(global_rks[pid]->rk != NULL)
+		{
+			rd_kafka_destroy(global_rks[pid]->rk);
+		}
+		
+		free(global_rks[pid]);
+		global_rks[pid] = NULL;
+		return;
+	}
+}
+
+void dns_kafka_lcllog_request(int pid,int view,char *domain,int number)
+{
+	if(global_rks[pid] == NULL)
+	{
+		global_rks[pid] = malloc(sizeof(kafka_log_struct_st));
+		if(global_rks[pid] == NULL)
+		{
+			goto ERROR_INIT;
+		}
+		
+		global_rks[pid]->rk = kafka_log_init(SAMPLE_BROKERS);
+		if(global_rks[pid]->rk == NULL)
+		{
+			goto ERROR_INIT;
+		}
+	}
+	
+	if(global_rks[pid]->rkt == NULL)
+	{
+		global_rks[pid]->rkt = kafka_log_set_topic(global_rks[pid]->rk,DNS_KAFKA_RECORD_TOPIC);
+		if(global_rks[pid]->rkt == NULL)
+		{
+			return;
+		}
+	}
+	
+	int size = sprintf_n(global_rks[pid]->bufs[global_rks[pid]->index],MAX_BUFFER_LEN,QUERY_LCLLOG_FORMAT,hostname,global_now,view,domain,number);
+	kafka_log_send(global_rks[pid]->rkt,global_rks[pid]->bufs[global_rks[pid]->index],size);
+	global_rks[pid]->index = (global_rks[pid]->index+1)%MAX_BUFFER_SIZE;
+	rd_kafka_poll(global_rks[pid]->rk, 0);
+	return;
+    
+ERROR_INIT:
+	if(global_rks[pid] != NULL)
+	{
+		if(global_rks[pid]->rk != NULL)
+		{
+			rd_kafka_destroy(global_rks[pid]->rk);
+		}
+		
+		free(global_rks[pid]);
+		global_rks[pid] = NULL;
+		return;
+	}
+}
+
+
+void dns_kafka_lcllog_query_A(int pid,char*type,int view,char *domain,int number,int sip,int dip)
+{
+	char srcip[16];
+	char dstip[16];
+	
+	if(global_rks[pid] == NULL)
+	{
+		global_rks[pid] = malloc(sizeof(kafka_log_struct_st));
+		if(global_rks[pid] == NULL)
+		{
+			goto ERROR_INIT;
+		}
+		
+		global_rks[pid]->rk = kafka_log_init(SAMPLE_BROKERS);
+		if(global_rks[pid]->rk == NULL)
+		{
+			goto ERROR_INIT;
+		}
+	}
+	
+	if(global_rks[pid]->rkt == NULL)
+	{
+		global_rks[pid]->rkt = kafka_log_set_topic(global_rks[pid]->rk,DNS_KAFKA_RECORD_TOPIC);
+		if(global_rks[pid]->rkt == NULL)
+		{
+			return;
+		}
+	}
+	
+	
+	inet_ntop(AF_INET, (void *)&sip,srcip,16);
+	inet_ntop(AF_INET ,(void *)&dip,dstip,16);
+	
+	int size = sprintf_n(global_rks[pid]->bufs[global_rks[pid]->index],MAX_BUFFER_LEN,REQUEST_LCLLOG_FORMAT,hostname,global_now,type,view,domain,srcip,dstip);
+	kafka_log_send(global_rks[pid]->rkt,global_rks[pid]->bufs[global_rks[pid]->index],size);
+	global_rks[pid]->index = (global_rks[pid]->index+1)%MAX_BUFFER_SIZE;
+	rd_kafka_poll(global_rks[pid]->rk, 0);
+	
+	return;
+	
+ERROR_INIT:
+	if(global_rks[pid] != NULL)
+	{
+		if(global_rks[pid]->rk != NULL)
+		{
+			rd_kafka_destroy(global_rks[pid]->rk);
+		}
+		
+		free(global_rks[pid]);
+		global_rks[pid] = NULL;
+		return;
+	}
+}

@@ -1,0 +1,20 @@
+
+www.smzdm.com|2|4.3.2.1 
+www.okok.com|4|192.168.22.126 
+www.lslsls.com|1|192.168.22.199 
+www.www.com|1|
+www.gg.com|1|192.168.77.76 192.168.77.77 
+www.baidu1.com|3|192.168.22.126 192.168.22.127 
+www.hao123.com|4|121.9.244.147 
+www.test.com|2|
+www.test.com|3|
+www.test1.com|2|
+www.test1.com|3|
+www.ha.com|0|121.9.244.147 
+www.rjkj.com|1|5.6.7.81 
+www.rjkj.com|2|192.168.88.5 7.8.9.0 
+www.qq.com|0|192.168.22.1 
+www.ok.com|3|5.4.3.2 
+www.test2.com|2|
+www.test2.com|3|
+www.rjnh.com|5|6.6.6.6 

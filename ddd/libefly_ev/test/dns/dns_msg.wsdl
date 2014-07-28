@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<definitions name="soap" targetNamespace="urn:soap" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:soap" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+<types xmlns="http://schemas.xmlsoap.org/wsdl/" />
+<portType name="soapPort"><operation name="init_target">
+<input message="tns:init_targetRequest" />
+<output message="tns:init_targetResponse" />
+</operation>
+<operation name="send_msg">
+<input message="tns:send_msgRequest" />
+<output message="tns:send_msgResponse" />
+</operation>
+<operation name="make_msg">
+<input message="tns:make_msgRequest" />
+<output message="tns:make_msgResponse" />
+</operation>
+</portType>
+<binding name="soapBinding" type="tns:soapPort">
+<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+<operation name="init_target">
+<soap:operation soapAction="urn:soap#dns_msg#init_target" />
+<input><soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</input>
+<output>
+<soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</output>
+</operation>
+<operation name="send_msg">
+<soap:operation soapAction="urn:soap#dns_msg#send_msg" />
+<input><soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</input>
+<output>
+<soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</output>
+</operation>
+<operation name="make_msg">
+<soap:operation soapAction="urn:soap#dns_msg#make_msg" />
+<input><soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</input>
+<output>
+<soap:body use="encoded" namespace="urn:soap" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+</output>
+</operation>
+</binding>
+<service name="soap">
+<documentation />
+<port name="soapPort" binding="tns:soapBinding"><soap:address location="http://192.168.22.126/create.php" />
+</port>
+</service>
+<message name="init_targetRequest">
+<part name="tar" type="xsd:string" />
+</message>
+<message name="init_targetResponse">
+<part name="init_target" type="xsd:string" />
+</message>
+<message name="send_msgRequest">
+<part name="type" type="xsd:string" />
+<part name="vid" type="xsd:string" />
+<part name="opt" type="xsd:string" />
+<part name="domain" type="xsd:string" />
+<part name="ip" type="xsd:string" />
+</message>
+<message name="send_msgResponse">
+<part name="send_msg" type="xsd:string" />
+</message>
+<message name="make_msgRequest">
+<part name="type" type="xsd:string" />
+<part name="vid" type="xsd:string" />
+<part name="opt" type="xsd:string" />
+<part name="domain" type="xsd:string" />
+<part name="ip" type="xsd:string" />
+</message>
+<message name="make_msgResponse">
+<part name="make_msg" type="xsd:string" />
+</message>
+</definitions>

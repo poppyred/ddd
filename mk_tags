@@ -1,0 +1,5 @@
+#!/bin/sh
+
+find . -name "*.py" > cscope.files
+cscope -bkq -i cscope.files
+ctags -R

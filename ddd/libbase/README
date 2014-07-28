@@ -1,0 +1,40 @@
+编译安装libwns库说明:
+	1.编译在64位的WAC上运行的库
+	export CC=gcc OPTFLAGS=-DSF_ARCH_X86_64 
+	make
+
+	2.编译在32位的AP上运行的库
+	export CC=mips-linux-gcc OPTFLAGS=-DSF_ARCH_MIPS_32
+	make
+
+	3.编译在其他32位的x86机器上测试的库
+	export CC=gcc OPTFLAGS=-DSF_ARCH_I686
+	make
+
+运行libwns测试代码说明:
+	1.测试在64位的WAC上运行的库
+	export CC=gcc OPTFLAGS=-DSF_ARCH_X86_64
+	make tests
+	make -C exmaple && ./exmaple/test_libwns_log
+
+	2.测试在32位的AP上运行的库
+	export CC=mips-linux-gcc OPTFLAGS=-DSF_ARCH_MIPS_32
+	make tests
+	make -C exmaple && ./exmaple/test_libwns_log
+
+	3.测试其他在32位的x86机器上测试的库
+	export CC=gcc OPTFLAGS=-DSF_ARCH_I686
+	make tests
+	make -C exmaple && ./exmaple/test_libwns_log
+
+
+----------------------------------------------------------------------------
+include:
+	所有库的头文件
+xtest:
+	部分库的单元测试代码目录
+log_plugins:
+	libwns_log日志输出插件目录
+example:
+	部分库的使用示例代码目录
+	test_libwns_log => libwns_log库使用实例
