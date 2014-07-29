@@ -11,9 +11,7 @@ from mgr_misc import _lineno
 import traceback
 import urllib
 
-__all__ = ['switch', 'req_handler', 'g_req_loger', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
-        'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
-        'req_handler_domain', 'req_handler_view_mask']
+__all__ = ['switch', 'req_handler', 'g_req_loger']
 
 g_req_loger = None
 

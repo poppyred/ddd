@@ -3,6 +3,7 @@
 
 g_isdebug = 1
 g_enable_stdin=1
+old_settings = None
 g_row_perpack = 5
 g_websvr_ip = '121.201.11.4'
 g_now = 0

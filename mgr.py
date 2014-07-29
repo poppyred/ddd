@@ -71,14 +71,14 @@ def main_loop():
                 g_factory.get_mgr_loger().error(traceback.format_exc())
                 break
 
-    if msg.g_enable_stdin and old_settings:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+    if msg.g_enable_stdin and msg.old_settings:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, msg.old_settings)
 
     stop_all()
 
 def sigint_handler(signum,frame):
     if msg.g_enable_stdin:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, msg.old_settings)
     stop_all()
     sys.exit()
 
@@ -109,7 +109,7 @@ class MyDaemon(Daemon):
 
         try:
             if msg.g_enable_stdin:
-                old_settings = termios.tcgetattr(sys.stdin)
+                msg.old_settings = termios.tcgetattr(sys.stdin)
                 tty.setcbreak(sys.stdin.fileno())
         except Exception as e:
             g_factory.get_mgr_loger().error(_lineno(), 'Exception:%s' % (e,))

@@ -4,7 +4,7 @@
 import queue_thread
 import msg
 import mgr_conf
-import request_handler
+from request_handler import *
 import sys
 import MySQL
 import socket
@@ -27,19 +27,19 @@ class mgr_handler(queue_thread.Qthread):
             raise Exception("[mgr_handler] Database configure error!!!")
 
         self.m_handlers['record'] = {}
-        self.m_handlers['record']['A'] = request_handler.req_handler_record_a(self.loger)
-        self.m_handlers['record']['AAAA'] = request_handler.req_handler_record_aaaa(self.loger)
-        self.m_handlers['record']['CNAME'] = request_handler.req_handler_record_cname(self.loger)
-        self.m_handlers['record']['NS'] = request_handler.req_handler_record_ns(self.loger)
-        self.m_handlers['record']['TXT'] = request_handler.req_handler_record_txt(self.loger)
-        self.m_handlers['record']['MX'] = request_handler.req_handler_record_mx(self.loger)
-        self.m_handlers['record']['domain_ns'] = request_handler.req_handler_record_domain_ns(self.loger)
+        self.m_handlers['record']['A'] = req_handler_record_a(self.loger)
+        self.m_handlers['record']['AAAA'] = req_handler_record_aaaa(self.loger)
+        self.m_handlers['record']['CNAME'] = req_handler_record_cname(self.loger)
+        self.m_handlers['record']['NS'] = req_handler_record_ns(self.loger)
+        self.m_handlers['record']['TXT'] = req_handler_record_txt(self.loger)
+        self.m_handlers['record']['MX'] = req_handler_record_mx(self.loger)
+        self.m_handlers['record']['domain_ns'] = req_handler_record_domain_ns(self.loger)
 
         self.m_handlers['domain'] = {}
-        self.m_handlers['domain']['__any__'] = request_handler.req_handler_domain(self.loger)
+        self.m_handlers['domain']['__any__'] = req_handler_domain(self.loger)
 
         self.m_handlers['view_mask'] = {}
-        self.m_handlers['view_mask']['__any__'] = request_handler.req_handler_view_mask(self.loger)
+        self.m_handlers['view_mask']['__any__'] = req_handler_view_mask(self.loger)
 
         self.loger.info(_lineno(), 'handlers map:', repr(self.m_handlers))
 
@@ -64,25 +64,25 @@ class mgr_handler(queue_thread.Qthread):
             self.dbcon = MySQL.MySQL(host=self.dbip, loger=self.loger)
         try:
             self.loger.debug(_lineno(self), 'recv request class %s' % (data['class']))
-            for case in request_handler.switch(data['class']):
+            for case in switch(data['class']):
                 if case(msg.g_class_init):
                     self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
-                    request_handler.req_handler.handle_proxy_init(self, data['inner_addr'][0])
+                    req_handler.handle_proxy_init(self, data['inner_addr'][0])
                     break
                 if case(msg.g_class_proxy_register):
                     self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
                     break
                 if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
-                    request_handler.req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
+                    req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
                     break
                 if case(msg.g_class_inner_chk_snd):
                     if len(self.proxy_addr.keys()) > 0:
-                        request_handler.req_handler.handle_inner_chk_snd(self)
+                        req_handler.handle_inner_chk_snd(self)
                     else:
                         self.loger.warn(_lineno(self), 'proxy ip is empty')
                     break
                 if case(msg.g_class_inner_chk_task_domain_reply) or case(msg.g_class_inner_chk_task_record_reply):
-                    request_handler.req_handler.handle_inner_chk_task_reply(self, data)
+                    req_handler.handle_inner_chk_task_reply(self, data)
                     break
                 if case():
                     self.loger.warn(_lineno(self), 'recv something else: ', data['class'])
