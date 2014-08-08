@@ -639,8 +639,7 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id,unsigned short
     h_rbtree_st * tree = tree_select(type);
     if (!tree)
     {
-        return -1;
-
+        return -1;
     }
 
 	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
@@ -762,7 +761,7 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 * @author hyb      @date 2013/07/22
 **/
 int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id,
-        unsigned short type)
+        unsigned short type,int pid)
 {
 	st_extche_view_node*node = NULL;
 	
@@ -807,6 +806,8 @@ int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id,
 
    
    // hyb_debug("[set extche sucess!] - [%s]-[view_id:%d]-[type:%d]\n",domain,view_id,type);
+
+    dns_lcllog_reqcnt_log(node->domain,node->domainlen,view_id,pid);
     
 	return (node->payload_size+12+use_domainlen);
     

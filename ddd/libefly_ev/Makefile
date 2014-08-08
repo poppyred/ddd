@@ -41,6 +41,10 @@ $(TARGET): $(ALL_OBJ)
 	$(CC)  $(ALL_OBJ)  -o $@ $(C_LIB)
 	$(AR)  $(STATIC)  $(ALL_OBJ) 
 
+	rm -rf ../lib/$(TARGET)
+	rm -rf ../lib/$(STATIC)
+	rm -rf /lib64/$(TARGET)
+	rm -rf /lib64/$(STATIC)
 	cp $(TARGET) ../lib/
 	cp $(STATIC) ../lib/
 	cp $(STATIC) /lib64/

@@ -41,5 +41,9 @@ void dns_lcllog_allreq_viewcount(int view_id);
 
 void dns_lcllog_illreq_viewcount(int view_id);
 
+void dns_lcllog_reqcnt_log(char *domain,int dlen,int view_id,int pid);
+
+void dns_lcllog_reqcnt();
+
 
 #endif

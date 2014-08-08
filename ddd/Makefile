@@ -1,4 +1,4 @@
-TARGET    = proxy
+TARGET    = eflydns
 INC_DIR   = ./libbase/include ./include ./libefly_ev ./FastIO/framework/inc ./FastIO/sys/ /opt/librdkafka/ 
 SRC_DIR   =  . 
 CFLAGS    =  -Wall -g #-O2 -fno-strict-aliasing #-Werror#-DSF_ARCH_X86_64 -std=gnu99 -fno-strict-aliasing -O2

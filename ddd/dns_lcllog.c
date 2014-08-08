@@ -14,6 +14,9 @@
 #define ANSWER_LCLLOG_FORMAT    "%ld\t%d\t%s\t%s\n"
 #define ERRDST_LCLLOG_FORMAT    "%ld\t%s\t%d\t%s\n"
 
+#define REQCNT_LCLLOG_FORMAT    "%ld\t%s\t%d\t%d\n"
+
+
 int g_cache_conut = 0;
 int g_record_conut = 0;
 int g_answer_conut = 0;
@@ -26,7 +29,6 @@ int g_dnsreq_conut = 0;
 int g_stop = 0;
 
 #define PTHREAD_NUMBER 24
-
 
 typedef struct st_lcldst_path
 {
@@ -50,10 +52,31 @@ typedef struct st_lclview
 }st_lclview;
 
 
+typedef struct st_logserver
+{
+    h_hash_st *count_table;
+    //int count; 
+    
+}st_logserver;
+
+
+typedef struct st_reqcnt_node
+{
+    int cnt[MAX_VIEM_NUM];
+    
+}st_reqcnt_node;
+
+
+
+st_logserver g_reqcnt_loger[PTHREAD_NUMBER];
+
+
 st_lcldst_path *g_general_path = NULL;
 st_lcldst_path *g_answer_path = NULL;
 st_lcldst_path *g_errdst_path = NULL;
 st_lcldst_path *g_view_path = NULL;
+st_lcldst_path *g_reqcnt_path = NULL;
+
 
 st_lclview *g_view_data = NULL;
 
@@ -196,7 +219,20 @@ static void make_path()
     sprintf_n(g_view_path[0].path,256,"./log/view/%04d-%02d-%02d",
             g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
 
+
+    mkdir("./log/reqcnt/",0777);
+    sprintf_n(g_reqcnt_path[0].path,256,"./log/reqcnt/%04d-%02d-%02d",
+            g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
+
     g_stop = 0;
+}
+
+static void reqcnt_loger_table_desteoy(void *data)
+{
+    st_reqcnt_node*node = NULL;
+    node = (st_reqcnt_node *)data;
+
+    h_free(node);
 }
 
 
@@ -227,12 +263,30 @@ int dns_lcllog_init(int pnum)
         return -1;
     }
 
+
+    g_reqcnt_path = (st_lcldst_path *)h_malloc(sizeof(st_lcldst_path));
+    if (!g_reqcnt_path)
+    {
+        return -1;
+    }
+    
+
     g_view_data = (st_lclview *)h_malloc(100 *sizeof(st_lclview));
     if (!g_view_data)
     {
         return -1;
     }
 
+    int i =0;
+    for ( i = 0; i< pnum ; i++)
+    {
+        g_reqcnt_loger[i].count_table = h_hash_create(reqcnt_loger_table_desteoy,NULL,0);
+        if(!g_reqcnt_loger[i].count_table)
+        {
+            return -1;
+        }
+    }
+    
     g_pnum = pnum;
 
     make_path();
@@ -473,7 +527,87 @@ void dns_lcllog_view()
 
     fclose(fp);
 
+}
+
+
+
+/******************************************************************************/
+
+
+
+void dns_lcllog_reqcnt_log(char *domain,int dlen,int view_id,int pid)
+{
+
+    h_hash_st *tar = g_reqcnt_loger[pid].count_table;
+    st_reqcnt_node *node = NULL;
+
+    hyb_debug("dns_lcllog_reqcnt_log domain[%d]:%s\n",view_id,domain);
+
+    if (h_hash_search(tar,domain,dlen,(void **)&node) == 0)
+    {
+        node->cnt[view_id] ++;
+    }
+    else
+    {
+        node = (st_reqcnt_node*)h_malloc(sizeof(st_reqcnt_node));
+
+        node->cnt[view_id] ++;
+        h_hash_insert(tar,domain,dlen,node);
+    }
+
 
 }
+
+
+static int reqcnt_log_hash_walk(const void *key, int klen, void *val, void *data)
+{
+
+    char name[128] = {0};
+    char msg[256] = {0};
+    FILE *fp = (FILE *)data;
+    char *domain = (char *)key;
+    st_reqcnt_node *node = (st_reqcnt_node *)val;
+
+    memcpy(name,domain,klen);
+
+    int i = 0;
+    for (i = 0; i < MAX_VIEM_NUM; i ++)
+    {
+        if (node->cnt[i])
+        {
+            sprintf_n(msg,256,REQCNT_LCLLOG_FORMAT,global_now, name , i, node->cnt[i]);
+            fwrite(msg,strlen(msg),1,fp);
+
+            node->cnt[i] = 0;
+        }
+
+    }
+     
+    return 0;
+
+    
+}
+
+
+
+void dns_lcllog_reqcnt()
+{
+    int i = 0;
+
+    FILE *fp = fopen(g_reqcnt_path[0].path,"a+");
+    if (!fp)
+    {
+        return ;
+    }
+
+    for(i = 0; i < g_pnum; i++)
+    {
+        h_hash_walk(g_reqcnt_loger[i].count_table, fp, reqcnt_log_hash_walk);
+    }
+
+    fclose(fp);
+    
+}
+
 
 

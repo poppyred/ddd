@@ -405,12 +405,13 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
         hyb_debug("Cache Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
         dns_rsyslog("Cache Answer [view:%d]=>[%s] to user[%s:%d]",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
 
+        dns_lcllog_reqcnt_log(domain,len,view_id,NIC_EXTRA_CONTEXT(src)->me);
 		return 0;
 
 	}
 
     
-    size = dns_ext_cache_get(txdata->pdata,domain,len,view_id,type);
+    size = dns_ext_cache_get(txdata->pdata,domain,len,view_id,type,NIC_EXTRA_CONTEXT(src)->me);
 	if (likely(size > 0))
 	{
 		memcpy(txdata->pdata, &qid , 2);
@@ -1054,39 +1055,10 @@ static void timer_callback4(void *user_data)
 
 static void timer_callback5(void *user_data)
 {
-    #if 0
-    /*a*/
-    send_pkt_debug("www.he.com",0x0001);
-    send_pkt_debug("zzz.he.com",0x0001);
+
     
-    /*ns*/
-    send_pkt_debug("he.com",0x0002);
+    dns_lcllog_reqcnt();
     
-    /*cname*/
-    send_pkt_debug("www.he.com",0x0005);
-
-    /*mx*/
-    send_pkt_debug("mail.he.com",0x000F);
-
-    /*txt*/
-    send_pkt_debug("www.he.com",0x0010);
-
-    /*aaaa*/
-    send_pkt_debug("www.he.com",0x001c);
-    send_pkt_debug("zzz.he.com",0x001c);
-
-    /*any*/
-    send_pkt_debug("www.he.com",0x00FF);
-    send_pkt_debug("zzz.he.com",0x00FF);
-    send_pkt_debug("mail.he.com",0x00FF);
-    send_pkt_debug("he.com",0x00FF); 
-    #endif
-}
-
-
-/*
-static void timer_callback6(void *user_data)
-{
 	if (g_mday == 0)
 	{
 		g_mday = g_tm->tm_mday;
@@ -1099,21 +1071,14 @@ static void timer_callback6(void *user_data)
 		}
 		else
 		{
-			dns_mask_syn();
-			dns_view_syn();
-			dns_domain_syn();
-			dns_extend_syn();
-
 			dns_lcllog_remake_path();
-			hyb_debug("Not The Same day,updating\n");
+			hyb_debug("Not The Same day, dns_lcllog_remake_path\n");
 			g_mday = g_tm->tm_mday;
 
 		}
 	}
-	hyb_debug("Today is %d\n",g_mday);
-
 }
-*/
+
 
 /****************************************************************************/
 
@@ -1146,8 +1111,8 @@ static int dns_timer_init()
 		goto FAILED;
 	}
 
-    /*测试用*/
-	if (!efly_timer_set(3000, 1000000, timer_callback5, NULL))
+    /*一分钟回调一次用*/
+	if (!efly_timer_set(10000, 60000, timer_callback5, NULL))
 	{
 		goto FAILED;
 	}
@@ -1294,11 +1259,6 @@ static void dns_handle_view_option(void *buf, int32_t b_len, char *src,char *ans
     
 
 }
-
-
-
-
-
 
 
 static int dns_event_init()
@@ -1717,11 +1677,6 @@ static int dns_socket_init(char *dstip, int port)
 
 
 }
-
-
-
-
-
 
 
 /**

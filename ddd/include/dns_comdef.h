@@ -9,6 +9,11 @@
 #define VIEW_OPTION_ADD    (1)
 #define VIEW_OPTION_DEL    (2)
 
+#ifndef MAX_VIEM_NUM
+#define MAX_VIEM_NUM    (100)
+#endif
+
+
 #define hyb_debug(fmt, args ...) \
     do {fprintf(stderr,"[%s][%d]:"fmt, __FILE__, __LINE__,##args);}while(0)
 

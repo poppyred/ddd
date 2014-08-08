@@ -88,7 +88,7 @@ int dns_ext_cache_del(char *domain,int domain_len,unsigned short type);
 * @see     
 * @author hyb      @date 2013/07/22
 **/
-int dns_ext_cache_get(char *pkt,char *domain,int domain_len,ushort view_id,unsigned short type);
+int dns_ext_cache_get(char *pkt,char *domain,int domain_len,ushort view_id,unsigned short type, int pid);
 
 
 /**
