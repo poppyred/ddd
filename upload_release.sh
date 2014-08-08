@@ -10,10 +10,10 @@ then
     echo "[ERROR] usage : ./send_dir ip source_dir dst_dir"
     exit 1
 fi
-ip='121.201.11.4'
+ip='121.201.12.67'
 #ip=$1
 port="22"
-passwd='dnspro@zshj#321'
+passwd='rjkj@dnspro#0801'
 local_dir='release/dnspro'
 remote_dir='/usr/local'
 
