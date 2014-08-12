@@ -577,6 +577,7 @@ class req_handler_record_domain_ns(req_hdl_abstract):
         self.loger.info(_lineno(), 'adding domain_ns:', data['main'], '-->', data['domain_ns'], ' into database')
         add_ret = worker.dbcon.query(msg.g_sql_add_a_domain_ns % (data['main'], int(data['ttl']), data['domain_ns'],
             data['rid'], data['main'], int(data['ttl']), data['domain_ns']))
+        self.loger.debug(_lineno(), 'add return ', add_ret)
         return add_ret, False, None
 
     def set(self, worker, data, ali_tbl):
