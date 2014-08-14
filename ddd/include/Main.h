@@ -39,7 +39,7 @@ struct temp_buf
 };
 
 /* Read_config.c*/
-int read_config(const char *fname);
+int dns_read_config(const char *fname);
 int action_for_day();
 
 

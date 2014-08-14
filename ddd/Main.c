@@ -54,9 +54,8 @@ struct tm *g_tm = NULL;
 
 
 
-char *dns_ip; //主DNS地址
-char *bind_ip; //绑定公网地址
-char *response_ip;
+char *g_mgr_ip; //主DNS地址
+char *g_core_ip; //绑定公网地址
 
 efly_ipc_svr *g_ipc_svr = NULL;
 
@@ -313,7 +312,7 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         /*查找用户对应视图*/
         int view_id = dns_mask_get_view(&client.sin_addr); 
         
-        view_id = 2;//***********test!!!!**************//
+        //view_id = 2;//***********test!!!!**************//
 
 	    /*local count*/
 	    dns_lcllog_allreq_count();
@@ -912,7 +911,7 @@ static void send_pkt_debug(char *domain,int type)
     
     int buflen = dns_pack_query(buf,domain,strlen(domain),2,type);
 
-    if(inet_aton(CORE_IP_ADDR,&addr.sin_addr) < 0) {
+    if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
         fprintf(stderr,"IP error:%sn",strerror(errno));
         exit(1);
     }
@@ -952,7 +951,7 @@ void request_to_core(char *domain,int view, int type)
     
     int buflen = dns_pack_query(buf,domain,strlen(domain),view,type);
 
-    if(inet_aton(CORE_IP_ADDR,&addr.sin_addr) < 0) {
+    if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
         fprintf(stderr,"IP error:%sn",strerror(errno));
         exit(1);
     }
@@ -1789,6 +1788,13 @@ int main(int argc, char **argv)
     hyb_debug("p1p1 mac address: [%s]\n", mac);
 	hyb_debug(" --- EflyDns Proxy Start! --- \n");
 
+
+    if (unlikely(dns_read_config("EflyDns.conf")))
+    {
+        hyb_debug("[Read_config] failed!\n");
+		goto VERIFY_ERROR;
+    }
+
     /*证书认证*/
     if (unlikely(dns_verify(mac,strlen(mac))))
     {
@@ -1799,7 +1805,7 @@ int main(int argc, char **argv)
     dns_syslog_init();
 
     /*初始化mgr socket*/
-	if (unlikely(dns_socket_init("10.10.10.4",54321)))
+	if (unlikely(dns_socket_init(g_mgr_ip,54321)))
 	{
 		hyb_debug("[Fio init] failed!\n");
 		goto SOCK_ERROR;

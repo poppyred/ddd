@@ -541,7 +541,7 @@ void dns_lcllog_reqcnt_log(char *domain,int dlen,int view_id,int pid)
     h_hash_st *tar = g_reqcnt_loger[pid].count_table;
     st_reqcnt_node *node = NULL;
 
-    hyb_debug("dns_lcllog_reqcnt_log domain[%d]:%s\n",view_id,domain);
+    //hyb_debug("dns_lcllog_reqcnt_log domain[%d]:%s\n",view_id,domain);
 
     if (h_hash_search(tar,domain,dlen,(void **)&node) == 0)
     {
