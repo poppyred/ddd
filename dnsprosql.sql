@@ -32,11 +32,11 @@ CREATE TABLE `a_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_a_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
 /*Data for the table `a_record` */
 
-insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (3,2,'www.hyb.com',600,'1.2.3.4','',0,1,578),(4,2,'aaa.hyb.com',600,'3.4.5.6','',0,1,579),(8,2,'sss.hyb.com',600,'6.7.8.9','',0,1,585),(6,2,'*.hyb.com',600,'7.7.7.7','',0,1,581),(10,6,'www.eflydns.com',600,'10.10.12.56','',0,1,595),(9,5,'www.hhyb.com',600,'1.2.3.4','',0,1,590),(15,10,'www.lkx.org',600,'202.96.128.166','',0,1,608);
+insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (3,2,'www.hyb.com',600,'1.2.3.4','',0,1,578),(4,2,'aaa.hyb.com',600,'3.4.5.6','',0,1,579),(8,2,'sss.hyb.com',600,'6.7.8.9','',0,1,585),(6,2,'*.hyb.com',600,'7.7.7.7','',0,1,581),(10,12,'www.eflydns.com',600,'10.10.12.56','',0,1,595),(9,13,'www.hhyb.com',600,'1.2.3.4','',0,1,590),(17,14,'www.lkx.org',600,'202.96.128.166','',0,1,614);
 
 /*Table structure for table `aaaa_record` */
 
@@ -91,11 +91,11 @@ CREATE TABLE `domain_ns` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_dom_ns` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 
 /*Data for the table `domain_ns` */
 
-insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (8,'hyb.com',600,'ns2.eflydns.net','null',577),(7,'fdsa.cn',600,'ns2.eflydns.net','null',575),(6,'hyb.com',600,'ns1.eflydns.net','null',576),(5,'fdsa.cn',600,'ns1.eflydns.net','null',574),(18,'eflydns.com',600,'ns1.eflydns.net','null',593),(17,'eflydns.com',600,'ns2.eflydns.net','null',594),(11,'mysq.cn',600,'ns2.eflydns.net','null',587),(12,'mysq.cn',600,'ns1.eflydns.net','null',586),(13,'hhyb.com',600,'ns2.eflydns.net','null',589),(14,'hhyb.com',600,'ns1.eflydns.net','null',588),(26,'lkx.org',600,'ns2.eflydns.net','null',607),(25,'lkx.org',600,'ns1.eflydns.net','null',606);
+insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (8,'hyb.com',600,'ns2.eflydns.net','null',577),(7,'fdsa.cn',600,'ns2.eflydns.net','null',575),(6,'hyb.com',600,'ns1.eflydns.net','null',576),(5,'fdsa.cn',600,'ns1.eflydns.net','null',574),(11,'mysq.cn',600,'ns2.eflydns.net','null',587),(12,'mysq.cn',600,'ns1.eflydns.net','null',586),(30,'lkx.org',600,'ns1.eflydns.net','null',612),(29,'lkx.org',600,'ns2.eflydns.net','null',613);
 
 /*Table structure for table `domain_zone` */
 
@@ -166,11 +166,11 @@ CREATE TABLE `snd_record` (
   `chktime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `opt` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8688 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=8721 DEFAULT CHARSET=utf8;
 
 /*Data for the table `snd_record` */
 
-insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (8669,'dns',1,1,'www.hyb.com',1,'2014-08-12 15:01:19',1),(8670,'dns',1,1,'aaa.hyb.com',1,'2014-08-12 15:01:19',1),(8671,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:01:19',1),(8672,'dns',1,1,'*.hyb.com',1,'2014-08-12 15:01:19',1),(8678,'dns',1,1,'www.eflydns.com',1,'2014-08-18 10:36:54',1),(8674,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:34:46',2),(8675,'dns',1,1,'sss.hyb.com',1,'2014-08-12 15:35:04',1),(8676,'dns',1,1,'www.hhyb.com',1,'2014-08-18 09:13:06',1),(8677,'dns',1,1,'www.eflydns.com',1,'2014-08-18 10:35:53',2),(8685,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:49:35',1),(8687,'dns',1,1,'www.lkx.org',1,'2014-08-18 11:00:22',1),(8686,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:54:39',2);
+insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (8669,'dns',1,1,'www.hyb.com',1,'2014-08-12 15:01:19',1),(8670,'dns',1,1,'aaa.hyb.com',1,'2014-08-12 15:01:19',1),(8671,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:01:19',1),(8672,'dns',1,1,'*.hyb.com',1,'2014-08-12 15:01:19',1),(8710,'dns',1,1,'www.eflydns.com',2,'2014-08-18 16:02:32',1),(8674,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:34:46',2),(8675,'dns',1,1,'sss.hyb.com',1,'2014-08-12 15:35:04',1),(8711,'dns',1,1,'www.hhyb.com',2,'2014-08-18 16:04:28',1),(8708,'dns',1,1,'www.eflydns.com',3,'2014-08-18 15:59:33',2),(8685,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:49:35',1),(8715,'dns',1,1,'www.lkx.org',1,'2014-08-18 16:07:02',1),(8686,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:54:39',2),(8720,'dns',1,1,'www.lkx.org',3,'2014-08-18 16:14:53',2),(8703,'dns',1,1,'www.hhyb.com',1,'2014-08-18 15:21:23',2);
 
 /*Table structure for table `txt_record` */
 
@@ -239,11 +239,11 @@ CREATE TABLE `zone` (
   `description` varchar(256) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain` (`domain`,`view`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 /*Data for the table `zone` */
 
-insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (2,1,'hyb.com',1,'2014-08-12 15:35:04',''),(3,1,'hyb.com',2,'2014-08-12 15:34:46',''),(6,1,'eflydns.com',1,'2014-08-18 10:36:54',''),(5,1,'hhyb.com',1,'2014-08-18 09:13:06',''),(10,1,'lkx.org',1,'2014-08-18 11:00:21','');
+insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (2,1,'hyb.com',1,'2014-08-12 15:35:04',''),(3,1,'hyb.com',2,'2014-08-12 15:34:46',''),(14,1,'lkx.org',1,'2014-08-18 16:16:03',''),(13,1,'hhyb.com',1,'2014-08-18 16:04:28',''),(12,1,'eflydns.com',1,'2014-08-18 16:02:32','');
 
 /* Trigger structure for table `a_record` */
 
@@ -1365,7 +1365,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_a INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('a_record'), aview, aname, 0, 2);
+				if n_rop != 0 then
+					CALL add_snd_req('dns', tbl_to_dnstype('a_record'), aview, aname, 0, 2);
+				end if;
 				SELECT aname, aview, 'a_record';
 				SET aview=-1;
 			END IF;
@@ -1380,7 +1382,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_aaaa INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('aaaa_record'), aview, aname, 0, 2);
+				IF n_rop != 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype('aaaa_record'), aview, aname, 0, 2);
+				end if;
 				SELECT aname, aview, 'aaaa_record';
 				SET aview=-1;
 			END IF;
@@ -1395,7 +1399,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_cname INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('cname_record'), aview, aname, 0, 2);
+				IF n_rop != 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype('cname_record'), aview, aname, 0, 2);
+				end if;				
 				SELECT aname, aview, 'cname_record';
 				SET aview=-1;
 			END IF;
@@ -1410,7 +1416,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_mx INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('mx_record'), aview, aname, 0, 2);
+				IF n_rop != 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype('mx_record'), aview, aname, 0, 2);
+				end if;
 				SELECT aname, aview, 'mx_record';
 				SET aview=-1;
 			END IF;
@@ -1425,7 +1433,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_ns INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('ns_record'), aview, aname, 0, 2);
+				IF n_rop != 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype('ns_record'), aview, aname, 0, 2);
+				end if;
 				SELECT aname, aview, 'ns_record';
 				SET aview=-1;
 			END IF;
@@ -1440,7 +1450,9 @@ BEGIN
 		IF NOT done THEN
 			FETCH cursor_txt INTO aname, aview;
 			IF aview!=-1 THEN
-				CALL add_snd_req('dns', tbl_to_dnstype('txt_record'), aview, aname, 0, 2);
+				IF n_rop != 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype('txt_record'), aview, aname, 0, 2);
+				end if;
 				SELECT aname, aview, 'txt_record';
 				SET aview=-1;
 			END IF;
@@ -1470,9 +1482,6 @@ BEGIN
 		END IF;
 	UNTIL done END REPEAT;
 	CLOSE cursor_zone;
-	
-	DELETE FROM zone WHERE domain=str_domain;
-	DELETE FROM domain_ns WHERE domain=str_domain;
 	
     END */$$
 DELIMITER ;
