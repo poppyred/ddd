@@ -320,7 +320,7 @@ class req_handler_impl(req_hdl_abstract):
         #{"name":"go","A":"1.2.3.4","ttl":"10","viewid":"0"}
         n_enable = 1
         if data.has_key('enable'):
-            n_enable = data['enable']
+            n_enable = int(data['enable'])
         add_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record,
                 (http_tbl_realname[ali_tbl], data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'],
                     data[ali_tbl], 0, n_enable, data['rid']))
@@ -344,7 +344,7 @@ class req_handler_impl(req_hdl_abstract):
         #self.loger.info(_lineno(), 'updating name:', data['name'], ' table:', http_tbl_realname[ali_tbl], ' into database')
         n_enable = 1
         if data.has_key('enable'):
-            n_enable = data['enable']
+            n_enable = int(data['enable'])
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record,
                 (http_tbl_realname[ali_tbl], data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'],
                     data[ali_tbl], 0, n_enable, data['rid']))
@@ -519,7 +519,7 @@ class req_handler_record_mx(req_handler_impl):
         self.loger.info(_lineno(), 'adding name:', data['name'], ' table:mx_record into database')
         n_enable = 1
         if data.has_key('enable'):
-            n_enable = data['enable']
+            n_enable = int(data['enable'])
         add_ret = worker.dbcon.call_proc(msg.g_proc_add_mx_record,
                 (data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data['level'], data[ali_tbl],
                     0, n_enable, data['rid']))
@@ -542,7 +542,7 @@ class req_handler_record_mx(req_handler_impl):
         self.loger.info(_lineno(), 'updating name:', data['name'], ' table:mx_record into database')
         n_enable = 1
         if data.has_key('enable'):
-            n_enable = data['enable']
+            n_enable = int(data['enable'])
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_mx_record,
                 (data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data['level'], data[ali_tbl],
                     0, n_enable, data['rid']))
@@ -595,9 +595,26 @@ class req_handler_domain(req_handler_impl):
         return req_hdl_abstract.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        return req_hdl_abstract.set(self, worker, data, ali_tbl)
+        #{"name":"test.com", "enable":1/0}
+        n_enable = 1 if int(data['enable'])==0 else 0
+        self.loger.info(_lineno(), 'update domain:', data['name'], '[', data['enable'], '] from database')
+        worker.dbcon.call_proc(msg.g_proc_set_a_domain, (data['name'], n_enable))
+        result = []
+        ars = worker.dbcon.show()
+        while ars and len(ars) > 0:
+            for i in range(len(ars)):
+                result.append(ars[i])
+            worker.dbcon.nextset()
+            ars = worker.dbcon.show()
+        worker.dbcon.fetch_proc_reset()
+        self.loger.info(_lineno(), 'select old:', result)
+        return True, True, result
 
     def delete(self, worker, data, ali_tbl):
+        if False:
+            data['enable'] = 0
+            return self.set(worker, data, ali_tbl)
+
         #{"name":"test.com"}
         self.loger.info(_lineno(), 'deleting domain:', data['name'], ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))

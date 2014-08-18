@@ -32,11 +32,11 @@ CREATE TABLE `a_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_a_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 /*Data for the table `a_record` */
 
-insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (6,7,'www.hyb.com',10,'2.3.4.5','',0,1,330),(7,7,'www.hyb.com',10,'4.5.6.7','',0,1,331),(16,8,'mail.chenjh.com',10,'10.10.10.3','',0,1,350),(79,35,'www.eflydns.com',600,'121.201.11.7','',0,1,520),(14,8,'www.chenjh.com',10,'10.10.10.1','',0,1,348),(37,29,'www.jihaoo.com',10,'1.1.1.1','',0,1,434),(18,7,'*.hyb.com',10,'2.2.2.2','',0,1,368),(38,29,'mail.jihaoo.com',30,'1.1.1.2','',0,1,435),(39,29,'jihaoo.com',30,'1.1.1.3','',0,1,436),(40,29,'*.jihaoo.com',1800,'1.1.1.4','',0,1,437),(42,30,'aa.jihaoo.com',3600,'4.4.4.4','',0,1,463),(85,34,'txt.he.com',600,'2.2.2.2','',0,1,523),(89,39,'a.he.com',600,'11.1.1.1','',0,1,532);
+insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (3,2,'www.hyb.com',600,'1.2.3.4','',0,1,578),(4,2,'aaa.hyb.com',600,'3.4.5.6','',0,1,579),(8,2,'sss.hyb.com',600,'6.7.8.9','',0,1,585),(6,2,'*.hyb.com',600,'7.7.7.7','',0,1,581),(10,6,'www.eflydns.com',600,'10.10.12.56','',0,1,595),(9,5,'www.hhyb.com',600,'1.2.3.4','',0,1,590),(15,10,'www.lkx.org',600,'202.96.128.166','',0,1,608);
 
 /*Table structure for table `aaaa_record` */
 
@@ -54,11 +54,9 @@ CREATE TABLE `aaaa_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_aaaa_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `aaaa_record` */
-
-insert  into `aaaa_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (1,8,'www.chenjh.com',10,'ff03:0:0:0:0:0:0:c1','',0,1,364),(2,8,'mail.chenjh.com',10,'ff03:0:0:0:0:0:0:c2','',0,1,365);
 
 /*Table structure for table `cname_record` */
 
@@ -76,7 +74,7 @@ CREATE TABLE `cname_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_cname_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `cname_record` */
 
@@ -93,11 +91,11 @@ CREATE TABLE `domain_ns` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_dom_ns` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 
 /*Data for the table `domain_ns` */
 
-insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (49,'he.com',600,'ns2.dnspro.net.','null',471),(7,'hyb.com',600,'ns2.dnspro.net.','null',329),(8,'hyb.com',600,'ns1.dnspro.net.','null',328),(9,'None',600,'ns1.dnspro.net.','null',332),(10,'None',600,'ns2.dnspro.net.','null',333),(11,'chenjh.com',600,'ns1.dnspro.net.','null',334),(12,'chenjh.com',600,'ns2.dnspro.net.','null',335),(55,'eflydns.com',600,'ns1.eflydns.net','null',497),(44,'eflypro.net',10,'ns2.dnspro.net.','null',441),(50,'he.com',600,'ns1.dnspro.net.','null',470),(43,'eflypro.net',10,'ns1.dnspro.net.','null',440),(42,'jihaoo.com',600,'ns2.dnspro.net.','null',433),(41,'jihaoo.com',600,'ns1.dnspro.net.','null',432),(63,'huangyb.com',600,'ns2.eflydns.net','null',549),(62,'dfasdf.cn',600,'ns1.eflydns.net','null',540),(61,'dfasdf.cn',600,'ns2.eflydns.net','null',541),(56,'eflydns.com',600,'ns2.eflydns.net','null',498),(64,'huangyb.com',600,'ns1.eflydns.net','null',548),(65,'hyyb.com',600,'ns2.eflydns.net','null',551),(66,'hyyb.com',600,'ns1.eflydns.net','null',550);
+insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (8,'hyb.com',600,'ns2.eflydns.net','null',577),(7,'fdsa.cn',600,'ns2.eflydns.net','null',575),(6,'hyb.com',600,'ns1.eflydns.net','null',576),(5,'fdsa.cn',600,'ns1.eflydns.net','null',574),(18,'eflydns.com',600,'ns1.eflydns.net','null',593),(17,'eflydns.com',600,'ns2.eflydns.net','null',594),(11,'mysq.cn',600,'ns2.eflydns.net','null',587),(12,'mysq.cn',600,'ns1.eflydns.net','null',586),(13,'hhyb.com',600,'ns2.eflydns.net','null',589),(14,'hhyb.com',600,'ns1.eflydns.net','null',588),(26,'lkx.org',600,'ns2.eflydns.net','null',607),(25,'lkx.org',600,'ns1.eflydns.net','null',606);
 
 /*Table structure for table `domain_zone` */
 
@@ -111,7 +109,7 @@ CREATE TABLE `domain_zone` (
 
 /*Data for the table `domain_zone` */
 
-insert  into `domain_zone`(`domain`,`zone`) values ('@.he.com','he.com'),('www.he.com','he.com'),('*.he.com','he.com'),('@.test.com','test.com'),('@.cjh.com','cjh.com'),('www.cjh.com','cjh.com'),('sss.cjh.com','cjh.com'),('www.aa.com','aa.com'),('www.hyb.com','hyb.com'),('www.chenjh.com','chenjh.com'),('mail.chenjh.com','chenjh.com'),('@.chenjh.com','chenjh.com'),('*.chenjh.com','chenjh.com'),('*.hyb.com','hyb.com'),('abc.he.com','he.com'),('chenjh.com','chenjh.com'),('he.com','he.com'),('cn.chenjh.com','chenjh.com'),('www.hf.com','hf.com'),('www.abc.com','abc.com'),('txt.abc.com','abc.com'),('mx.abc.com','abc.com'),('aaaa.abc.com','abc.com'),('ns.abc.com','abc.com'),('a.abc.com','abc.com'),('222.aa.com','aa.com'),('www.jihaoo.com','jihaoo.com'),('mail.jihaoo.com','jihaoo.com'),('jihaoo.com','jihaoo.com'),('*.jihaoo.com','jihaoo.com'),('aa.jihaoo.com','jihaoo.com'),('txt.he.com','he.com'),('a.he.com','he.com'),('www.eflydns.com','eflydns.com'),(',str_name,','eflydns.com'),('a.aaa.com','aaa.com'),('b.aaa.com','aaa.com'),('c.aaa.com','aaa.com'),('ttt.he.com','he.com'),('txt.aaa.com','aaa.com');
+insert  into `domain_zone`(`domain`,`zone`) values ('www.hyb.com','hyb.com'),('aaa.hyb.com','hyb.com'),('ttt.hyb.com','hyb.com'),('*.hyb.com','hyb.com'),('www.eflydns.com','eflydns.com'),('sss.hyb.com','hyb.com'),('www.hhyb.com','hhyb.com'),('www.lkx.cn','lkx.cn'),('www.lkx.org','lkx.org');
 
 /*Table structure for table `mx_record` */
 
@@ -130,7 +128,7 @@ CREATE TABLE `mx_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_mx_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `mx_record` */
 
@@ -150,11 +148,9 @@ CREATE TABLE `ns_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_ns_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `ns_record` */
-
-insert  into `ns_record`(`id`,`zone`,`name`,`ttl`,`server`,`description`,`state`,`enable`,`rid`) values (3,3,'@.test.com',600,'ns2.dnspro.net.','',0,1,308),(4,3,'@.test.com',600,'ns1.dnspro.net.','',0,1,307);
 
 /*Table structure for table `snd_record` */
 
@@ -170,11 +166,11 @@ CREATE TABLE `snd_record` (
   `chktime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `opt` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9834 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=8688 DEFAULT CHARSET=utf8;
 
 /*Data for the table `snd_record` */
 
-insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (9395,'view',0,6,'10.229.0.0/16',1,'2014-07-18 23:57:16',1),(9396,'view',0,6,'112.90.49.16/30',1,'2014-07-18 23:57:16',1),(9397,'view',0,6,'112.90.49.24/29',1,'2014-07-18 23:57:16',1),(9398,'view',0,5,'192.168.22.0/24',1,'2014-07-18 23:57:16',1),(9399,'view',0,3,'192.176.129.0/24',1,'2014-07-18 23:57:16',1),(9400,'view',0,5,'192.168.85.0/24',1,'2014-07-18 23:57:16',1),(9401,'view',0,5,'10.11.255.0/24',1,'2014-07-18 23:57:16',1),(9402,'view',0,7,'119.145.147.16/28',1,'2014-07-18 23:57:16',1),(9403,'view',0,2,'104.119.200.0/24',1,'2014-07-18 23:57:16',1),(9614,'dns',1,2,'www.he.com',2,'2014-07-22 15:06:42',1),(9405,'dns',1,2,'*.he.com',1,'2014-07-18 23:57:21',1),(9407,'dns',1,2,'www.hyb.com',1,'2014-07-18 23:57:21',1),(9408,'dns',1,2,'mail.chenjh.com',1,'2014-07-18 23:57:21',1),(9409,'dns',1,2,'www.chenjh.com',1,'2014-07-18 23:57:21',1),(9410,'dns',1,2,'*.hyb.com',1,'2014-07-18 23:57:21',1),(9411,'dns',28,2,'www.chenjh.com',1,'2014-07-18 23:57:21',1),(9412,'dns',28,2,'mail.chenjh.com',1,'2014-07-18 23:57:21',1),(9413,'dns',5,0,'www.he.com',1,'2014-07-18 23:57:21',1),(9414,'dns',5,0,'test.he.com',2,'2014-07-18 23:57:21',1),(9416,'dns',2,0,'@.he.com',1,'2014-07-18 23:57:21',1),(9418,'dns',2,0,'@.test.com',2,'2014-07-18 23:57:21',1),(9419,'dns',16,2,'he.com',1,'2014-07-18 23:57:21',1),(9420,'dns',16,0,'cn.chenjh.com',1,'2014-07-18 23:57:21',1),(9435,'dns',1,0,'www.abc.com',2,'2014-07-19 12:29:15',1),(9455,'dns',2,0,'ns.abc.com',2,'2014-07-19 13:07:32',1),(9423,'dns',28,0,'aaaa.abc.com',2,'2014-07-18 23:59:45',1),(9424,'dns',15,3,'mx.abc.com',2,'2014-07-19 00:00:01',1),(9425,'dns',16,1,'txt.abc.com',2,'2014-07-19 00:00:19',1),(9427,'dns',28,0,'aaaa.abc.com',3,'2014-07-19 00:01:44',2),(9428,'dns',15,3,'mx.abc.com',3,'2014-07-19 00:01:29',2),(9430,'dns',16,1,'txt.abc.com',3,'2014-07-19 00:01:29',2),(9442,'dns',1,0,'www.abc.com',3,'2014-07-19 12:33:22',2),(9453,'dns',16,0,'ns.abc.com',2,'2014-07-19 13:06:58',1),(9433,'dns',1,0,'www.aa.com',1,'2014-07-19 08:21:03',1),(9434,'dns',1,0,'www.aa.com',1,'2014-07-19 08:21:07',2),(9462,'dns',28,2,'aaaa.abc.com',2,'2014-07-19 13:27:18',1),(9464,'dns',16,0,'txt.abc.com',2,'2014-07-19 13:27:50',1),(9438,'dns',15,1,'mx.abc.com',2,'2014-07-19 12:31:04',1),(9470,'dns',16,0,'txt.abc.com',3,'2014-07-19 13:29:15',2),(9444,'dns',15,1,'mx.abc.com',3,'2014-07-19 12:33:07',2),(9467,'dns',28,2,'aaaa.abc.com',3,'2014-07-19 13:29:15',2),(9447,'dns',1,1,'a.abc.com',2,'2014-07-19 13:04:26',1),(9448,'dns',28,3,'aaaa.abc.com',2,'2014-07-19 13:05:10',1),(9449,'dns',15,0,'mx.abc.com',2,'2014-07-19 13:05:32',1),(9459,'dns',2,0,'ns.abc.com',3,'2014-07-19 13:08:12',2),(9454,'dns',16,0,'ns.abc.com',3,'2014-07-19 13:07:32',2),(9456,'dns',1,1,'a.abc.com',3,'2014-07-19 13:08:02',2),(9457,'dns',28,3,'aaaa.abc.com',3,'2014-07-19 13:08:02',2),(9458,'dns',15,0,'mx.abc.com',3,'2014-07-19 13:08:12',2),(9461,'dns',1,0,'a.abc.com',2,'2014-07-19 13:26:56',1),(9463,'dns',15,4,'mx.abc.com',1,'2014-07-19 13:27:36',1),(9465,'dns',2,2,'ns.abc.com',2,'2014-07-19 13:28:06',1),(9466,'dns',1,0,'a.abc.com',3,'2014-07-19 13:29:15',2),(9468,'dns',15,4,'mx.abc.com',1,'2014-07-19 13:29:15',2),(9469,'dns',2,2,'ns.abc.com',3,'2014-07-19 13:29:15',2),(9471,'dns',1,2,'222.aa.com',1,'2014-07-21 14:33:41',1),(9483,'dns',1,2,'www.jihaoo.com',1,'2014-07-21 15:11:26',1),(9482,'dns',1,2,'www.jihaoo.com',1,'2014-07-21 15:11:26',2),(9475,'dns',1,2,'mail.jihaoo.com',1,'2014-07-21 14:51:56',1),(9476,'dns',1,2,'jihaoo.com',1,'2014-07-21 14:52:14',1),(9581,'dns',1,2,'*.jihaoo.com',1,'2014-07-22 09:52:58',1),(9580,'dns',1,2,'*.jihaoo.com',1,'2014-07-22 09:52:58',2),(9484,'dns',5,0,'www.jihaoo.com',1,'2014-07-21 15:14:04',1),(9485,'dns',5,0,'www.jihaoo.com',1,'2014-07-21 15:17:38',2),(9486,'dns',5,2,'www.jihaoo.com',1,'2014-07-21 15:17:38',1),(9487,'dns',5,2,'mail.jihaoo.com',1,'2014-07-21 15:18:40',1),(9533,'dns',5,2,'*.jihaoo.com',1,'2014-07-21 15:47:15',1),(9577,'dns',5,2,'*.jihaoo.com',1,'2014-07-21 16:37:43',2),(9535,'dns',15,2,'mail.jihaoo.com',1,'2014-07-21 15:48:57',1),(9536,'dns',15,2,'mail.jihaoo.com',1,'2014-07-21 15:50:15',2),(9495,'dns',15,2,'www.jihaoo.com',1,'2014-07-21 15:25:35',1),(9502,'dns',15,2,'jihaoo.com',1,'2014-07-21 15:30:29',1),(9497,'dns',15,2,'*.jihaoo.com',1,'2014-07-21 15:26:51',1),(9503,'dns',15,2,'jihaoo.com',1,'2014-07-21 15:30:33',2),(9500,'dns',15,2,'*.jihaoo.com',1,'2014-07-21 15:30:15',2),(9504,'dns',15,2,'www.jihaoo.com',1,'2014-07-21 15:30:47',2),(9537,'dns',2,2,'www.jihaoo.com',1,'2014-07-21 15:55:17',1),(9545,'dns',2,2,'mail.jihaoo.com',1,'2014-07-21 16:01:18',1),(9539,'dns',2,0,'mail.jihaoo.com',1,'2014-07-21 15:56:59',1),(9547,'dns',2,2,'mail.jihaoo.com',3,'2014-07-21 16:02:20',2),(9541,'dns',2,0,'mail.jihaoo.com',1,'2014-07-21 16:00:40',2),(9548,'dns',2,2,'www.jihaoo.com',1,'2014-07-21 16:02:48',2),(9564,'dns',16,2,'www.jihaoo.com',1,'2014-07-21 16:12:13',1),(9609,'dns',16,2,'mail.jihaoo.com',1,'2014-07-22 11:08:34',1),(9610,'dns',16,2,'mail.jihaoo.com',1,'2014-07-22 11:09:28',2),(9567,'dns',28,2,'www.jihaoo.com',1,'2014-07-21 16:35:15',1),(9566,'dns',16,2,'www.jihaoo.com',3,'2014-07-21 16:34:45',2),(9568,'dns',28,2,'mail.jihaoo.com',1,'2014-07-21 16:35:29',1),(9569,'dns',28,2,'jihaoo.com',1,'2014-07-21 16:35:43',1),(9570,'dns',28,2,'*.jihaoo.com',1,'2014-07-21 16:35:59',1),(9571,'dns',28,2,'mail.jihaoo.com',1,'2014-07-21 16:37:07',2),(9572,'dns',28,2,'jihaoo.com',1,'2014-07-21 16:37:07',2),(9573,'dns',28,2,'www.jihaoo.com',1,'2014-07-21 16:37:07',2),(9574,'dns',28,2,'*.jihaoo.com',1,'2014-07-21 16:37:07',2),(9575,'dns',5,2,'mail.jihaoo.com',1,'2014-07-21 16:37:43',2),(9576,'dns',5,2,'www.jihaoo.com',1,'2014-07-21 16:37:43',2),(9584,'dns',1,0,'aa.jihaoo.com',1,'2014-07-22 09:53:44',1),(9583,'dns',1,0,'aa.jihaoo.com',1,'2014-07-22 09:53:36',2),(9621,'dns',1,2,'www.he.com',1,'2014-07-22 15:06:53',2),(9586,'dns',1,2,'*.he.com',1,'2014-07-22 10:02:15',2),(9587,'dns',5,0,'www.he.com',1,'2014-07-22 10:02:15',2),(9588,'dns',5,0,'test.he.com',3,'2014-07-22 10:02:15',2),(9590,'dns',2,0,'@.he.com',3,'2014-07-22 10:02:15',2),(9591,'dns',16,2,'he.com',1,'2014-07-22 10:02:15',2),(9594,'dns',1,2,'he.com',1,'2014-07-22 10:49:00',1),(9638,'dns',1,0,'www.he.com',1,'2014-07-22 15:15:35',1),(9595,'dns',1,2,'he.com',1,'2014-07-22 10:49:23',2),(9639,'dns',1,0,'www.he.com',1,'2014-07-22 15:15:39',2),(9833,'dns',16,2,'txt.he.com',1,'2014-07-24 11:24:12',1),(9600,'dns',16,0,'txt.he.com',1,'2014-07-22 10:54:25',1),(9601,'dns',16,0,'txt.he.com',1,'2014-07-22 10:55:13',2),(9644,'dns',1,0,'a.he.com',1,'2014-07-22 15:17:51',1),(9832,'dns',16,2,'txt.he.com',3,'2014-07-24 11:24:12',2),(9645,'dns',1,0,'a.he.com',1,'2014-07-22 15:18:13',2),(9687,'dns',1,2,'www.eflydns.com',1,'2014-07-23 09:43:17',1),(9648,'dns',1,2,'222.aa.com',1,'2014-07-22 16:07:51',2),(9654,'dns',1,2,'www.eflydns.com',3,'2014-07-22 16:39:35',2),(9675,'dns',1,1,'www.eflydns.com',1,'2014-07-22 17:01:24',1),(9676,'dns',1,1,'www.eflydns.com',1,'2014-07-22 17:01:34',2),(9662,'dns',1,1,',str_name,',3,'2014-07-22 16:49:17',2),(9672,'dns',1,3,'www.eflydns.com',1,'2014-07-22 17:00:54',1),(9673,'dns',1,3,'www.eflydns.com',1,'2014-07-22 17:01:00',2),(9819,'dns',1,1,'a.aaa.com',1,'2014-07-23 10:14:46',1),(9678,'dns',15,1,'b.aaa.com',1,'2014-07-22 17:34:26',1),(9679,'dns',16,1,'c.aaa.com',1,'2014-07-22 17:34:40',1),(9680,'dns',16,1,'c.aaa.com',1,'2014-07-22 17:35:20',2),(9823,'dns',1,1,'a.aaa.com',3,'2014-07-23 10:15:33',2),(9682,'dns',15,1,'b.aaa.com',1,'2014-07-22 17:35:32',2),(9824,'dns',15,1,'a.aaa.com',1,'2014-07-23 10:15:33',2),(9690,'dns',15,2,'txt.he.com',1,'2014-07-23 10:02:47',1),(9691,'dns',15,2,'txt.he.com',1,'2014-07-23 10:04:21',2),(9768,'dns',1,2,'txt.he.com',1,'2014-07-23 10:11:07',1),(9765,'dns',1,2,'txt.he.com',1,'2014-07-23 10:10:55',2),(9756,'dns',16,1,'ttt.he.com',1,'2014-07-23 10:07:30',1),(9757,'dns',16,1,'ttt.he.com',1,'2014-07-23 10:09:01',2),(9758,'dns',1,1,'ttt.he.com',1,'2014-07-23 10:09:01',1),(9763,'dns',1,1,'txt.he.com',1,'2014-07-23 10:10:31',1),(9760,'dns',1,1,'txt.he.com',1,'2014-07-23 10:09:59',2),(9761,'dns',16,1,'txt.he.com',1,'2014-07-23 10:09:59',1),(9762,'dns',16,1,'txt.he.com',1,'2014-07-23 10:10:31',2),(9816,'dns',15,1,'a.aaa.com',1,'2014-07-23 10:13:44',1),(9817,'dns',2,1,'a.aaa.com',1,'2014-07-23 10:14:22',1),(9818,'dns',16,1,'txt.aaa.com',1,'2014-07-23 10:14:36',1),(9820,'dns',1,2,'a.aaa.com',1,'2014-07-23 10:15:03',1),(9821,'dns',1,2,'a.aaa.com',1,'2014-07-23 10:15:21',2),(9825,'dns',2,1,'a.aaa.com',1,'2014-07-23 10:15:33',2),(9826,'dns',16,1,'txt.aaa.com',1,'2014-07-23 10:15:33',2),(9829,'dns',1,1,'a.he.com',1,'2014-07-23 10:24:42',1);
+insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (8669,'dns',1,1,'www.hyb.com',1,'2014-08-12 15:01:19',1),(8670,'dns',1,1,'aaa.hyb.com',1,'2014-08-12 15:01:19',1),(8671,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:01:19',1),(8672,'dns',1,1,'*.hyb.com',1,'2014-08-12 15:01:19',1),(8678,'dns',1,1,'www.eflydns.com',1,'2014-08-18 10:36:54',1),(8674,'dns',1,2,'ttt.hyb.com',1,'2014-08-12 15:34:46',2),(8675,'dns',1,1,'sss.hyb.com',1,'2014-08-12 15:35:04',1),(8676,'dns',1,1,'www.hhyb.com',1,'2014-08-18 09:13:06',1),(8677,'dns',1,1,'www.eflydns.com',1,'2014-08-18 10:35:53',2),(8685,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:49:35',1),(8687,'dns',1,1,'www.lkx.org',1,'2014-08-18 11:00:22',1),(8686,'dns',1,1,'www.lkx.cn',1,'2014-08-18 10:54:39',2);
 
 /*Table structure for table `txt_record` */
 
@@ -192,11 +188,9 @@ CREATE TABLE `txt_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_txt_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `txt_record` */
-
-insert  into `txt_record`(`id`,`zone`,`name`,`ttl`,`txt`,`description`,`state`,`enable`,`rid`) values (23,34,'txt.he.com',3600,'工工杠     dddd','',0,1,473),(20,29,'mail.jihaoo.com',600,'123','',0,1,475),(7,9,'cn.chenjh.com',10,'顶戴一模型本花样百出','',0,1,380);
 
 /*Table structure for table `view_index` */
 
@@ -208,7 +202,6 @@ CREATE TABLE `view_index` (
   `view_name` varchar(32) NOT NULL,
   `status` varchar(10) NOT NULL,
   `comment` varchar(255) NOT NULL,
-  `err_status` varchar(11) NOT NULL DEFAULT 'false',
   `ttl` int(11) NOT NULL DEFAULT '300',
   PRIMARY KEY (`index`),
   UNIQUE KEY `one_line` (`view_name`,`id`)
@@ -216,7 +209,7 @@ CREATE TABLE `view_index` (
 
 /*Data for the table `view_index` */
 
-insert  into `view_index`(`index`,`id`,`view_name`,`status`,`comment`,`err_status`,`ttl`) values (1,2,'电信视图','true','广东电信','false',300),(2,3,'联通视图','true','','false',300),(3,4,'广东铁通视图','true','','false',300),(4,5,'睿江办公网视图','true','','false',300),(5,6,'中山广电视图','true','','false',300),(6,1,'默认视图','true','不能删除','false',300),(7,7,'efly劫持','true','20140220添加','false',300);
+insert  into `view_index`(`index`,`id`,`view_name`,`status`,`comment`,`ttl`) values (1,2,'电信视图','true','广东电信',300),(2,3,'联通视图','true','',300),(3,4,'广东铁通视图','true','',300),(4,5,'睿江办公网视图','true','',300),(5,6,'中山广电视图','true','',300),(6,1,'默认视图','true','不能删除',300);
 
 /*Table structure for table `view_mask` */
 
@@ -233,8 +226,6 @@ CREATE TABLE `view_mask` (
 
 /*Data for the table `view_mask` */
 
-insert  into `view_mask`(`id`,`network`,`viewid`,`status`) values (620,'10.229.0.0/16',6,'true'),(621,'112.90.49.16/30',6,'true'),(622,'112.90.49.24/29',6,'true'),(623,'192.168.22.0/24',5,'true'),(624,'192.176.129.0/24',3,'true'),(643,'192.168.85.0/24',5,'true'),(645,'10.11.255.0/24',5,'true'),(646,'119.145.147.16/28',7,'true'),(647,'104.119.200.0/24',2,'true');
-
 /*Table structure for table `zone` */
 
 DROP TABLE IF EXISTS `zone`;
@@ -248,11 +239,11 @@ CREATE TABLE `zone` (
   `description` varchar(256) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain` (`domain`,`view`)
-) ENGINE=MyISAM AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 /*Data for the table `zone` */
 
-insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (34,1,'he.com',2,'2014-07-24 11:24:12',''),(33,1,'he.com',0,'2014-07-22 15:18:13',''),(3,1,'test.com',0,'2014-07-11 17:37:44',''),(8,1,'chenjh.com',2,'2014-07-16 16:43:01',''),(7,1,'hyb.com',2,'2014-07-15 16:42:01',''),(9,1,'chenjh.com',0,'2014-07-16 20:18:21',''),(37,1,'eflydns.com',3,'2014-07-22 17:01:00',''),(30,1,'jihaoo.com',0,'2014-07-22 09:53:44',''),(29,1,'jihaoo.com',2,'2014-07-22 11:09:28',''),(36,1,'eflydns.com',1,'2014-07-22 17:01:34',''),(35,1,'eflydns.com',2,'2014-07-23 09:43:17',''),(39,1,'he.com',1,'2014-07-23 10:24:42','');
+insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (2,1,'hyb.com',1,'2014-08-12 15:35:04',''),(3,1,'hyb.com',2,'2014-08-12 15:34:46',''),(6,1,'eflydns.com',1,'2014-08-18 10:36:54',''),(5,1,'hhyb.com',1,'2014-08-18 09:13:06',''),(10,1,'lkx.org',1,'2014-08-18 11:00:21','');
 
 /* Trigger structure for table `a_record` */
 
@@ -262,7 +253,7 @@ DELIMITER $$
 
 /*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_a_record` AFTER INSERT ON `a_record` FOR EACH ROW BEGIN
 call update_domain_zone(new.name,new.zone);
--- insert into snd_record(class, `type`, viewid, `data`, state, opt) value('abc',0, new.zone, 'sagasdgasg', 0, 1);
+
 call update_zone(new.zone);
 	
 END */$$
@@ -500,7 +491,7 @@ DELIMITER $$
 	in n_state int,
 	in str_comm varchar(255))
 BEGIN
--- 暂时没用
+
 	DECLARE done INT DEFAULT 0;
 	DECLARE onw VARCHAR(255) DEFAULT NULL;
 	DECLARE oview INT DEFAULT -1;
@@ -563,7 +554,7 @@ BEGIN
 		EXECUTE stmt;
 		IF @oname IS NOT NULL AND @oview IS NOT NULL THEN
 			if strcmp(cut_tbl, tab_name)!=0 then
-				-- SET @sqlcmd = CONCAT("UPDATE `", cut_tbl, "` SET `enable`=0 WHERE rid=", n_rid);
+				
 				SET @sqlcmd = CONCAT("delete from `", cut_tbl, "` WHERE rid=", n_rid);
 				PREPARE stmt FROM @sqlcmd;
 				EXECUTE stmt;
@@ -574,40 +565,40 @@ BEGIN
 		set i = i + 1;  
 	end while;
 	
-	-- update的时候才用
-	-- SET @sqlcmd = CONCAT("UPDATE `", tab_name, "` SET `enable`=", n_enable, " WHERE rid=", n_rid);
-	-- PREPARE stmt FROM @sqlcmd;
-	-- EXECUTE stmt;
+	
+	
+	
+	
 				
 	SET @sqlcmd = 'error';
 	IF STRCMP(tab_name, 'a_record')=0 OR STRCMP(tab_name, 'aaaa_record')=0 THEN
-		-- CALL add_a_record('a_record', 't2.test.com','test.com',2,10,'3.3.3.3',0,1,153);
-		-- CALL del_a_record('a_record', 153);
-		-- CALL add_a_record('aaaa_record', 't2.test.com','test.com',2,10,'2404:6800:4005:806::1014',0,1,153);
-		-- CALL del_a_record('aaaa_record', 153);
+		
+		
+		
+		
 		SET @sqlcmd = CONCAT('INSERT INTO ',tab_name,' (zone,`name`,ttl,ipaddr,state,`enable`,`rid`) VALUES(',
 				     n_zid,',\'',str_name,'\',',n_ttl,',\'',str_data,'\',',n_state,',',n_enable,',',n_rid,
 				     ') ON DUPLICATE KEY UPDATE zone=',n_zid,',`name`=\'',str_name,'\',`ttl`=',n_ttl,
 				     ',ipaddr=\'',str_data,'\',state=',n_state,',`enable`=',n_enable);
 	ELSEIF STRCMP(tab_name, 'cname_record')=0 THEN
-		-- CALL add_a_record('cname_record', 't2.test.com','test.com',2,10,'ttt3.bb.com',0,1,153);
-		-- CALL del_a_record('cname_record', 153);
+		
+		
 		SET @sqlcmd = CONCAT('INSERT INTO ',tab_name,' (zone,`name`,ttl,`cname`,state,`enable`,`rid`) VALUES(',
 				     n_zid,',\'',str_name,'\',',n_ttl,',\'',str_data,'\',',n_state,',',n_enable,',',n_rid,
 				     ') ON DUPLICATE KEY UPDATE zone=',n_zid,',`name`=\'',str_name,'\',`ttl`=',n_ttl,
 				     ',`cname`=\'',str_data,'\',state=',n_state,',`enable`=',n_enable);
 		
 	ELSEIF STRCMP(tab_name, 'ns_record')=0 THEN
-		-- CALL add_a_record('ns_record', 't2.test.com','test.com',2,10,'ttt3.bb.com',0,1,153);
-		-- CALL del_a_record('ns_record', 153);
+		
+		
 		SET @sqlcmd = CONCAT('INSERT INTO ',tab_name,' (zone,`name`,ttl,`server`,state,`enable`,`rid`) VALUES(',
 				     n_zid,',\'',str_name,'\',',n_ttl,',\'',str_data,'\',',n_state,',',n_enable,',',n_rid,
 				     ') ON DUPLICATE KEY UPDATE zone=',n_zid,',`name`=\'',str_name,'\',`ttl`=',n_ttl,
 				     ',`server`=\'',str_data,'\',state=',n_state,',`enable`=',n_enable);
 		
 	ELSEIF STRCMP(tab_name, 'txt_record')=0 THEN
-		-- CALL add_mx_record('txt_record', 't3.test.com','test.com',2,10,'asdgjasdglsgkj你好',0,1,153);
-		-- CALL del_a_record('txt_record', 153);
+		
+		
 		SET @sqlcmd = CONCAT('INSERT INTO ',tab_name,' (zone,`name`,ttl,`txt`,state,`enable`,`rid`) VALUES(',
 				     n_zid,',\'',str_name,'\',',n_ttl,',\'',str_data,'\',',n_state,',',n_enable,',',n_rid,
 				     ') ON DUPLICATE KEY UPDATE zone=',n_zid,',`name`=\'',str_name,'\',`ttl`=',n_ttl,
@@ -635,7 +626,7 @@ DELIMITER $$
 	IN n_view INT, 
 	in str_nw varchar(255))
 BEGIN
--- 暂时没用
+
 	DECLARE done INT DEFAULT 0;
 	declare onw varchar(255) default null;
 	declare oview int default -1;
@@ -701,7 +692,7 @@ BEGIN
 		EXECUTE stmt;
 		IF @oname IS NOT NULL AND @oview IS NOT NULL THEN
 			IF STRCMP(cut_tbl, 'mx_record')!=0 THEN
-				-- SET @sqlcmd = CONCAT("UPDATE `", cut_tbl, "` SET `enable`=0 WHERE rid=", n_rid);
+				
 				SET @sqlcmd = CONCAT("delete from `", cut_tbl, "` WHERE rid=", n_rid);
 				PREPARE stmt FROM @sqlcmd;
 				EXECUTE stmt;
@@ -712,10 +703,10 @@ BEGIN
 		SET i = i + 1;  
 	END WHILE;
 	
-	-- update的时候才用到
-	-- SET @sqlcmd = CONCAT("UPDATE `mx_record` SET `enable`=", n_enable, " WHERE rid=", n_rid);
-	-- PREPARE stmt FROM @sqlcmd;
-	-- EXECUTE stmt;
+	
+	
+	
+	
 	
 	SET @sqlcmd = CONCAT('INSERT INTO `mx_record`',' (zone,`name`,ttl,`level`,`server`,state,`enable`,`rid`) VALUES(',
 		n_zid,',\'',str_name,'\',',n_ttl,',',n_level,',\'',str_data,'\',',n_state,',',n_enable,',',n_rid,
@@ -904,7 +895,7 @@ BEGIN
 				SET i=1;  
 				WHILE i <= 6 DO
 					SET cut_tbl=CONCAT(SUBSTRING_INDEX(SUBSTRING_INDEX(arr_tbls, ',' ,i),',',-1));
-					-- SET @sqlcmd=CONCAT("UPDATE `", cut_tbl, "` SET `enable`=0 WHERE `enable`=1 AND `zone`=", n_zid);
+					
 					SET @sqlcmd=CONCAT("delete from `", cut_tbl, "` WHERE `zone`=", n_zid);
 					PREPARE stmt FROM @sqlcmd;
 					EXECUTE stmt;
@@ -931,8 +922,8 @@ DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `del_a_record`(IN `tab_name` VARCHAR(255), IN `n_rid` INT)
 BEGIN
-        -- declare oname varchar(256);
-        -- declare oview int;
+        
+        
 	SET @oname = NULL;
 	SET @oview = NULL;
 	SET @ozid = NULL;
@@ -940,9 +931,9 @@ BEGIN
 		" ar LEFT JOIN zone ze ON ar.zone=ze.id WHERE ar.enable=1 AND ar.rid=",n_rid," LIMIT 1");
 	PREPARE stmt FROM @sqlcmd;
 	EXECUTE stmt;
-	-- DEALLOCATE PREPARE stmt;
+	
 	
-	-- SET @sqlcmd = CONCAT('UPDATE ',tab_name,' SET `enable`=0 WHERE rid=',n_rid);
+	
 	SET @sqlcmd = CONCAT('delete from ',tab_name,' WHERE rid=',n_rid);
 	PREPARE stmt FROM @sqlcmd;
 	EXECUTE stmt;
@@ -981,7 +972,7 @@ DELIMITER $$
 /*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `del_a_view`(
 	IN n_view INT)
 BEGIN
--- 暂时没用
+
 	DECLARE done INT DEFAULT 0;
 	DECLARE aname VARCHAR(255) DEFAULT NULL;
 	DECLARE aview INT DEFAULT -1;
@@ -1138,7 +1129,7 @@ DELIMITER $$
 	IN n_view INT,
 	in str_domain varchar(255))
 BEGIN
--- 暂时没用
+
 	DECLARE done INT DEFAULT 0;
 	DECLARE aname VARCHAR(255) DEFAULT NULL;
 	DECLARE aview INT DEFAULT -1;
@@ -1295,7 +1286,7 @@ DELIMITER $$
 	IN n_view INT, 
 	IN str_nw VARCHAR(255))
 BEGIN
--- 暂时没用
+
 	DECLARE done INT DEFAULT 0;
 	DECLARE onw VARCHAR(255) DEFAULT NULL;
 	DECLARE oview INT DEFAULT -1;
@@ -1323,6 +1314,169 @@ BEGIN
     END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `onoff_a_domain` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `onoff_a_domain` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `onoff_a_domain`(
+	IN str_domain VARCHAR(255), in n_rop int)
+BEGIN
+	-- n_rop 反操作，即：想开启传0，想关闭传1
+	DECLARE done INT DEFAULT 0;
+	DECLARE aname VARCHAR(255) DEFAULT NULL;
+	DECLARE aview INT DEFAULT -1;
+	DECLARE arr_tbls VARCHAR(255);
+	DECLARE cut_tbl VARCHAR(255);
+	DECLARE n_zid INT DEFAULT 0;
+	declare n_goodop int default 0;
+	DECLARE i INT;
+	DECLARE cursor_a CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `a_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_aaaa CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `aaaa_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_cname CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `cname_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_mx CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `mx_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_ns CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `ns_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_txt CURSOR FOR 
+		(SELECT ar.name,ze.view FROM `txt_record` ar LEFT JOIN `zone` ze ON ar.zone=ze.id 
+		WHERE ar.enable=n_rop AND ze.domain=str_domain);
+	DECLARE cursor_zone CURSOR FOR 
+		SELECT `id` FROM `zone` WHERE `domain`=str_domain;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+	SET arr_tbls = 'a_record,aaaa_record,cname_record,mx_record,ns_record,txt_record';
+	
+	if n_rop=0 then
+		set n_goodop=1;
+	end if;
+	
+	OPEN cursor_a;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_a INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('a_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'a_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_a ;
+	
+	SET done = 0;
+	SET aview = -1;
+	OPEN cursor_aaaa;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_aaaa INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('aaaa_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'aaaa_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_aaaa;
+	
+	SET done = 0;
+	SET aview = -1;
+	OPEN cursor_cname;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_cname INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('cname_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'cname_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_cname;
+	
+	SET done = 0;
+	SET aview = -1;
+	OPEN cursor_mx;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_mx INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('mx_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'mx_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_mx;
+	
+	SET done = 0;
+	SET aview = -1;
+	OPEN cursor_ns;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_ns INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('ns_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'ns_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_ns;
+	
+	SET done = 0;
+	SET aview = -1;
+	OPEN cursor_txt;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_txt INTO aname, aview;
+			IF aview!=-1 THEN
+				CALL add_snd_req('dns', tbl_to_dnstype('txt_record'), aview, aname, 0, 2);
+				SELECT aname, aview, 'txt_record';
+				SET aview=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_txt;
+	
+	SET done = 0;
+	SET n_zid = -1;
+	OPEN cursor_zone;
+	REPEAT
+		IF NOT done THEN
+			FETCH cursor_zone INTO n_zid;
+			IF n_zid!=-1 THEN
+				SET i=1;  
+				WHILE i <= 6 DO
+					SET cut_tbl=CONCAT(SUBSTRING_INDEX(SUBSTRING_INDEX(arr_tbls, ',' ,i),',',-1));
+					
+					SET @sqlcmd=CONCAT("update `", cut_tbl, "` set `enable`=", n_goodop, " WHERE `zone`=", n_zid);
+					PREPARE stmt FROM @sqlcmd;
+					EXECUTE stmt;
+					DEALLOCATE PREPARE stmt; 
+					SET i = i + 1;
+				END WHILE;
+			SET n_zid=-1;
+			END IF;
+		END IF;
+	UNTIL done END REPEAT;
+	CLOSE cursor_zone;
+	
+	DELETE FROM zone WHERE domain=str_domain;
+	DELETE FROM domain_ns WHERE domain=str_domain;
+	
+    END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `update_domain_zone` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `update_domain_zone` */;
@@ -1333,7 +1487,7 @@ DELIMITER $$
 begin
 declare v_main varchar(256) default null;    
 select `domain` INTO v_main from `zone` where `id`=nid limit 1;
--- insert into snd_record(class, `type`, viewid, `data`, state, opt)value(sub,0, id, v_main, 0, 1);
+
 INSERT INTO `domain_zone`(`domain`,`zone`) VALUES(sub,v_main) 
 	on duplicate key update zone=v_main;
 end */$$
