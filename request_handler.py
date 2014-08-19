@@ -254,7 +254,12 @@ class req_handler(object):
             ptr_tasks[task_id] = {'ret':0, 'result':'task id '+task_id + ' succ', 'error':''}
             #2、如果有需要，通知proxy
             if go_on:
-                worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
+                try:
+                    worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
+                except Exception as e:
+                    g_req_loger.error(_lineno(), 'notify proxy error!!!!--->', repr(e))
+                    g_req_loger.error(traceback.format_exc())
+                    continue
 
         req_handler.notify_flush(worker, msgobj)
         worker.http_th.put(replymsg)
