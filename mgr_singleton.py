@@ -7,17 +7,19 @@ import thread_chkchange
 import mgr_worker
 import mgr_loger
 import mgr_conf
+import zk_handler
 
 __all__ = ['g_factory']
 
 class mgr_factory(object):
-    __slots__ = ('loger', 'mgr_worker', 'reply_th', 'http_th', 'chkchange_th')
+    __slots__ = ('loger', 'mgr_worker', 'reply_th', 'http_th', 'chkchange_th', 'zkhandler')
     def __init__(self):
         self.reply_th = None
         self.http_th = None
         self.chkchange_th = None
         self.mgr_worker = None
         self.loger = None
+        self.zkhandler = None
 
     def get_mgr_loger(self):
         if not self.loger:
@@ -48,6 +50,11 @@ class mgr_factory(object):
                                                        self.get_http_thread().tq,
                                                        self.get_mgr_loger())
         return self.chkchange_th
+
+    def get_zkhandler(self):
+        if not self.zkhandler:
+            self.zkhandler = zk_handler.GJZookeeper(self.get_mgr_loger())
+        return self.zkhandler
 
 g_factory = mgr_factory()
 

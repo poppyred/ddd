@@ -99,6 +99,9 @@ class MyDaemon(Daemon):
         g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
 
         g_factory.get_mgr_loger().start()
+        time.sleep(1)
+        g_factory.get_zkhandler()
+
         g_factory.get_mgr_worker().start()
         g_factory.get_repth_thread().start()
         time.sleep(1)

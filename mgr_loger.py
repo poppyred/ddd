@@ -133,6 +133,8 @@ class mgr_loger(queue_thread.Qthread):
             self.put({'level':l, 'log':ldata})
 
     def set_level(self, strl):
+        if not self.dic_level.has_key(strl):
+            return
         self.level = self.dic_level[strl]
         if self.level == self.ldebug:
             self.realtime = True
