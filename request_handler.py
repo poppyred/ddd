@@ -246,7 +246,8 @@ class req_handler(object):
             except Exception as e:
                 g_req_loger.error(_lineno(), '!!!!--->', repr(e))
                 g_req_loger.error(traceback.format_exc())
-                ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':repr(e)}
+                #ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':repr(e)}
+                ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':'set db failed!'}
                 continue
             if not db_ret:
                 ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':'db error'}
