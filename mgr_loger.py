@@ -26,6 +26,7 @@ class mgr_loger(queue_thread.Qthread):
         self.lock = threading.Lock()
         self.realtime = False
         self.level = self.ldebug
+        self.strlevel = 'debug'
         self.set_level(strlevel)
         self.str_times = ['', '']
         self.linec = 0
@@ -132,10 +133,14 @@ class mgr_loger(queue_thread.Qthread):
         if self.__chmod__(l, ldata):
             self.put({'level':l, 'log':ldata})
 
+    def get_level(self):
+        return self.strlevel
+
     def set_level(self, strl):
         if not self.dic_level.has_key(strl):
             return
         self.level = self.dic_level[strl]
+        self.strlevel = strl
         if self.level == self.ldebug:
             self.realtime = True
 

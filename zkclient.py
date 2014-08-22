@@ -25,7 +25,7 @@ TYPE_NAME_MAPPING = {
     zookeeper.CREATED_EVENT: "created",
     zookeeper.DELETED_EVENT: "deleted",
     zookeeper.CHANGED_EVENT: "changed",
-    zookeeper.CHILD_EVENT: "child", 
+    zookeeper.CHILD_EVENT: "child",
 }
 
 class ZKClientError(Exception):
@@ -89,7 +89,7 @@ class ZKClient(object):
 
     def close(self):
         return zookeeper.close(self.handle)
-    
+
     def create(self, path, data="", flags=0, acl=[ZOO_OPEN_ACL_UNSAFE]):
         start = time.time()
         result = zookeeper.create(self.handle, path, data, acl, flags)

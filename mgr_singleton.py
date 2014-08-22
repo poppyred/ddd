@@ -53,7 +53,7 @@ class mgr_factory(object):
 
     def get_zkhandler(self):
         if not self.zkhandler:
-            self.zkhandler = zk_handler.GJZookeeper(self.get_mgr_loger())
+            self.zkhandler = zk_handler.LKXZookeeper(self.get_mgr_loger())
         return self.zkhandler
 
 g_factory = mgr_factory()
