@@ -44,7 +44,7 @@ mkdir -p $local_dir
 expect -c " 
         spawn scp -r -P $port $local_dir root@$ip:$remote_dir
         expect {
-            \"*assword\" {set timeout 600; send \"$passwd\r\";}
+            \"*assword\" {set timeout 60000; send \"$passwd\r\";}
             \"yes/no\" {send \"yes\r\"; exp_continue;}
         }
         expect eof"
@@ -53,7 +53,7 @@ expect -c "
         spawn ssh root@$ip
         expect {
             \"*yes/no\" { send \"yes\r\"; exp_continue;}
-            \"*assword:\" {set timeout 600; send \"$passwd\r\";}
+            \"*assword:\" {set timeout 60000; send \"$passwd\r\";}
         }
         expect \"#*\"
             send \"cd $remote_dir/dnspro\r\"

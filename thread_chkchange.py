@@ -50,6 +50,11 @@ class thread_chkchange(threading.Thread):
         if not added:
             self.tasknodeds.append(node)
 
+    def del_tasknode_byname_lock(self, name):
+        self.lock.acquire()
+        self.del_tasknode_byname(name)
+        self.lock.release()
+
     def del_tasknode_byname(self, name):
         for i in range(len(self.tasknodeds)-1,-1,-1):
             if self.tasknodeds[i].nname == name:

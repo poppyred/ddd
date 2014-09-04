@@ -19,6 +19,7 @@ class mgr_handler(queue_thread.Qthread):
     m_handlers = {}
     def __init__(self, loger):
         queue_thread.Qthread.__init__(self, 'mgr_work_thread', self.handler_qsize, loger)
+        self.check_thd = None
         self.proxy_addr = {}
         self.dbip = mgr_conf.g_db_ip
         self.dbcon = MySQL.MySQL(host=self.dbip, user=mgr_conf.g_db_user, passwd=mgr_conf.g_db_passwd,
@@ -47,18 +48,27 @@ class mgr_handler(queue_thread.Qthread):
         #self.__test__()
 
     def __test__(self):
-        del_ret = self.dbcon.call_proc(msg.g_proc_del_a_record, ('a_record', 189))
-        result = self.dbcon.fetch_proc_reset()
-        print '1: delret:', del_ret, 'result:', result
-        time.sleep(2)
-        add_ret = self.dbcon.call_proc(msg.g_proc_add_a_record,
-                ('a_record',  't3.test.com','test.com',2,10,'3.3.3.3',0,1,190))
-        raa = self.dbcon.fetch_proc_reset()
-        print '2: add_ret:', add_ret, 'result:', raa
+        if False:
+            del_ret = self.dbcon.call_proc(msg.g_proc_del_a_record, ('a_record', 189))
+            result = self.dbcon.fetch_proc_reset()
+            print '1: delret:', del_ret, 'result:', result
+            time.sleep(2)
+            add_ret = self.dbcon.call_proc(msg.g_proc_add_a_record,
+                    ('a_record',  't3.test.com','test.com',2,10,'3.3.3.3',0,1,190))
+            raa = self.dbcon.fetch_proc_reset()
+            print '2: add_ret:', add_ret, 'result:', raa
+
+        if True:
+            self.dbcon.query(msg.g_init_sql_chk_init_ok)
+            result = self.dbcon.show()
+            print repr(result)
+            print result[0][0]
+
         sys.exit()
 
-    def set_http_thread(self, http_th):
+    def set_buddy_thread(self, http_th, check_thd):
         self.http_th = http_th
+        self.check_thd = check_thd
 
     def handler(self, data):
         if self.dbcon.conn_error:
@@ -68,15 +78,30 @@ class mgr_handler(queue_thread.Qthread):
             for case in switch(data['class']):
                 if case(msg.g_class_init):
                     self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
+                    msg.g_init_resp_expect = -1
                     req_handler.handle_proxy_init(self, data['inner_addr'][0])
                     break
                 if case(msg.g_class_proxy_register):
                     self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
+                    if msg.g_init_resp_expect == -1:
+                        self.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init_ok)
+                        self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+                        msg.g_init_resp_expect = 0
+                        self.loger.info(_lineno(self), 'on register add timers OK')
                     break
                 if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
                     req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
                     break
+                if case(msg.g_class_inner_chk_init_ok):
+                    self.loger.info(_lineno(self), data['class'], '...')
+                    ok_cnt = req_handler.handle_inner_chk_init_ok(self)
+                    if ok_cnt != None and ok_cnt == msg.g_init_resp_expect:
+                        self.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init_ok)
+                        self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+                        self.loger.info(_lineno(self), 'on init add timers OK')
+                    break
                 if case(msg.g_class_inner_chk_snd):
+                    self.loger.info(_lineno(self), data['class'], '...')
                     if len(self.proxy_addr.keys()) > 0:
                         req_handler.handle_inner_chk_snd(self)
                     else:

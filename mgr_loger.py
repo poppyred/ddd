@@ -119,6 +119,8 @@ class mgr_loger(queue_thread.Qthread):
     def __chmod__(self, l, ldata):
         if not self.realtime:
             return True
+        if l > self.level:
+            return False
         try:
             self.lock.acquire()
             self.__wlog__(l, ldata)

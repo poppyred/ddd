@@ -101,9 +101,11 @@ class req_handler(object):
                     0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl],
                     'pkt_head':msg.g_pack_head_init_dns})
+                count += 1
                 req_handler.notify_proxy(worker, msgobj, addr)
 
             req_handler.notify_proxy(worker, msgobj, addr, True)
+        msg.g_init_resp_expect = count
 
     @staticmethod
     def handle_proxy_init_reply(worker, answ, addr):
@@ -130,6 +132,14 @@ class req_handler(object):
         #g_req_loger.debug(_lineno(), str_class, ' update return:', repr(update_ret))
         #if not update_ret or update_ret[0][0] != 1 :
         #    g_req_loger.error(_lineno(), '%s update database fail!!!!' % (str_class))
+
+    @staticmethod
+    def handle_inner_chk_init_ok(worker):
+        worker.dbcon.query(msg.g_init_sql_chk_init_ok)
+        result = worker.dbcon.show()
+        if result:
+            return result[0][0]
+        return None
 
     @staticmethod
     def handle_inner_chk_snd(worker):
