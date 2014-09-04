@@ -6,7 +6,8 @@ log_path = '/usr/local/dnspro/log'
 log_name = 'dnspro.log'
 log_direction = 0
 
-g_inner_chk_snd_time = 10
+#g_inner_chk_snd_time = 10
+g_inner_chk_snd_time = 3600
 g_inner_chk_task_domain_time = 5
 g_inner_chk_task_record_time = 2
 
