@@ -13,6 +13,7 @@ import msg
 
 class mgr_loger(queue_thread.Qthread):
     __slots__ = ('ldebug', 'linfo', 'lwarn', 'lerror', 'dic_level')
+    loger_qsize = 10000
     maxline = msg.g_log_maxline
     ldebug = 3
     linfo = 2
@@ -22,7 +23,7 @@ class mgr_loger(queue_thread.Qthread):
     dic_levelstr = {lerror:'<ERROR>', lwarn:'<WARN>', linfo:'<INFO>', ldebug:'<DEBUG>'}
 
     def __init__(self, strlevel, _dir=0, lpath=None, lname=None):
-        queue_thread.Qthread.__init__(self, 'mgr_loger', None)
+        queue_thread.Qthread.__init__(self, 'mgr_loger', self.loger_qsize, None)
         self.lock = threading.Lock()
         self.realtime = False
         self.level = self.ldebug

@@ -15,9 +15,10 @@ from mgr_misc import _lineno
 import traceback
 
 class mgr_handler(queue_thread.Qthread):
+    handler_qsize = 30000
     m_handlers = {}
     def __init__(self, loger):
-        queue_thread.Qthread.__init__(self, 'mgr_work_thread', loger)
+        queue_thread.Qthread.__init__(self, 'mgr_work_thread', self.handler_qsize, loger)
         self.proxy_addr = {}
         self.dbip = mgr_conf.g_db_ip
         self.dbcon = MySQL.MySQL(host=self.dbip, user=mgr_conf.g_db_user, passwd=mgr_conf.g_db_passwd,

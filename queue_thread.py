@@ -10,11 +10,11 @@ import traceback
 __all__ = ['Qthread']
 
 class Qthread(threading.Thread):
-    def __init__(self, name, loger):
+    def __init__(self, name, qsize, loger):
         threading.Thread.__init__(self)
         self.thread_stop = False
         self.th_name = name
-        self.tq = Queue.Queue(1000)
+        self.tq = Queue.Queue(qsize)
         self.loger = loger
         self.log_queue = False
 

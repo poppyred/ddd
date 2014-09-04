@@ -10,8 +10,9 @@ import httplib
 from mgr_misc import _lineno
 
 class http_thread(queue_thread.Qthread):
+    http_qsize = 1000
     def __init__(self, worker, loger):
-        queue_thread.Qthread.__init__(self, 'http_thread', loger)
+        queue_thread.Qthread.__init__(self, 'http_thread', self.http_qsize, loger)
         self.worker = worker
 
     def handler(self, data):
