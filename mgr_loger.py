@@ -13,7 +13,7 @@ import msg
 
 class mgr_loger(queue_thread.Qthread):
     __slots__ = ('ldebug', 'lcare', 'linfo', 'lwarn', 'lerror', 'dic_level')
-    loger_qsize = 10000
+    loger_qsize = 40000
     maxline = msg.g_log_maxline
     ldebug = 4
     lcare = 3

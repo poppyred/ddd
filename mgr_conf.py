@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:UTF-8 -*-
 
-log_level='info'
+log_level='care'
 log_path = '/usr/local/dnspro/log'
 log_name = 'dnspro.log'
 log_direction=1

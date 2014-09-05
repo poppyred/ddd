@@ -15,7 +15,7 @@ from mgr_misc import _lineno
 import traceback
 
 class mgr_handler(queue_thread.Qthread):
-    handler_qsize = 30000
+    handler_qsize = 40000
     m_handlers = {}
     def __init__(self, loger):
         queue_thread.Qthread.__init__(self, 'mgr_work_thread', self.handler_qsize, loger)
