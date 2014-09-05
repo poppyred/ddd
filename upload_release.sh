@@ -10,7 +10,7 @@ then
     echo "[ERROR] usage : ./send_dir ip source_dir dst_dir"
     exit 1
 fi
-ip='121.201.12.57'
+ip='121.201.12.67'
 #ip=$1
 port="22"
 passwd='rjkj@dnspro#0801'

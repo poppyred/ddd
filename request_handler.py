@@ -40,7 +40,7 @@ class switch(object):
 class req_handler(object):
     @staticmethod
     def notify_proxy(worker, msgobj, addr, flush=False):
-        if not flush and len(msgobj) >= msg.g_row_perpack or flush and len(msgobj) > 0:
+        if not flush and len(msgobj) >= mgr_conf.g_row_perpack or flush and len(msgobj) > 0:
             pre_pkt_head = None
             pre_i = 0
             for i in range(len(msgobj)):
@@ -59,7 +59,7 @@ class req_handler(object):
             if pre_pkt_head == None:
                 g_req_loger.error(_lineno(), 'no pkt_head key-->', repr(msgobj))
             else:
-                g_req_loger.info(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:]))
+                g_req_loger.care(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:]))
                 worker.reply(msgobj[pre_i:], pre_pkt_head, addr)
 
             del msgobj[:]
@@ -72,24 +72,10 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_init(worker, addr):
-        #query view
         worker.dbcon.query(msg.g_sql_clean_snd_req)
-        worker.dbcon.query(msg.g_init_sql_view)
-        result = worker.dbcon.show()
+        #query dns
         msgobj = []
         count = 0
-        if result:
-            for row in result:
-                g_req_loger.debug(_lineno(), row)
-                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
-                msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
-                count += 1
-                req_handler.notify_proxy(worker, msgobj, addr)
-
-            req_handler.notify_proxy(worker, msgobj, addr, True)
-
-        #query dns
-        del msgobj[:]
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
@@ -103,8 +89,57 @@ class req_handler(object):
                     'pkt_head':msg.g_pack_head_init_dns})
                 count += 1
                 req_handler.notify_proxy(worker, msgobj, addr)
-
             req_handler.notify_proxy(worker, msgobj, addr, True)
+
+        #query view
+        del msgobj[:]
+        worker.dbcon.query(msg.g_init_sql_view)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                g_req_loger.debug(_lineno(), row)
+                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
+                msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
+                count += 1
+                req_handler.notify_proxy(worker, msgobj, addr)
+            req_handler.notify_proxy(worker, msgobj, addr, True)
+
+        msg.g_init_resp_expect = count
+
+    @staticmethod
+    def handle_proxy_init_new(worker, addr):
+        worker.dbcon.query(msg.g_sql_clean_snd_req)
+        #query dns
+        msgobj = []
+        count = 0
+        for atbl in msg.g_list_tbl:
+            worker.dbcon.query(msg.g_init_sql_dns % (atbl))
+            result = worker.dbcon.show()
+            if not result:
+                continue
+            for row in result:
+                g_req_loger.debug(_lineno(), "dns query %s res: %s" % (atbl, row))
+                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
+                    0, msg.g_opt_add))
+                msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl],
+                    'pkt_head':msg.g_pack_head_init_dns})
+                count += 1
+                req_handler.notify_proxy(worker, msgobj, addr)
+            req_handler.notify_proxy(worker, msgobj, addr, True)
+
+        #query view
+        del msgobj[:]
+        worker.dbcon.query(msg.g_init_sql_view)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                g_req_loger.debug(_lineno(), row)
+                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
+                msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
+                count += 1
+                req_handler.notify_proxy(worker, msgobj, addr)
+            req_handler.notify_proxy(worker, msgobj, addr, True)
+
         msg.g_init_resp_expect = count
 
     @staticmethod

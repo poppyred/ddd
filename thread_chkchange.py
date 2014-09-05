@@ -20,7 +20,7 @@ class task_node():
         self.deadline = msg.g_now + interval
 
 class thread_chkchange(threading.Thread):
-    def __init__(self, workq, httpq, loger):
+    def __init__(self, workq4init, workq, httpq, loger):
         threading.Thread.__init__(self)
         self.thread_stop = False
         #self.host = host
@@ -28,6 +28,7 @@ class thread_chkchange(threading.Thread):
         self.tasknodeds = []
         self.lock = threading.Lock()
         self.tq = workq
+        self.tq4init = workq4init
         self.http_tq = httpq
         self.loger = loger
 

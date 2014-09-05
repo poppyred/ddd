@@ -32,6 +32,9 @@ def stop_all():
     if g_factory.get_repth_thread().isAlive():
         g_factory.get_repth_thread().stop()
         g_factory.get_repth_thread().join()
+    if g_factory.get_mgr_worker4init().isAlive():
+        g_factory.get_mgr_worker4init().stop()
+        g_factory.get_mgr_worker4init().join()
     if g_factory.get_mgr_worker().isAlive():
         g_factory.get_mgr_worker().stop()
         g_factory.get_mgr_worker().join()
@@ -95,14 +98,15 @@ class MyDaemon(Daemon):
         g_factory.get_http_thread()
         g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_init_ok, mgr_conf.g_inner_chk_init_ok_time)
         #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
-        g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
-        g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
+        #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
+        #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
         g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())
 
         g_factory.get_mgr_loger().start()
         time.sleep(1)
         g_factory.get_zkhandler()
 
+        g_factory.get_mgr_worker4init().start()
         g_factory.get_mgr_worker().start()
         g_factory.get_repth_thread().start()
         time.sleep(1)

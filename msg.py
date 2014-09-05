@@ -4,7 +4,6 @@
 g_isdebug = 1
 g_enable_stdin=0
 old_settings = None
-g_row_perpack = 10
 g_websvr_ip = '121.201.11.4'
 g_now = 0
 g_log_maxline = 90000
@@ -71,7 +70,7 @@ g_init_sql_view = 'SELECT viewid as view, network as mask from view_mask \
         mk left join view_index idx on mk.viewid=idx.id where mk.status=\'true\' '
 g_init_sql_dns = 'SELECT ar.name as domain, ze.view as view FROM %s ar \
         left join zone ze on ar.zone=ze.id where ar.enable=1'
-g_init_sql_chk_init_ok = 'SELECT COUNT(*) FROM snd_record WHERE state=1'
+g_init_sql_chk_init_ok = 'SELECT COUNT(*) FROM snd_record WHERE state!=0'
 
 g_proc_add_snd_req = 'add_snd_req'
 #g_proc_add_snd_req_ret = 'select @_' + g_proc_add_snd_req + '_6'

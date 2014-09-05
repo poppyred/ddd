@@ -14,13 +14,14 @@ from mgr_misc import _lineno
 import traceback
 
 class reply_thread(threading.Thread):
-    def __init__(self, worker, loger, host='', port=54321, bufsize=1024):
+    def __init__(self, worker4init, worker, loger, host='', port=54321, bufsize=1024):
         threading.Thread.__init__(self)
         self.HOST = host
         self.PORT = port
         self.udpSerSock = None
         self.BUFSIZE = bufsize
         self.thread_stop = False
+        self.worker4init = worker4init
         self.worker = worker
         self.loger = loger
 
@@ -50,7 +51,12 @@ class reply_thread(threading.Thread):
                         continue
                     decodejson = json.loads(data)
                     decodejson['inner_addr'] = addr
-                    self.worker.put(decodejson)
+                    for case in switch(decodejson['class']):
+                        if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
+                            self.worker4init.put(decodejson)
+                            break
+                        if case():
+                            self.worker.put(decodejson)
             except Exception as e:
                 self.loger.error(_lineno(self), 'inner error:', repr(e))
                 self.loger.error(traceback.format_exc())

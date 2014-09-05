@@ -12,15 +12,16 @@ import os
 import msg
 
 class mgr_loger(queue_thread.Qthread):
-    __slots__ = ('ldebug', 'linfo', 'lwarn', 'lerror', 'dic_level')
+    __slots__ = ('ldebug', 'lcare', 'linfo', 'lwarn', 'lerror', 'dic_level')
     loger_qsize = 10000
     maxline = msg.g_log_maxline
-    ldebug = 3
+    ldebug = 4
+    lcare = 3
     linfo = 2
     lwarn = 1
     lerror = 0
-    dic_level = {'error':lerror, 'warn':lwarn, 'info':linfo, 'debug':ldebug}
-    dic_levelstr = {lerror:'<ERROR>', lwarn:'<WARN>', linfo:'<INFO>', ldebug:'<DEBUG>'}
+    dic_level = {'error':lerror, 'warn':lwarn, 'info':linfo, 'care':lcare, 'debug':ldebug}
+    dic_levelstr = {lerror:'<ERROR>', lwarn:'<WARN>', linfo:'<INFO>', lcare:'<CARE>', ldebug:'<DEBUG>'}
 
     def __init__(self, strlevel, _dir=0, lpath=None, lname=None):
         queue_thread.Qthread.__init__(self, 'mgr_loger', self.loger_qsize, None)
@@ -155,6 +156,9 @@ class mgr_loger(queue_thread.Qthread):
 
     def info(self, *ldata):
         self.__chklog__(self.dic_level['info'], ldata)
+
+    def care(self, *ldata):
+        self.__chklog__(self.dic_level['care'], ldata)
 
     def debug(self, *ldata):
         self.__chklog__(self.dic_level['debug'], ldata)
