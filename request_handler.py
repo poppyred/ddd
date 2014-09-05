@@ -120,8 +120,8 @@ class req_handler(object):
                 continue
             for row in result:
                 g_req_loger.debug(_lineno(), "dns query %s res: %s" % (atbl, row))
-                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
-                    0, msg.g_opt_add))
+                #worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
+                #    0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl]})
                 count += 1
                 cur_cnt += 1
@@ -142,7 +142,7 @@ class req_handler(object):
         if result:
             for row in result:
                 g_req_loger.debug(_lineno(), row)
-                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
+                #worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1]})
                 count += 1
                 cur_cnt += 1
@@ -156,6 +156,9 @@ class req_handler(object):
                     return
 
         msg.g_init_resp_expect = count
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
 
     @staticmethod
     def handle_proxy_init_reply(worker, answ, addr):
