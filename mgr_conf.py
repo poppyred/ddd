@@ -6,8 +6,9 @@ log_path = '/usr/local/dnspro/log'
 log_name = 'dnspro.log'
 log_direction=1
 
+g_size_perpack = 1024
 g_row_perpack = 10
-g_row_perpack4init = 200
+g_row_perpack4init = 1000
 
 g_inner_chk_init_ok_time = 2
 g_inner_chk_snd_time = 10

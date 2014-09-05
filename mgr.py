@@ -100,6 +100,8 @@ class MyDaemon(Daemon):
         #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
         #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
         #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
+        if False: #test
+            g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_init_test, mgr_conf.g_inner_chk_init_ok_time)
         g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())
 
         g_factory.get_mgr_loger().start()

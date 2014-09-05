@@ -112,6 +112,7 @@ class req_handler(object):
         #query dns
         msgobj = []
         count = 0
+        cur_cnt = 0
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
@@ -121,24 +122,38 @@ class req_handler(object):
                 g_req_loger.debug(_lineno(), "dns query %s res: %s" % (atbl, row))
                 worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                     0, msg.g_opt_add))
-                msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl],
-                    'pkt_head':msg.g_pack_head_init_dns})
+                msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl]})
                 count += 1
-                req_handler.notify_proxy(worker, msgobj, addr)
-            req_handler.notify_proxy(worker, msgobj, addr, True)
+                cur_cnt += 1
+                if cur_cnt >= mgr_conf.g_row_perpack4init:
+                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns) != True:
+                        return
+                    cur_cnt = 0
+                    del msgobj[:]
+        if cur_cnt > 0:
+            if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns) != True:
+                return
 
         #query view
         del msgobj[:]
         worker.dbcon.query(msg.g_init_sql_view)
         result = worker.dbcon.show()
+        cur_cnt = 0
         if result:
             for row in result:
                 g_req_loger.debug(_lineno(), row)
                 worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
-                msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
+                msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1]})
                 count += 1
-                req_handler.notify_proxy(worker, msgobj, addr)
-            req_handler.notify_proxy(worker, msgobj, addr, True)
+                cur_cnt += 1
+                if cur_cnt >= mgr_conf.g_row_perpack4init:
+                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view) != True:
+                        return
+                    cur_cnt = 0
+                    del msgobj[:]
+            if cur_cnt > 0:
+                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view) != True:
+                    return
 
         msg.g_init_resp_expect = count
 

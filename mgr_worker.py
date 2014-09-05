@@ -80,7 +80,15 @@ class mgr_handler(queue_thread.Qthread):
                     self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
                     msg.g_init_resp_expect = -1
                     mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
-                    req_handler.handle_proxy_init(self, data['inner_addr'][0])
+                    #req_handler.handle_proxy_init(self, data['inner_addr'][0])
+                    req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
+                    break
+                if case(msg.g_class_init_test):
+                    self.check_thd.del_tasknode_byname_lock(msg.g_class_init_test)
+                    self.proxy_addr['121.201.12.66'] = ('121.201.12.66', 12353)
+                    msg.g_init_resp_expect = -1
+                    mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
+                    req_handler.handle_proxy_init_new(self, '121.201.12.66')
                     break
                 if case(msg.g_class_proxy_register):
                     self.loger.info(_lineno(self), data['class'], '... expect[', msg.g_init_resp_expect, ']')
@@ -147,6 +155,43 @@ class mgr_handler(queue_thread.Qthread):
             self.loger.error(traceback.format_exc())
             if self.proxy_addr.has_key(host):
                 self.proxy_addr.pop(host)
+        finally:
+            s.close()
+
+    def sendto_(self, msgobj, addr, head, port=12345):
+        if addr == None or not self.proxy_addr.has_key(addr):
+            self.loger.error(_lineno(self), 'addr is error!!!! addr: ', repr(addr))
+            return False
+        try:
+            host = self.proxy_addr[addr][0]
+            encodedjson = json.dumps(msgobj)
+            str_fmt = "H" + str(len(encodedjson)) + "s"
+            str_send = struct.pack(str_fmt, head, encodedjson)
+
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((host, port))
+            cnt = len(str_send)
+            self.loger.info(_lineno(self), 'need to send(%d)' % (cnt,))
+            ibegin = 0
+            iend = 0
+            ilen = 0
+            while True:
+                ilen = mgr_conf.g_size_perpack if cnt>mgr_conf.g_size_perpack else cnt
+                iend += ilen
+                data = str_send[ibegin:iend]
+                s.send(data)
+                cnt -= ilen
+                self.loger.info(_lineno(self), 'sent(%d)' % (ilen,))
+                ibegin = iend
+                if cnt <= 0:
+                    break
+            return True
+        except socket.error, msg:
+            self.loger.error(_lineno(self), 'dip(%s) (%s): %s' % (host, msg.args[0],msg.args[1]))
+            self.loger.error(traceback.format_exc())
+            if self.proxy_addr.has_key(addr):
+                self.proxy_addr.pop(addr)
+            return False
         finally:
             s.close()
 
