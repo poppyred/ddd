@@ -6,6 +6,7 @@ import Queue
 import sys
 from mgr_misc import _lineno
 import traceback
+import time
 
 __all__ = ['Qthread']
 
@@ -17,12 +18,22 @@ class Qthread(threading.Thread):
         self.tq = Queue.Queue(qsize)
         self.loger = loger
         self.log_queue = False
+        self.lock = threading.Lock()
 
     def get_queue():
         return self.tq
 
     def put(self, data):
+        while True:
+            self.lock.acquire()
+            if self.tq.full():
+                self.lock.release()
+                print 'queue full go to sleep'
+                time.sleep(1)
+            else:
+                break
         self.tq.put(data, block=False)
+        self.lock.release()
 
     def run(self):
         while not self.thread_stop:

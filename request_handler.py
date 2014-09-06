@@ -180,7 +180,7 @@ class req_handler(object):
             if case():
                 state_set = 0
         g_req_loger.debug(_lineno(), str_class, ' ', answ['type'], ' ', answ['viewid'], ' ', answ['data'], ' ', state_set, ' ', answ['opt'])
-        if False:
+        if True:
             worker.dbcon.call_proc(msg.g_proc_update_snd_req, (str_class, answ['type'], answ['viewid'],
                 answ['data'], state_set, answ['opt']))
         #worker.dbcon.query(msg.g_proc_update_snd_req_ret)
