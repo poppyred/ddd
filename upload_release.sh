@@ -1,4 +1,4 @@
-#!/bin/bash
+5!/bin/bash
 
 # Function : transfer directory from localhost to remote node
 # args       : ip password local_dir remote_dir
