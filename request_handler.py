@@ -89,6 +89,16 @@ class req_handler(object):
                     'pkt_head':msg.g_pack_head_init_dns})
                 count += 1
                 req_handler.notify_proxy(worker, msgobj, addr)
+
+                if atbl == 'cname_record':
+                    g_req_loger.debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
+                    worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
+                        0, msg.g_opt_add))
+                    msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type['a_record'],
+                        'pkt_head':msg.g_pack_head_init_dns})
+                    count += 1
+                    req_handler.notify_proxy(worker, msgobj, addr)
+
             req_handler.notify_proxy(worker, msgobj, addr, True)
 
         #query view
@@ -556,6 +566,57 @@ class req_handler_record_cname(req_handler_impl):
 
     def notify(self, worker, msgobj, opt=None, data=None, odata=None):
         self.donotify(worker, msgobj, opt, data, odata, 'cname_record')
+
+    def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
+        if len(worker.proxy_addr.keys()) < 1:
+            return
+        self.loger.debug(_lineno(), 'opt:', opt, ' data:', data)
+        for case in switch(opt):
+            if case('add'):
+                #可以直接覆盖也就是发add
+                if (odata and len(odata) > 0 and len(odata[0]) >= 4):
+                    odata0 = odata[0]
+                    ropt = 'del'
+                    if odata0[3] > 0:
+                        ropt = 'add'
+                    msgobj.append({'opt':http_opt_str2int[ropt], 'domain':odata0[0], 'view':odata0[1], 'type':msg.g_dict_type[odata0[2]],
+                            'pkt_head':msg.g_pack_head_init_dns})
+                    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
+
+                # add: {u'A': u'9.9.9.9', u'viewid': u'2', u'main': u'test.com', u'name': u't9.test.com', u'ttl': u'10'}
+                msgobj.append({'opt':http_opt_str2int['add'], 'domain':data['name'].lstrip('@.'), 'view':int(data['viewid']),
+                    'type':msg.g_dict_type[real_tbl], 'pkt_head':msg.g_pack_head_init_dns})
+                break
+            if case('set'):
+                if (odata and len(odata) > 0 and len(odata[0]) >= 4):
+                    odata0 = odata[0]
+                    ropt = 'del'
+                    if odata0[3] > 0:
+                        ropt = 'add'
+                    msgobj.append({'opt':http_opt_str2int[ropt], 'domain':odata0[0], 'view':odata0[1], 'type':msg.g_dict_type[odata0[2]],
+                            'pkt_head':msg.g_pack_head_init_dns})
+                    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
+
+                # set: {"name":"t4.test.com","main":"test.com","rid":133,"A":"4.4.4.4","ttl":"10","viewid":"2"}
+                ropt = 'add'
+                if data.has_key('enable') and int(data['enable'])==0:
+                    ropt = 'del'
+                msgobj.append({'opt':http_opt_str2int[ropt], 'domain':data['name'].lstrip('@.'), 'view':int(data['viewid']),
+                    'type':msg.g_dict_type[real_tbl], 'pkt_head':msg.g_pack_head_init_dns})
+                break
+            if case('del'):
+                if (odata and len(odata) > 0 and len(odata[0]) >= 3):
+                    odata0 = odata[0]
+                    ropt = opt
+                    if odata0[2] > 0:
+                        ropt = 'add'
+                    msgobj.append({'opt':http_opt_str2int[ropt], 'domain':odata0[0], 'view':odata0[1], 'type':msg.g_dict_type[real_tbl],
+                        'pkt_head':msg.g_pack_head_init_dns})
+                break
+            if case():
+                self.loger.warn(_lineno(), 'opt:', opt, ' has not been implemented!')
+
+        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
 
 class req_handler_record_ns(req_handler_impl):
     def __init__(self, loger):
