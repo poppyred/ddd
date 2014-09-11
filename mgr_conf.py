@@ -19,10 +19,10 @@ g_url_inner_chk_task_ip = '121.201.12.60'
 g_url_inner_chk_task_url = 'http://' + g_url_inner_chk_task_ip + '/dnspro/dnsbroker/'
 g_mgr_sid = 'node_mgr_primary_zs_bgp'
 
-g_db_ip= '121.201.12.67'
+g_db_ip= '127.0.0.1'
 g_db_user= 'root'
 g_db_passwd = 'rjkj@rjkj'
 g_db_db = 'dnspro_core'
 
-g_zkClis = '121.201.12.57:2181,121.201.12.58:2181,121.201.12.60:2181,121.201.12.61:2181,121.201.12.62:2181'
+g_zkClis = '121.201.12.58:2181,121.201.12.59:2181,121.201.12.60:2181,121.201.12.61:2181,121.201.12.62:2181'
 #g_zkClis = 'localhost:2181'
