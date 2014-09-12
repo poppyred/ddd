@@ -53,12 +53,13 @@ class reply_thread(threading.Thread):
                     decodejson['inner_addr'] = addr
                     for case in switch(decodejson['class']):
                         if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
-                            if msg.g_init_complete == True:
-                                self.loger.info(_lineno(self), 'send to worker')
-                                self.worker.put(decodejson)
-                            else:
-                                self.loger.info(_lineno(self), 'send to 4init')
-                                self.worker4init.put(decodejson)
+                            #if msg.g_init_complete == True:
+                            #    self.loger.info(_lineno(self), 'send to worker')
+                            #    self.worker.put(decodejson)
+                            #else:
+                            #    self.loger.info(_lineno(self), 'send to 4init')
+                            #    self.worker4init.put(decodejson)
+                            self.worker4init.put(decodejson)
                             break
                         if case():
                             self.worker.put(decodejson)

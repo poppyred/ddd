@@ -10,7 +10,7 @@ then
     echo "[ERROR] usage : ./send_dir ip source_dir dst_dir"
     exit 1
 fi
-ip='121.201.12.58'
+ip='121.201.12.67'
 #ip=$1
 port="22"
 passwd='rjkj@dnspro#0801'
@@ -33,6 +33,9 @@ sed -i "/log_level/c log_level=\'info\'" mgr_conf.py
 
 oldlogdir=`sed -n '/log_direction/p' mgr_conf.py`
 sed -i "/log_direction/c log_direction=1" mgr_conf.py
+
+oldmgrsid=`sed -n '/g_mgr_sid/p' mgr_conf.py`
+sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp_bak'" mgr_conf.py
 
 python -c "import compileall; compileall.compile_dir('.')"
 mkdir -p $local_dir
@@ -64,4 +67,5 @@ expect -c "
 sed -i "/g_enable_stdin/c $oldline" msg.py
 sed -i "/log_level/c $oldloglevel" mgr_conf.py
 sed -i "/log_direction/c $oldlogdir" mgr_conf.py
+sed -i "/g_mgr_sid/c $oldmgrsid" mgr_conf.py
 /bin/rm $local_dir/* -rf

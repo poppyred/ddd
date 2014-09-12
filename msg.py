@@ -9,7 +9,7 @@ g_now = 0
 g_log_maxline = 90000
 
 g_init_resp_expect = -1
-g_init_complete = False
+#g_init_complete = False
 
 g_a_tbl = 1
 g_ns_tbl = 2

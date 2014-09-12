@@ -16,6 +16,7 @@ import traceback
 
 class mgr_handler(queue_thread.Qthread):
     handler_qsize = 40000
+    proxy_health = 3
     m_handlers = {}
     def __init__(self, loger):
         queue_thread.Qthread.__init__(self, 'mgr_work_thread', self.handler_qsize, loger)
@@ -77,24 +78,24 @@ class mgr_handler(queue_thread.Qthread):
             self.loger.info(_lineno(self), 'recv request class %s' % (data['class']))
             for case in switch(data['class']):
                 if case(msg.g_class_init):
-                    self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
+                    self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
                     msg.g_init_resp_expect = -1
-                    msg.g_init_complete = False
+                    #msg.g_init_complete = False
                     mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
                     #req_handler.handle_proxy_init(self, data['inner_addr'][0])
                     req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
                     break
                 if case(msg.g_class_init_test):
                     self.check_thd.del_tasknode_byname_lock(msg.g_class_init_test)
-                    self.proxy_addr['121.201.12.66'] = ('121.201.12.66', 12353)
+                    self.proxy_addr['121.201.12.66'] = [('121.201.12.66', 12353), self.proxy_health]
                     msg.g_init_resp_expect = -1
-                    msg.g_init_complete = False
+                    #msg.g_init_complete = False
                     mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
                     req_handler.handle_proxy_init_new(self, '121.201.12.66')
                     break
                 if case(msg.g_class_proxy_register):
                     self.loger.info(_lineno(self), data['class'], '... expect[', msg.g_init_resp_expect, ']')
-                    self.proxy_addr[data['inner_addr'][0]] = data['inner_addr']
+                    self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
                     if msg.g_init_resp_expect == -1:
                         self.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init_ok)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
@@ -102,12 +103,12 @@ class mgr_handler(queue_thread.Qthread):
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
                         mgr_conf.g_row_perpack = 10
                         msg.g_init_resp_expect = 0
-                        msg.g_init_complete = True
+                        #msg.g_init_complete = True
                         self.loger.info(_lineno(self), 'on register add timers OK')
                     break
-                if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
-                    req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
-                    break
+                #if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
+                #    req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
+                #    break
                 if case(msg.g_class_inner_chk_init_ok):
                     ok_cnt = req_handler.handle_inner_chk_init_ok(self)
                     if ok_cnt:
@@ -120,11 +121,20 @@ class mgr_handler(queue_thread.Qthread):
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
                         mgr_conf.g_row_perpack = 10
-                        msg.g_init_complete = True
+                        #msg.g_init_complete = True
                         self.loger.info(_lineno(self), 'on init add timers OK')
                     break
                 if case(msg.g_class_inner_chk_snd):
                     self.loger.info(_lineno(self), data['class'], '...')
+                    del_items = []
+                    for k, v in self.proxy_addr.iteritems():
+                        v[1] = v[1] - 1
+                        self.loger.info(_lineno(self), 'proxy %s->%s[%d]' % (k, v, v[1]))
+                        if v[1] <= 0:
+                            del_items.append(k)
+                    for p in del_items:
+                        self.proxy_addr.pop(p)
+
                     if len(self.proxy_addr.keys()) > 0:
                         req_handler.handle_inner_chk_snd(self)
                     else:
@@ -147,7 +157,7 @@ class mgr_handler(queue_thread.Qthread):
         self.loger.care(_lineno(self), 'sending:', encodedjson)
         str_fmt = "H" + str(len(encodedjson)) + "s"
         str_send = struct.pack(str_fmt, head, encodedjson)
-        self.__sendto_short__(str_send, self.proxy_addr[addr][0])
+        self.__sendto_short__(str_send, self.proxy_addr[addr][0][0])
 
     def __sendto_short__(self, data, host, port=12345):
         try:
@@ -167,7 +177,7 @@ class mgr_handler(queue_thread.Qthread):
             self.loger.error(_lineno(self), 'addr is error!!!! addr: ', repr(addr))
             return False
         try:
-            host = self.proxy_addr[addr][0]
+            host = self.proxy_addr[addr][0][0]
             encodedjson = json.dumps(msgobj)
             str_fmt = "H" + str(len(encodedjson)) + "s"
             str_send = struct.pack(str_fmt, head, encodedjson)
