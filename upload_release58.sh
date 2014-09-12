@@ -2,8 +2,8 @@
 
 # Function : transfer directory from localhost to remote node
 # args       : ip password local_dir remote_dir
-# Author   : firefoxbug
-# Date     : 2013/06/25
+# Author   : likunxiang
+# Date     : 2014/06/25
 
 if [ $# -ne 0 ]
 then
@@ -41,6 +41,8 @@ python -c "import compileall; compileall.compile_dir('.')"
 mkdir -p $local_dir
 /bin/rm $local_dir/* -rf
 /bin/mv *.pyc $local_dir
+mkdir -p $local_dir/test
+/bin/mv test/*.pyc $local_dir/test
 #/bin/cp mgr_conf.py chlog.sh init.sh stop.sh start.sh psmgr.sh $local_dir -rf
 /bin/cp *.py chlog.sh init.sh stop.sh start.sh psmgr.sh $local_dir -rf
 
