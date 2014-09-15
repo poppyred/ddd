@@ -12,14 +12,14 @@ class MySQL(object):
     '''
     MySQL
     '''
-    conn = ''
-    cursor = ''
-    def __init__(self,host='121.201.11.3',user='root',passwd='qwer',db='dnspro_core',charset='utf8', loger=None):
+    conn = None
+    cursor = None
+    def __init__(self,host='121.201.11.3',user='root',password='rjkj@rjkj',db='dnspro_core',charset='utf8', loger=None):
         """MySQL Database initialization """
         self.conn_error = True
         self.host = host
         self.user = user
-        self.passwd = passwd
+        self.passwd = password
         self.db = db
         self.charset = charset
         self.cursor = None
@@ -32,9 +32,18 @@ class MySQL(object):
 
     def __myconnect__(self):
         try:
+            self.loger.info(_lineno(self), 'host[%s], user[%s], passwd[%s], db[%s]' % (self.host, self.user, self.passwd, self.db))
             if self.db=='':
+                if self.cursor:
+                    self.cursor.close()
+                if self.conn:
+                    self.conn.close()
                 self.conn = MySQLdb.connect(self.host,self.user,self.passwd,port=3306)
             else:
+                if self.cursor:
+                    self.cursor.close()
+                if self.conn:
+                    self.conn.close()
                 self.conn = MySQLdb.connect(self.host,self.user,self.passwd,self.db,port=3306)
             self.conn_error= False
         except MySQLdb.Error,e:

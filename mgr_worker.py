@@ -23,7 +23,7 @@ class mgr_handler(queue_thread.Qthread):
         self.check_thd = None
         self.proxy_addr = {}
         self.dbip = mgr_conf.g_db_ip
-        self.dbcon = MySQL.MySQL(host=self.dbip, user=mgr_conf.g_db_user, passwd=mgr_conf.g_db_passwd,
+        self.dbcon = MySQL.MySQL(host=self.dbip, user=mgr_conf.g_db_user, password=mgr_conf.g_db_passwd,
                 db=mgr_conf.g_db_db, loger=loger)
         if self.dbcon.conn_error:
             self.loger.error(traceback.format_exc())
