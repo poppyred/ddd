@@ -225,7 +225,7 @@ static int32_t read_sock(int32_t fd, void *buffer, uint32_t length)
     {
         if((nread = read(fd, ptr, nleft)) < 0)
         {
-            if(errno == EINTR)
+            if(errno == EAGAIN)
             {
                 nread = 0;
                 continue;
@@ -269,7 +269,7 @@ static int32_t write_sock(int32_t fd, void *buffer, uint32_t length)
     {
         if((nwrite = write(fd, ptr, nleft))<=0)
         {
-            if(errno == EINTR)
+            if(errno == EAGAIN)
             {
                 nwrite = 0;
             }
