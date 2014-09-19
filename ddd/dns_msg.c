@@ -890,6 +890,7 @@ int dns_msg_cache_analyze(char *msg)
 	json_arr = cJSON_Parse(msg);
     if (!json_arr)
     {
+        hyb_debug("dns_msg_cache_analyze failed!reason:json parse failed!\n");
         goto FAILED;
     }
 
@@ -971,8 +972,12 @@ int dns_msg_view_analyze(char *msg)
     int i = 0;
 
     cJSON *json_arr = NULL;
-    
 	json_arr = cJSON_Parse(msg);
+    if (!json_arr)
+    {
+        hyb_debug("dns_msg_view_analyze failed!reason:json parse failed!\n");
+        return 0;
+    }
 
     int num = cJSON_GetArraySize(json_arr);
 
@@ -983,7 +988,6 @@ int dns_msg_view_analyze(char *msg)
         int mask_num = 0;
         
         cJSON *json = cJSON_GetArrayItem(json_arr, i);
-
         cJSON *opt = cJSON_GetObjectItem(json,"opt");
         char *opt_js = cJSON_Print(opt);
         int opt_id = atoi(opt_js);

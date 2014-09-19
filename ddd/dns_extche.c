@@ -180,6 +180,20 @@ static int extche_member_compare(const void *key1, uint32_t domain_len1,const vo
 			return -1;
 		}
 	}
+
+    if (domain_len1 > domain_len2)
+    {
+        return 1;
+    }
+
+    if (j>0)
+    {
+        if (domain2[j] != '.')
+        {
+            return -1;
+        }
+    }
+    
 	return 0;
 }
 
@@ -377,7 +391,15 @@ st_extche_view_node * get_extche_veiw_node(char * domain,int domain_len,ushort v
 	}
 	
 	node = temp->view[view_id];
-	return node;
+
+    if (node)
+    {
+	    return node;
+    }
+    else
+    {
+        return temp->view[1];
+    }
 }
 
 static 
@@ -776,6 +798,12 @@ int dns_ext_cache_get(char *packet,char *domain,int domain_len,ushort view_id,
 	{
 		return 0;
 	}
+
+    /*·ÀÖ¹½âÎö@¼ÇÂ¼*/
+    if(domain_len == (node->domainlen-2))
+    {
+        return 0;
+    }
     
     char ext_domain[MAX_NAME_LEN] = {0};
     char use_domain[MAX_NAME_LEN] = {0};

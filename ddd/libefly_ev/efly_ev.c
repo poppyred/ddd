@@ -13,7 +13,7 @@
 
 
 #define hyb_debug(fmt, args ...) \
-    do {printf("[%s][%d]:"fmt, __FILE__, __LINE__,##args);}while(0)
+    do {fprintf(stderr,"[%s][%d]:"fmt, __FILE__, __LINE__,##args);}while(0)
         
 
 /* -------system -------- */
@@ -24,7 +24,7 @@
 
 #define MAX_PATH_LEN    (25)
 #define LEN_OF_LISTEN   (100)
-#define RECV_BUF_LEN    (1500)
+#define RECV_BUF_LEN    (30000)
 #define ANSWER_BUF_LEN  (20)
 
 
@@ -312,7 +312,7 @@ static void on_read(int fd, short ev, void *arg)
         return;
     }
 
-    //hyb_debug("received msg: %s from %s\n", req +sizeof(unsigned short), cli->srcname);
+    hyb_debug("received len:%d\n", len);
 
     
     memcpy(&id,req,sizeof(unsigned short));

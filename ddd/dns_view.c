@@ -394,7 +394,7 @@ int dns_view_create(ushort view_id)
 	temp = g_veiw_array[view_id];
 	if(temp != NULL)
 	{
-		he_debug("[dns_view_create] create view fail:view exist!\n");
+		//he_debug("[dns_view_create] create view fail:view exist!\n");
 		return -1;
 	}
 

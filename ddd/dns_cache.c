@@ -631,9 +631,7 @@ int dns_cache_get(char* answer, char* domain, int domain_len, int view_id,
         hyb_debug("Set wrong type cache!\n");
         return -1;
     }
-
     
-    //int i = 0;
     st_cache_domain *temp = NULL;
 
     if (likely(h_hash_search(cache_table,domain,domain_len,(void **)&temp) == 0))
@@ -641,40 +639,21 @@ int dns_cache_get(char* answer, char* domain, int domain_len, int view_id,
         st_cache_view_node *view_temp = temp->view[view_id];
         if (likely(view_temp))
         {
-            #if 0
-            int left = view_temp->end_time - global_now;
-            if (unlikely(left < 0))
-            {
-                dns_view_destroy(view_temp,temp,view_id);
-                return -1;
-               
-            }
-            else
-            {
-                unsigned short ttl = htons(left);
-                if (dns_edit_ttl_check(view_temp->msg, view_temp->off[0], ttl))
-                {
-                    //TODO CHANGE TTL         
-                    for (i = 0; i < view_temp->count; i++)
-                    {
-                        dns_edit_ttl(view_temp->msg, view_temp->off[i], ttl);
-                    }
-                    
-                }
-                
-                
-                memcpy(answer, view_temp->msg,view_temp->msg_len);  
-                
-                
-                return view_temp->msg_len;
-            }
-            #endif
-
                             
-            memcpy(answer, view_temp->msg,view_temp->msg_len);       
-                
+            memcpy(answer, view_temp->msg,view_temp->msg_len);               
             return view_temp->msg_len;
             
+        }
+        else
+        {
+            st_cache_view_node *view_temp = temp->view[1];
+            if (likely(view_temp))
+            {
+           
+                memcpy(answer, view_temp->msg,view_temp->msg_len);        
+                return view_temp->msg_len;
+            
+            }
         }
         
     }

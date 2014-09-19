@@ -1,0 +1,54 @@
+.ac_results {
+	background: #FEFEFE;
+	display: block;
+	border: solid 1px #c7ccd2;
+	border-right-color: #e0e4e9;
+	border-bottom-color: #e0e4e9;
+	text-align: left; z-index: 2000; 
+}
+
+.ac_results ul {
+	width: 100%;
+	list-style-position: outside;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.ac_results li {
+	margin: 0px;
+	padding: 5px 5px;
+	cursor: default;
+	display: block;
+	color: #666;
+	/* 
+	if width will be 100% horizontal scrollbar will apear 
+	when scroll mode will be used
+	*/
+	/*width: 100%;*/
+	font: menu;
+	font-size: 14px;
+	/* 
+	it is very important, if line-height not setted or setted 
+	in relative units scroll will be broken in firefox
+	*/
+	line-height: 16px;
+	overflow: hidden;
+}
+
+
+.ac_odd {
+	background-color: #f0f0f0;
+}
+
+.ac_over {
+	background-color: #1c8fdf;
+	color: white;
+}
+
+.autocomplete_icon { 
+	background-image: url(/quote/images/autocomplete.gif);	
+	cursor: pointer;
+	cursor: hand;	
+}
+

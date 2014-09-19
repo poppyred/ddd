@@ -12,7 +12,7 @@
 
 
 
-#define he_debug(fmt, args ...) \
+#define hyb_debug(fmt, args ...) \
     do {fprintf(stderr,"[%s][%d][he]:"fmt, __FILE__, __LINE__,##args);}while(0)
 
 #define random(x) (rand()%x)
@@ -227,7 +227,7 @@ int mask_syn_from_mysql()
 	result = mask_memory_to_file();
 	if(result != 0)
 	{
-		he_debug("mask_memory_to_file fail.");
+		hyb_debug("mask_memory_to_file fail.");
 		return -1;
 	}
 
@@ -235,7 +235,7 @@ int mask_syn_from_mysql()
 	result = mask_exe_php();
 	if(result != 0)
 	{
-		he_debug("mask_exe_php fail.");
+		hyb_debug("mask_exe_php fail.");
 		return -1;
 	}
 
@@ -763,7 +763,7 @@ int dns_mask_insert(char ipaddr[MAX_IP_LEN],int mask,ushort view_id)
 	result = mask_view_insert(ipaddr,mask,view_id);
 	if(result == 0)
 	{
-		he_debug("insert mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
+		//hyb_debug("insert mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
 	}
 	return result;
 }
@@ -785,7 +785,7 @@ int dns_mask_remove(char ipaddr[MAX_IP_LEN],int mask)
 	result = mask_view_remove(ipaddr,mask);
 	if(result == 0)
 	{
-		he_debug("remove mask[%s/%d]\n",ipaddr,mask);
+		hyb_debug("remove mask[%s/%d]\n",ipaddr,mask);
 	}
 	return result;
 }
@@ -996,6 +996,7 @@ int dns_mask_view_node_count()
 **/
 int dns_mask_control_node_count()
 {
+    hyb_debug("[The Mask num:%d]\n",mask_get_read_control_array()->size);
 	return mask_get_read_control_array()->size;
 }
 

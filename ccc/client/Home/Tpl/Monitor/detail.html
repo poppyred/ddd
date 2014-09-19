@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 域名监控</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" >
+	var show_hide=0, chart_line, chart_pie;
+    	$(function () {
+	    Highcharts.setOptions({                                                     
+		global: {                                                               
+		    useUTC: false                                                       
+		}                                                                       
+	    });  
+	    chart_line = new Highcharts.Chart({
+		chart : {
+			renderTo: "chart",
+			zoomType: 'x'
+			//events:{ load: getdata }
+		},
+		title: {
+		    text: ''//,
+		    //x: -20 //center
+		},
+		xAxis: {                                                                
+		    type: 'datetime',                                                   
+		    tickPixelInterval: 150                                              
+		},   
+		/*xAxis: {
+		    categories: ['14:50', '14:55', '15:00', '15:05', '15:10', '15:15','15:20', '15:25', '15:30', '15:35', '15:40', '15:45']
+		},*/
+		yAxis: {
+		    title: {
+			text: '响应时间 (ms)'
+		    },
+		    min: 0,
+		    plotLines: [{
+			value: 0,
+			width: 1,
+			color: '#808080'
+		    }]
+		},
+		tooltip: {
+		    valueSuffix: 'ms',
+		    crosshairs: true,
+		    shared: true
+		},
+		legend: {
+		    enabled: false
+		},
+		/*plotOptions: {
+		    line: {
+			marker: {
+			    enabled: false
+			}
+		    }
+		},*/
+		series: [{
+			name: '广州电信',
+			data: (function() {
+				var data = [], time = (new Date()).getTime(), i;
+				for (i = -12; i <= 0; i++) {
+					data.push({                                                 
+					    x: time + i * 1000 * 60 * 5,
+					    y: parseInt(Math.random() * 50) + 10
+					});
+				}
+				return data;
+			})()
+		}, {
+		      name: '上海联通',
+		      data: (function() {
+				var data = [], time = (new Date()).getTime(), i;
+				for (i = -12; i <= 0; i++) {
+					data.push({                                                 
+					    x: time + i * 1000 * 60 * 5,
+					    y: parseInt(Math.random() * 60) + 10
+					});
+				}
+				return data;
+			})()
+		}, {
+		      name: '北京BGP',
+		      data: (function() {
+				var data = [], time = (new Date()).getTime(), i;
+				for (i = -12; i <= 0; i++) {
+					data.push({                                                 
+					    x: time + i * 1000 * 60 * 5,
+					    y: parseInt(Math.random() * 40) + 10
+					});
+				}
+				return data;
+			})()
+		}]
+	    });
+	    
+	    chart_pie = new Highcharts.Chart({
+		chart: {
+		    renderTo: "chart_pie",
+		    plotBackgroundColor: null,
+		    plotBorderWidth: null,
+		    plotShadow: false
+		},
+		title: {
+		    text: ''
+		},
+		tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+		},
+		plotOptions: {
+		    pie: {
+			allowPointSelect: true,
+			cursor: 'pointer',
+			dataLabels: {
+			    enabled: true,
+			    color: '#000000',
+			    connectorColor: '#000000',
+			    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+			}
+		    }
+		},
+		series: [{
+		    type: 'pie',
+		    name: '响应占比',
+		    data: [
+			['华南地区', 45.0],
+			['华东地区', 26.8],
+			['华北地区', 8.5],
+			['其他地区', 6.2]
+		    ]
+		}]
+	    });
+	});
+	function setData(str, evt){
+		$(".ui-btn-blue").addClass("ui-btn-grey");
+		$(".ui-btn-blue").removeClass("ui-btn-blue");
+		$(evt).removeClass("ui-btn-grey");
+		$(evt).addClass("ui-btn-blue");
+		if(str == "广州电信"){
+			chart_line.series[0].show();
+			chart_line.series[1].hide();
+			chart_line.series[2].hide();
+			$("#avg-rsp-num").html(parseInt(Math.random() * 10) + 40);
+		}
+		if(str == "上海联通"){
+			chart_line.series[1].show();
+			chart_line.series[0].hide();
+			chart_line.series[2].hide();
+			$("#avg-rsp-num").html(parseInt(Math.random() * 10) + 50);
+		}
+		if(str == "北京BGP"){
+			chart_line.series[2].show();
+			chart_line.series[0].hide();
+			chart_line.series[1].hide();
+			$("#avg-rsp-num").html(parseInt(Math.random() * 10) + 30);
+		}
+		if(str == "全部"){
+			chart_line.series[2].show();
+			chart_line.series[0].show();
+			chart_line.series[1].show();
+			$("#avg-rsp-num").html(parseInt(Math.random() * 10) + 40);
+		}
+	}
+	function changeRoute(evt){
+		var data1 = getData(30);
+		var data2 = getData(60);
+		var data3 = getData(40);
+		chart_line.series[0].setData(data1,true);
+		chart_line.series[1].setData(data2,true);
+		chart_line.series[2].setData(data3,true);
+		$("#avg-rsp-num").html(parseInt(Math.random() * 10) + 40);
+
+		chart_pie.series[0].setData([['华南地区', parseInt(Math.random() * 10) + 50],
+			['华东地区', parseInt(Math.random() * 10) + 20],
+			['华北地区', parseInt(Math.random() * 10) + 8],
+			['其他地区', parseInt(Math.random() * 10) + 3]]);
+	}
+	function getData(span){
+		var data = [], time = (new Date()).getTime(), i;
+			for (i = -12; i <= 0; i++) {
+				data.push({                                                 
+				x: time + i * 1000 * 60 * 5,
+				y: parseInt(Math.random() * span) + 10
+			});
+		}
+		return data;
+	}
+    </script>
+</head>
+<body class="page-dns" style="">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header_moniter" /> 
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList" ></a><span class="s"></span>
+				<a href="index.html">域名监控</a><span class="s"></span>
+				<strong class="current">{$domain} 的监控详情</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<span class="dtype icon-hichina"></span><strong class="dname">{$domain}</strong>
+				<a class="rf icon icon-log" style="margin-top:20px;background-position: 0 0;" href="javascript:void(0);" target="_blank">导出监控数据</a>
+				<a class="rf icon icon-export" style="margin-top:20px;background-position: 0 -38px;" href="javascript:void(0);" target="_blank">监控设置</a>
+			</p>
+		</div> 
+		<div class="J_infoBox" style="display:none;">
+		    <div class="dns-tip-box fix J_dnsTipBox">
+			<div class="lf tips">
+			    <p>
+				<b class="ui-color-red">
+				    请您先设置解析记录，然后再到域名注册的地方把DNS修改为如下阿里DNS，以使解析生效：
+				    <a class="ui-help" href="javascript:void(0);" title="先设置解析记录，后修改DNS，可使您的域名解析平滑过渡，访问无断点。"></a>
+				</b><br>
+				&emsp;&nbsp;
+				<b class="font-arial">ns1.alidns.com<br>&emsp;&nbsp;ns2.alidns.com</b>
+			    </p>
+			    <p>&emsp;&nbsp;<button class="ui-btn-grey btn-check-cur-dns J_checkCurrentDns">检测当前DNS</button>
+			    </p>
+			    <p class="dot">
+				阿里DNS不能和其他DNS同时使用，若与其他DNS同时使用会导致解析混乱。
+			    </p>
+			    <p class="dot">
+				修改 DNS 服务器需要最长 72 小时的全球生效时间，请耐心等待。
+			    </p>
+			</div>
+			<div class="lf helps">
+			    <p class="how"><a href="javascript:void(0);" target="_blank">如何修改DNS？</a></p>
+			    <p class="when"><a href="javascript:void(0);" target="_blank">设置解析后多长时间生效？</a></p>
+			    <p class="qa"><a href="javascript:void(0);" target="_blank">解析常见问题？</a></p>
+			</div>
+			<a class="btn-close J_btnClose" href="javascript:void(0);" onClick="closeDiv();" >close</a>
+		    </div>
+		</div>
+		<div class="table-box">
+			<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+				<div class="lf">
+					选择线路：<select class="ui-select" onchange="changeRoute(this);">
+						<option selected value="recent">121.25.62.14</option>
+						<option value="ishichina">58.63.124.21</option> 
+						<option value="errordomain">125.63.163.35</option>
+					</select>
+				</div>
+				<div class="rf">
+					选择URL：<select class="ui-select" style="width:380px;">
+						<option selected value="all">http://{$domain}/</option>
+						<option value="recent">http://{$domain}/index/login</option>
+					</select>
+					<!--input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" type="text" placeholder="请选择查询日期">
+					<button class="ui-btn-grey">查询</button-->
+				</div>
+			</div>
+		</div> 
+		<div class="table-box">
+			<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+				<div class="lf"> 
+					监控节点：
+					<button class="ui-btn-blue" onClick="setData('全部',this)">全部</button>
+					<button class="ui-btn-grey" style="" onClick="setData('广州电信',this)">广州电信</button>
+					<button class="ui-btn-grey" style="" onClick="setData('上海联通',this)">上海联通</button>
+					<button class="ui-btn-grey" style="" onClick="setData('北京BGP',this)">北京BGP</button>
+				</div> 
+			</div>
+		</div>
+		<div class="table-box">
+			<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+				<div class="lf"><text x="16" y="25" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Verdana, Arial, Helvetica, sans-serif;font-size:14px;color:#404040;font-weight:bold;fill:#404040;width:706px;" text-anchor="start" class="highcharts-title" zIndex="4"><tspan x="16">响应时间波动</tspan></text></div>
+			</div>
+			<div id="chart" style="height:220px;margin-top:10px;"></div>
+		</div> 
+		<div class="table-box" style="display:block;height:250px;">
+			<div style="width:440px;float:left;">
+				<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+					<div class="lf">
+						<text x="16" y="25" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Verdana, Arial, Helvetica, sans-serif;font-size:14px;color:#404040;font-weight:bold;fill:#404040;width:706px;" text-anchor="start" class="highcharts-title" zIndex="4"><tspan x="16">平均响应时间</tspan></text>
+					</div>
+				</div>
+				<div style="margin-top:50px;margin-left:120px;">
+					<span id="avg-rsp-num" style="font-size: 5.9em;">42</span>
+					<span style="font-size: 2.9em;margin-left:20px;">ms</span>
+				</div>
+			</div> 
+			<div style="width:440px;float:left;">
+				<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+					<div class="lf"> 
+						<text x="16" y="25" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Verdana, Arial, Helvetica, sans-serif;font-size:14px;color:#404040;font-weight:bold;fill:#404040;width:706px;" text-anchor="start" class="highcharts-title" zIndex="4"><tspan x="16">响应区域分布</tspan></text>
+					</div> 
+				</div>
+				<div id="chart_pie" style="height:220px;margin-top:10px;"></div>
+			</div> 
+		</div>
+		<div class="table-box">
+			<div class="table-toolbar" style="border-bottom:none;padding:0 0;">
+				<div class="lf"><text x="16" y="25" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Verdana, Arial, Helvetica, sans-serif;font-size:14px;color:#404040;font-weight:bold;fill:#404040;width:706px;" text-anchor="start" class="highcharts-title" zIndex="4"><tspan x="16">路线详情</tspan></text></div>
+			</div>
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<!--thead-->
+				<tr id="tr_title">
+					<th class="chk"></th> 		
+					<th class="sortable" sort="type"><span class="el">解析线路</span></th> 		
+					<th class="sortable" sort="rr"><span class="el">服务器IP</span></th> 		
+					<th class="sortable" sort="line"><span class="el">当前状态</span></th> 				
+					<th>操作</th>
+				</tr>
+				<!--/thead--> 	
+				<!--tbody-->   
+					<tr class="data"> 	 	
+						<td class="chk"></td> 	 	 	
+						<td class="type" onclick="editTable(this)">MX</td> 	
+						<td class="rr" onclick="editTable(this)">@</td> 	 	
+						<td class="route" onclick="editTable(this)">默认</td> 		 	
+						<td class="iop">
+							<a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a>
+							<a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteDns('one',this)"></a>
+						</td> 	 
+					</tr>
+					<tr style="display:none" class="msg_info" id="tx_1">	 	
+						<td colspan="8" class="expand-outer"></td>
+					</tr>
+					<tr class="data">
+						<td class="chk"></td> 	 	 
+						<td class="type" onclick="editTable(this)">A</td> 	
+						<td class="rr" onclick="editTable(this)">www.keyanwei.com.cn</td> 	 	
+						<td class="route" onclick="editTable(this)">联通</td> 	 	 	
+						<td class="iop">
+							<a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a>
+							<a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteDns('one',this)"></a>
+						</td> 	 
+					</tr>
+					<tr style="display:none" class="msg_info" id="tx_2"> 	 	
+						<td colspan="8" class="expand-outer"></td> 	 
+					</tr>
+				<!--/tbody--> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+    <!-- 消息提示 -->
+    <div class="ui-pop-box small-con-box" id="message" style=" display:none; width: auto; height: auto; left: 635.5px; top: 212px;"><div class="con small-con" ></div></div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 自定义线路</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/artDialog.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/artDialog/jquery.artDialog.js"></script>
+	<script type="text/javascript" >
+		$(function(){
+			//加载提示信息
+		});
+		//修改自定义线路
+		function updateRoute(obj,name){
+			if(confirm('确认修改自定义线路？')){
+				var val = $(obj).parent().find('textarea').val(),is_ok=true,arr,tem;
+				if(typeof(val)=='undefined' || val==""){
+					$(obj).parent().find('textarea').focus();
+					is_ok=false;
+					return ;
+				}
+				if(val.indexOf(';')!=-1 || val.indexOf('\n')!=-1){
+					if(val.indexOf(';')!=-1){
+						arr = val.split(';')
+						for(var i=0;i<arr.length;i++){
+							if(arr[i]!=''){
+								if(arr[i].indexOf('-')!=-1){							
+									tem = arr[i].split('-');
+									if(tem.length!=2){
+										messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+										is_ok=false;
+										return ;
+									}
+									for(var j=0;j<tem.length;j++){
+										if(!CheckIp(tem[j])){
+											messageBox('del_up_Route_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+											is_ok=false;
+											return ;
+										}
+									}
+								}else{
+									messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+									is_ok=false;
+									return ;
+								}
+							}
+						}
+					}else{
+						arr = val.split('\n')
+						for(var i=0;i<arr.length;i++){
+							if(arr[i]!=''){
+								if(arr[i].indexOf('-')!=-1){
+									tem = arr[i].split('-');
+									if(tem.length!=2){
+										messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+										is_ok=false;
+										return ;
+									}
+									for(var j=0;j<tem.length;j++){
+										if(!CheckIp(tem[j])){
+											messageBox('del_up_Route_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+											is_ok=false;
+											return ;
+										}	
+									}
+								}else{
+									messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+									is_ok=false;
+									return ;
+								}
+							}
+						}
+					}
+				}else{
+					if(val.indexOf('-')!=-1){
+						tem = val.split('-');
+						if(tem.length!=2){
+							messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+							is_ok=false;
+							return ;
+						}
+						for(var j=0;j<tem.length;j++){
+							if(!CheckIp(tem[j])){
+								messageBox('del_up_Route_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+								is_ok=false;
+								return ;
+							}	
+						}
+					}else{
+						messageBox('del_up_Route_msg','输入的格式有误，请重新输入。');
+						is_ok=false;
+						return ;
+					}
+				}
+				if(is_ok){
+					if(val.indexOf('\n')){
+						val = val.replace(/\n/g,';');
+					}
+					$.ajax({
+						url:'__APP__/Domain/updateRoute',
+						type:'post',
+						data:{'name':name,'ips':val},
+						success:function(data){
+							if(data.info=='success'){								
+								var t = val.split(';'),text="";
+								for(var i=0;i<t.length;i++){
+									if(i!=t.length-1){
+										text += t[i] + "&#13;"
+									}else{
+										text += t[i]
+									}
+								}
+								$(obj).parent().find('textarea').val(text);
+								messageBox('del_up_Route_msg','自定义线路修改成功');
+							}else{
+								messageBox('del_up_Route_msg',data.data);	
+							}
+						},
+						error:function(data){
+							messageBox('del_up_Route_msg',data.statusText);
+						}
+						
+					});
+				}
+			}
+		}
+		//删除自定义线路
+		function delRoute(obj,name){
+			if(confirm('确定删除该自定义线路吗？原来定义了该路线的记录会被置为默认线路！')){
+				$.ajax({
+					url:'__APP__/Domain/deleteRoute',
+					type:'post',
+					data:{'name':name},
+					success:function(data){
+						if(data.info=='success'){
+							$(obj).parent().parent().empty();
+							messageBox('del_up_Route_msg',data.data);
+							if(typeof($('#myData .data .laber').html())=='undefined'){
+								$('#myData .data').attr('id','null_route');
+								$('#myData .data').html('<td colspan="2"><span>暂无自定义线路~</span></td>');
+							}
+						}else{
+							messageBox('del_up_Route_msg',data.data);		
+						}
+					},
+					error:function(data){
+						messageBox('del_up_Route_msg',data.statusText);
+					}
+				});
+			}
+		}
+		function bindRoute(route){
+			var val;
+			if(typeof(route)=='undefined' || route==""){
+				return "默认";
+			}else{
+				return val;
+			}
+		}
+		
+		function addRoute(){
+			var is_ok=true,name=$("#txt_name").val(),ips=$("#txt_ip").val(),
+			arr,tem;
+			//alert(arr[1]);
+			if(typeof(name)=='undefined' || name==""){
+				$("#txt_name").focus();
+				is_ok=false;
+				return ;
+			}
+			if(typeof(ips)=='undefined' || ips==""){
+				$("#txt_ip").focus();
+				is_ok=false;
+				return ;
+			}
+			if(ips.indexOf(';')!=-1 || ips.indexOf('\n')!=-1){
+				if(ips.indexOf(';')!=-1){
+					arr = ips.split(';')
+					for(var i=0;i<arr.length;i++){
+						if(arr[i]!=''){
+							if(arr[i].indexOf('-')!=-1){							
+								tem = arr[i].split('-');
+								if(tem.length!=2){
+									messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+									is_ok=false;
+									return ;
+								}
+								for(var j=0;j<tem.length;j++){
+									if(!CheckIp(tem[j])){
+										messageBox('addRoute_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+										is_ok=false;
+										return ;
+									}
+								}
+							}else{
+								messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+								is_ok=false;
+								return ;
+							}
+						}
+					}
+				}else{
+					arr = ips.split('\n')
+					for(var i=0;i<arr.length;i++){
+						if(arr[i]!=''){
+							if(arr[i].indexOf('-')!=-1){
+								tem = arr[i].split('-');
+								if(tem.length!=2){
+									messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+									is_ok=false;
+									return ;
+								}
+								for(var j=0;j<tem.length;j++){
+									if(!CheckIp(tem[j])){
+										messageBox('addRoute_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+										is_ok=false;
+										return ;
+									}	
+								}
+							}else{
+								messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+								is_ok=false;
+								return ;
+							}
+						}
+					}
+				}
+			}else{
+				if(ips.indexOf('-')!=-1){
+					tem = ips.split('-');
+					if(tem.length!=2){
+						messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+						is_ok=false;
+						return ;
+					}
+					for(var j=0;j<tem.length;j++){
+						if(!CheckIp(tem[j])){
+							messageBox('addRoute_msg','输入的['+tem[j]+']ip格式有误，请重新输入。');
+							is_ok=false;
+							return ;
+						}	
+					}
+				}else{
+					messageBox('addRoute_msg','输入的格式有误，请重新输入。');
+					is_ok=false;
+					return ;
+				}
+			}
+			if(is_ok){
+				if(ips.indexOf('\n')){
+					ips = ips.replace(/\n/g,';');
+				}
+				$.ajax({
+					url:'__APP__/Domain/addRoute',
+					type:'post',
+					data:{'name':name,'ips':ips,'id':$("#txt_zone_id").val()},
+					success:function(data){
+						if(data.info=='success'){
+							if($("#null_route").html()){
+								$("#null_route").empty();
+							}
+							var t = ips.split(';'),text="";
+							for(var i=0;i<t.length;i++){
+								if(i!=t.length-1){
+									text += t[i] + "&#13;"
+								}else{
+									text += t[i]
+								}
+							}	
+							$('#txt_name').val('');
+							$('#txt_ip').val('');
+							$("#myData").prepend('<tr class="data"><td class="laber">'+data.data.name+'</td><td class="edit"><textarea cols="30" rows="4" class="ui-textarea" style="margin:10px auto;">'+text+'</textarea>&nbsp;<a style="margin-left:10px;"  href="javascript:" onclick="updateRoute(this,\''+data.data.name+'\');">修改</a><a style="margin-left:10px;" href="javascript:" onclick="delRoute(this,\''+data.data.name+'\');">删除</a></td></tr>');
+							messageBox('addRoute_msg',"自定义线路添加成功");	
+						}else{
+							messageBox('addRoute_msg',data.data);
+						}
+					},
+					error:function(data){
+						messageBox('addRoute_msg',data.statusText);
+					}
+					
+				});
+			}
+			
+		}
+		
+    </script>
+</head>
+<body class="page-dns">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<input type="hidden" value="{$zone}" id="txt_zone"/>
+		<input type="hidden" value="{$zone_id}" id="txt_zone_id"/>
+		<input type="hidden" value="{$is_new}" id="is_first"/>
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList" ></a><span class="s"></span>
+				<a href="domainList.html">域名列表</a><span class="s"></span>
+				<strong class="current">{$zone} 的自定义线路</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<!--if condition="$is_on eq 0">
+                	<span class="dtype icon-pause"></span>
+					<else /-->
+                    <if condition="$level neq 0">
+                        <span class="dtype icon-vip"></span>
+                        <else /><span class="dtype icon-novip"></span>
+                    </if>
+                <!--/if-->
+				<strong id="cur_zone" class="dname">{$zone}</strong>
+				<span class="tab "><a style="margin-left:10px;" href="javascript:void(0);">自定义路线</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainRpt?d={$zone}">解析统计</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainSet?d={$zone}">域名设置</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/detail?d={$zone}">记录管理</a></span>
+			</p>
+		</div> 
+		<div class="J_infoBox" style="display:none;">
+        <div class="dns-tip-box fix J_dnsTipBox">
+            <div class="lf tips">
+                <p>
+                    <b class="ui-color-red">
+                        域名解析记录生效的时间分为以下三种情况：
+                        <a class="ui-help" href="javascript:void(0);" title="先设置解析记录，后修改DNS，可使您的域名解析平滑过渡，访问无断点。"></a>
+                    </b>
+                <p class="dot">
+                   新增解析记录，我们是实时生效的。
+                </p>
+                <p class="dot">
+                   修改域名记录，DNSPro解析权威服务器上是实时生效的，最终生效时间取决于各地运营商的缓存DNS刷新时间；一般可认为修改记录后生效时间为您域名记录之前设置的TTL时间，所以还请耐心等待。
+                </p>
+                <p class="dot">
+                   新修改域名DNS指向DNSPro解析的DNS后，我们的DNS服务器的生效时间是实时的，但因各地ISP服务商刷新域名DNS的时间不一致，所以导致解析在全球生效一般需要0--72小时，所以还请您耐心的等待。
+                </p>
+                
+            </div>
+            <div class="lf helps">
+                <p class="how"><a href="" target="_blank">如何修改DNS？</a></p>
+                <p class="when"><a href="" target="_blank">设置解析后多长时间生效？</a></p>
+                <p class="qa"><a href="" target="_blank">解析常见问题？</a></p>
+            </div>
+            <a class="btn-close J_btnClose" href="javascript:void(0);" onClick="closeDiv();" >close</a>
+        </div>
+    </div>
+		<div class="table-box">
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<thead>
+					<tr id="tr_title">
+						<th style="text-align:left;font-size:13px;color:#404040;">[已添加线路]</th>
+                        <th>
+                        <div class="ui-pop-box small-con-box" id="del_up_Route_msg" style="float:left; margin-left:10px; display:none;width:auto;height:auto;margin-top:-4px;">
+							<div style="position: relative;background-color: #fff;border: solid 1px #999; height:20px;line-height:20px; padding:2px 10px 2px 10px">这里是提示信息</div>
+						</div>
+                        </th> 	
+					</tr>
+				</thead> 	
+				<tbody id="myData">
+                	<if condition="$rlist_count eq 0">
+                    	<tr class="data" id="null_route">
+                        	<td colspan="2"><span>暂无自定义线路~</span></td>
+                        </tr>
+                    <else/>
+                        <volist name="rlist" id="r">
+                            <tr class="data">
+                                <td class="laber">{$r.name}</td>
+                                <td class="edit">
+                                <textarea cols="30" rows="4" class="ui-textarea" style="margin:10px auto;"><volist name="rmlist" id="rm"><if condition="$rm['route_id'] eq $r['id']">{$rm.mask_start}-{$rm.mask_end}&#13;<else /></if></volist></textarea>
+                                <a style="margin-left:10px;" href="javascript:void(0);" onClick="updateRoute(this,'{$r.name}')">修改</a><a style="margin-left:10px;" href="javascript:" onclick="delRoute(this,'{$r.name}');">删除</a>						
+                            </td>
+                        </tr>
+                        </volist>
+                    </if>
+				</tbody> 
+				<thead>
+					<tr id="tr_title">
+						<th style="text-align:left;font-size:13px;color:#404040;">[添加线路]</th> 	
+                        <th>
+                        <div class="ui-pop-box small-con-box" id="addRoute_msg" style="float:left; margin-left:10px; display:none;width:auto;height:auto;margin-top:-4px;">
+							<div style="position: relative;background-color: #fff;border: solid 1px #999; height:20px;line-height:20px; padding:2px 10px 2px 10px">这里是提示信息</div>
+						</div>
+                        </th>
+					</tr>
+				</thead>
+				<tbody id="addData">
+					<tr class="data">
+					    <td class="laber">路线名称</td> 	
+					    <td class="edit remark"><input class="ui-ipt-txt" id="txt_name" type="text" placeholder="填写路线名称"/></td>
+					</tr>
+					<tr class="data">
+					    <td class="laber">路线IP段</td> 	
+					    <td class="edit"><textarea cols="30" rows="4" autocomplete="off" id="txt_ip" class="ui-textarea" style="margin:10px auto;" placeholder="请填写IP段，每段以分号或者换行分隔。例如：1.1.1.1-2.2.2.2;"></textarea></td>  
+					</tr>
+					<tr class="data">
+					    <td class="laber"></td> 	
+					    <td class="edit"><button class="ui-btn-blue" onclick="addRoute()">添加</button></td>
+					</tr>
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

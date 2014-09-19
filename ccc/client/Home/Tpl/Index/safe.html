@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 账户管理</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/artDialog.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery.mailAutoComplete-3.1.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>    
+	<style type="text/css">     
+		.out_box{border:1px solid #ccc; background:#fff; font-size:16px;}     
+		.list_box{border-bottom:1px solid #eee; padding:0 5px; cursor:pointer;}     
+		.focus_box{background:#f0f3f9;}     
+		.mark_box{color:#c00;}     
+	</style> 
+</head>
+<body class="page-dns">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" /> 
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList" ></a><span class="s"></span>
+				<a href="__APP__/Index/user">账户管理</a><span class="s"></span>
+				<strong class="current">账号安全</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<span class="dtype icon-null"></span>
+				<strong id="cur_zone" class="dname"></strong>
+				<span class="tab nocur"><a href="__APP__/Index/alarm">告警通知</a></span>
+				<span class="tab "><a href="__APP__/Index/safe">账号安全</a></span>
+				<span class="tab nocur"><a href="__APP__/Index/user">用户信息</a></span>
+			</p>
+		</div>
+		<div class="table-box">
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab" style="font-size:14px;">
+				<thead>
+					<tr id="tr_title">
+						<th style="text-align:left;font-size:13px;color:#404040;height:30px;"></th>
+						<th colspan="2" style="height:30px;">
+						<div class="ui-pop-box small-con-box" id="jbzl_msg" style="float:left; margin-left:10px; display:none;width:auto;height:auto;margin-top:-4px;">
+							<div style="position: relative;background-color: #fff;border: solid 1px #999; height:20px;line-height:20px; padding:2px 10px 2px 10px">这里是提示信息</div>
+						</div>
+						</th>
+					</tr>
+				</thead> 	
+				<tbody id="myData">
+					<!--tr class="data" style="height:55px;">
+					    <td class="laber" style="text-align:center;width:150px;">登录密码</td>
+					    <td class="edit">EflyDNS提醒：定期修改密码是个好习惯哦～</td>
+					    <td class="info"><a href="javascript:void(0);" onClick="updateDesc()">修改</a></td>
+					</tr-->
+					<tr class="data" style="height:55px;">
+					    <td class="laber" style="text-align:center;width:150px;">E令牌</td> 	
+					    <td class="edit" style="width:520px;">您还没有开启E令牌</td>
+					    <td class="info"><a href="javascript:void(0);" onClick="updateDesc()">开启</a></td>
+					</tr>
+					<tr class="data" style="height:55px;">
+					    <td class="laber" style="text-align:center;width:150px;">登录保护</td> 	
+					    <td class="edit" style="width:520px;">您尚未开启登录保护</td>
+					    <td class="info"><a href="javascript:void(0);" onClick="updateDesc()">开启</a></td>
+					</tr>
+					<tr class="data" style="height:25px;"></tr>
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

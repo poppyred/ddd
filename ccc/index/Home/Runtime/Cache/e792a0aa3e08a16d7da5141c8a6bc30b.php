@@ -1,0 +1,14 @@
+<?php if (!defined('THINK_PATH')) exit();?>
+                  <div class="help_item">
+                      <div class="help_item_text">
+                        
+<p>1、登陆 http://diy.hichina.com</p>
+<p>2、按照下图提示，填写EflyDNS的2个DNS短地址</p>
+<p>ns1.eflydns.net</p>
+<p>ns2.eflydns.net</p>
+<p><img src="__ROOT__/Public/images/help/qp/q41-1.jpg"/></p>
+<p>3、点击提交，然后等待全球DNS服务器刷新（最多72小时）</p>
+
+
+                      </div>
+                  </div>

@@ -45,5 +45,8 @@ void dns_lcllog_reqcnt_log(char *domain,int dlen,int view_id,int pid);
 
 void dns_lcllog_reqcnt();
 
+void dns_lcllog_reqcnt_remake_path();
+
+
 
 #endif

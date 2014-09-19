@@ -48,6 +48,7 @@
 
 static int dnsheadsize = sizeof(dnsheader);
 time_t global_now = 0; //全局时间，每秒+1s
+int g_hour = 0;
 int g_mday = 0;
 struct tm *g_tm = NULL;
 
@@ -221,23 +222,6 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
     /*view_id= 1 为默认视图*/
     if(likely(view_id > 0 && view_id < MAX_VIEM_NUM)) //在用户ip视图中找到
     {
-        #if 0 
-        /*检查是否被劫持*/
-        if (unlikely(dns_record_answer_check(src,out,txdata,domain,domainlen,view_id,&client,qurey_id,rxdata->dip,rxdata->smac) == 0))
-        {
-            return;
-	    }
-
-           
-        /*检查是否在错误记录*/       
-		if (unlikely(dns_errdst_answer_check(src,out,txdata,domain,domainlen,view_id,&client,qurey_id,rxdata->dip,rxdata->smac) == 0))
-		{
-			return;
-		}
-        #endif
-
-
-
         /*检查是否已缓存*/
         int ret = dns_cache_answer_check(src, txdata, domain, domainlen, view_id, 
                 q_type,client,qurey_id,rxdata->dip,rxdata->smac);
@@ -246,6 +230,7 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
             /*找不到*/
             if (q_type == 0x001c)
             {
+                ///hyb_debug("AAAA NULL ANSWER!\n");
                 txdata->dmac = &rxdata->smac;
 			    txdata->dstip = rxdata->sip;
 			    txdata->dstport = rxdata->sport;
@@ -313,13 +298,13 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         int view_id = dns_mask_get_view(&client.sin_addr); 
         
         //view_id = 2;//***********test!!!!**************//
+        hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
 
 	    /*local count*/
 	    dns_lcllog_allreq_count();
 	    dns_lcllog_dnsreq_count();
         dns_lcllog_allreq_viewcount(view_id); 
         dns_lcllog_dnsreq_viewcount(view_id);
-
 
         answer_to_client(src, rxdata, recvlen, q_type, q_id, &client, domain, domainlen,view_id);
 
@@ -334,6 +319,7 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         {                 
              /*查找用户对应视图*/
             int view_id = dns_mask_get_view((struct in_addr *)&client_ip); 
+            hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
                 
 	        /*local count*/
 	        dns_lcllog_allreq_count();
@@ -948,7 +934,7 @@ void request_to_core(char *domain,int view, int type)
 
     
     char buf[1500] = {0};
-    
+
     int buflen = dns_pack_query(buf,domain,strlen(domain),view,type);
 
     if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
@@ -964,6 +950,38 @@ void request_to_core(char *domain,int view, int type)
     memcpy(txdata->pdata,buf,buflen);
     
 	fio_send(t, htons(buflen), txdata, 1);
+
+    #if 0
+    //cname处理
+    if (type == 5)
+    {
+            memset(buf,0,1500);
+
+            txcount = fio_nic_reserve_tx(t,&txdata,NULL);
+	        if (unlikely(txcount == 0))
+	        {
+		        return;
+	        }
+            
+            int buflen = dns_pack_query(buf,domain,strlen(domain),view,1);
+
+        
+            if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
+                fprintf(stderr,"IP error:%sn",strerror(errno));
+                exit(1);
+            }
+
+	        txdata->dstip = addr.sin_addr.s_addr;
+            txdata->srcip = inet_aton("192.168.23.226",NULL);
+	        txdata->dstport = htons(53);
+	        txdata->srcport = htons(5353);
+    
+             memcpy(txdata->pdata,buf,buflen);
+    
+	        fio_send(t, htons(buflen), txdata, 1);
+    }
+    #endif
+
     
 }
 
@@ -1019,13 +1037,15 @@ static void timer_callback1(void *user_data)
 static void timer_callback2(void *user_data)
 {
 	global_now = time(NULL);
-	if(dns_cache_info())
+	if(dns_cache_info() || dns_mask_control_node_count())
 	{
         /*初始化配置*/
-        init_to_mgr();
+        register_to_mgr();
 	}
-
-    register_to_mgr();
+    else
+    {
+        init_to_mgr();
+    }
 
 #ifdef _DISPLAY_TABLE
 	display_table();
@@ -1054,19 +1074,22 @@ static void timer_callback4(void *user_data)
 
 static void timer_callback5(void *user_data)
 {
-
-    
     dns_lcllog_reqcnt();
     
 	if (g_mday == 0)
 	{
 		g_mday = g_tm->tm_mday;
+        g_hour = g_tm->tm_hour;
 	}
 	else
 	{
 		if (g_mday == g_tm->tm_mday)
-		{
+		{       
 			hyb_debug("The Same day,no update\n");   
+            if (g_hour != g_tm->tm_hour)
+            {
+                dns_lcllog_reqcnt_remake_path();
+            }
 		}
 		else
 		{
@@ -1867,6 +1890,8 @@ int main(int argc, char **argv)
 		hyb_debug("[Fio init] failed!\n");
 		goto QUIT;
 	}
+
+    sleep(5);
 
     /*初始化配置*/
     init_to_mgr();

@@ -177,12 +177,12 @@ static void make_path()
     sprintf_n(dir_path,256,"./log/answer/%04d-%02d-%02d/",g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
 
     mkdir(dir_path,0777);
-
     memset(dir_path,0,256);
 
     sprintf_n(dir_path,256,"./log/errdst/%04d-%02d-%02d/",g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
 
     mkdir(dir_path,0777);
+    memset(dir_path,0,256);
     
     for(i = 0; i < g_pnum; i++)
     {
@@ -221,8 +221,13 @@ static void make_path()
 
 
     mkdir("./log/reqcnt/",0777);
-    sprintf_n(g_reqcnt_path[0].path,256,"./log/reqcnt/%04d-%02d-%02d",
-            g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
+    
+    
+    sprintf_n(dir_path,256,"./log/reqcnt/%04d-%02d-%02d/",g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday);
+    mkdir(dir_path,0777);
+
+    sprintf_n(g_reqcnt_path[0].path,256,"./log/reqcnt/%04d-%02d-%02d/%02d",
+            g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday,g_tm->tm_hour);
 
     g_stop = 0;
 }
@@ -299,6 +304,14 @@ void dns_lcllog_remake_path()
 {
     make_path();
 }
+
+void dns_lcllog_reqcnt_remake_path()
+{
+    sprintf_n(g_reqcnt_path[0].path,256,"./log/reqcnt/%04d-%02d-%02d/%02d",
+            g_tm->tm_year+1900, g_tm->tm_mon+1,g_tm->tm_mday,g_tm->tm_hour);
+    
+}
+
 
 
 void dns_lcllog_general()
