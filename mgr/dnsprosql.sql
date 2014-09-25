@@ -32,11 +32,11 @@ CREATE TABLE `a_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_a_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=85 DEFAULT CHARSET=utf8;
 
 /*Data for the table `a_record` */
 
-insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (3,2,'www.hyb.com',600,'1.2.3.4','',0,1,578),(4,2,'aaa.hyb.com',600,'3.4.5.6','',0,1,579),(8,2,'sss.hyb.com',600,'6.7.8.9','',0,1,585),(6,2,'*.hyb.com',600,'7.7.7.7','',0,1,581),(19,16,'www.eflydns.com',600,'121.201.12.61','',0,1,620),(30,15,'likunxiang.lkx.org',600,'8.8.8.8','',0,1,636),(35,26,'www.abc.com',600,'12.12.1.2','',0,1,635),(18,15,'www.lkx.org',600,'202.96.128.166','',0,1,617),(33,27,'www.dnspro.cn',600,'21.35.214.1','',0,1,645),(31,15,'baidu.lkx.org',600,'202.96.128.86','',0,1,637),(32,35,'google.lkx.org',600,'202.96.128.186','',0,1,638),(37,29,'www.gdzjwl.net',600,'121.201.12.61','',0,1,658),(49,29,'bbb.gdzjwl.net',600,'1.2.34.4','',0,1,679),(40,16,'eflydns.com',600,'121.201.12.61','',0,1,665),(41,16,'*.eflydns.com',600,'121.201.12.61','',0,1,666),(59,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.8','',0,1,711),(58,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.90','',0,1,710),(50,31,'dnspro.cn',600,'10.10.10.10','',0,1,682),(51,32,'www.o-ran.com',600,'127.0.0.1','',0,1,685),(52,33,'www.he.com',600,'1.1.1.1','',0,1,688),(54,26,'eee.abc.com',600,'5.5.5.5','',0,1,696),(55,36,'www.efly.d2okkk.net',600,'119.145.147.22','',0,1,703),(56,26,'ddd.abc.com',600,'4.4.4.4','',0,1,708),(57,26,'ccc.abc.com',600,'6.6.6.6','',0,1,709),(60,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.9','',0,1,712),(61,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.10','',0,1,713),(62,29,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,714),(63,30,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,715),(64,37,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,716),(65,38,'www.lw.com.www.lw.com',600,'11.11.11.11','',0,1,719),(66,38,'www.lw.com.www.lw.com',600,'11.11.11.1','',0,1,720),(67,39,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,721);
+insert  into `a_record`(`id`,`zone`,`name`,`ttl`,`ipaddr`,`description`,`state`,`enable`,`rid`) values (3,2,'www.hyb.com',600,'1.2.3.4','',0,1,578),(4,2,'aaa.hyb.com',600,'3.4.5.6','',0,1,579),(8,2,'sss.hyb.com',600,'6.7.8.9','',0,1,585),(6,2,'*.hyb.com',600,'7.7.7.7','',0,1,581),(19,16,'www.eflydns.com',600,'121.201.12.61','',0,1,620),(68,40,'www.eflypro.com',600,'121.9.13.185','',0,1,727),(35,26,'www.abc.com',600,'12.12.1.2','',0,1,635),(18,15,'www.lkx.org',600,'202.96.128.166','',0,1,617),(33,27,'www.dnspro.cn',600,'21.35.214.1','',0,1,645),(31,15,'baidu.lkx.org',600,'202.96.128.86','',0,1,637),(32,15,'google.lkx.org',600,'202.96.128.187','',0,1,638),(37,29,'www.gdzjwl.net',600,'121.201.12.66','',0,1,658),(49,29,'bbb.gdzjwl.net',600,'1.2.34.4','',0,1,679),(75,16,'eflydns.com',600,'121.201.12.61','',0,1,744),(41,16,'*.eflydns.com',600,'121.201.12.61','',0,1,666),(59,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.8','',0,1,711),(58,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.90','',0,1,710),(50,31,'dnspro.cn',600,'10.10.10.10','',0,1,682),(51,32,'www.o-ran.com',600,'127.0.0.1','',0,1,685),(52,33,'www.he.com',600,'1.1.1.1','',0,1,688),(54,26,'eee.abc.com',600,'5.5.5.5','',0,1,696),(55,36,'www.efly.d2okkk.net',600,'119.145.147.22','',0,1,703),(56,26,'ddd.abc.com',600,'4.4.4.4','',0,1,708),(57,26,'ccc.abc.com',600,'6.6.6.6','',0,1,709),(60,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.9','',0,1,712),(61,29,'www.efly.cc.gdzjwl.net',600,'115.238.154.10','',0,1,713),(62,29,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,714),(63,30,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,715),(64,29,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,716),(65,38,'www.www.lw.com',600,'11.11.11.11','',0,1,719),(66,38,'www.www.lw.com',600,'11.11.11.12','',0,1,720),(67,39,'www.eflypro.com.gdzjwl.net',600,'121.9.13.185','',0,1,721),(84,50,'www.test.com',600,'100.100.100.100','',0,1,765),(83,49,'www.lkx.com',600,'8.8.8.8','',0,1,762),(71,40,'skynet.eflypro.com',600,'121.201.11.8','',0,1,732),(76,40,'eflypro.com',600,'121.9.13.185','',0,1,745),(77,40,'ess.eflypro.com',600,'119.145.147.88','',0,1,746);
 
 /*Table structure for table `aaaa_record` */
 
@@ -74,11 +74,11 @@ CREATE TABLE `cname_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_cname_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 /*Data for the table `cname_record` */
 
-insert  into `cname_record`(`id`,`zone`,`name`,`ttl`,`cname`,`description`,`state`,`enable`,`rid`) values (2,29,'kks.gdzjwl.net',600,'www.gdzjwl.net','',0,1,663);
+insert  into `cname_record`(`id`,`zone`,`name`,`ttl`,`cname`,`description`,`state`,`enable`,`rid`) values (2,29,'kks.gdzjwl.net',600,'www.gdzjwl.net','',0,1,663),(5,15,'likunxiang.lkx.org',600,'google.lkx.org','',0,1,724),(6,15,'likunxiang.lkx.org',600,'baidu.lkx.org','',0,1,636);
 
 /*Table structure for table `domain_ns` */
 
@@ -93,11 +93,11 @@ CREATE TABLE `domain_ns` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_dom_ns` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=113 DEFAULT CHARSET=utf8;
 
 /*Data for the table `domain_ns` */
 
-insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (8,'hyb.com',600,'ns2.eflydns.net','null',577),(7,'fdsa.cn',600,'ns2.eflydns.net','null',575),(6,'hyb.com',600,'ns1.eflydns.net','null',576),(5,'fdsa.cn',600,'ns1.eflydns.net','null',574),(42,'abc.com',600,'ns1.eflydns.net','null',633),(34,'eflydns.com',600,'ns1.eflydns.net','null',618),(46,'dnspro.cn',600,'ns1.eflydns.net','null',643),(45,'dnspro.cn',600,'ns2.eflydns.net','null',644),(33,'eflydns.com',600,'ns2.eflydns.net','null',619),(32,'lkx.org',600,'ns1.eflydns.net','null',615),(31,'lkx.org',600,'ns2.eflydns.net','null',616),(41,'abc.com',600,'ns2.eflydns.net','null',634),(43,'None',600,'ns2.eflydns.net','null',639),(54,'daoba.com',600,'ns2.eflydns.net','null',655),(53,'daoba.com',600,'ns1.eflydns.net','null',654),(55,'gdzjwl.net',600,'ns1.eflydns.net','null',656),(56,'gdzjwl.net',600,'ns2.eflydns.net','null',657),(57,'testing.com',600,'ns2.eflydns.net','null',662),(58,'testing.com',600,'ns1.eflydns.net','null',661),(59,'baidu.com',600,'ns1.eflydns.net','null',675),(60,'baidu.com',600,'ns2.eflydns.net','null',676),(61,'lkx.com',600,'ns1.eflydns.net','null',677),(62,'lkx.com',600,'ns2.eflydns.net','null',678),(63,'www.efly.cc',600,'ns1.eflydns.net','null',680),(64,'www.efly.cc',600,'ns2.eflydns.net','null',681),(65,'o-ran.com',600,'ns1.eflydns.net','null',683),(66,'o-ran.com',600,'ns2.eflydns.net','null',684),(67,'he.com',600,'ns2.eflydns.net','null',687),(68,'he.com',600,'ns1.eflydns.net','null',686),(69,'tifa.com',600,'ns1.eflydns.net','null',689),(70,'tifa.com',600,'ns2.eflydns.net','null',690),(71,'lkx.cn',600,'ns1.eflydns.net','null',692),(72,'lkx.cn',600,'ns2.eflydns.net','null',693),(73,'www.eflypro.com',600,'ns1.eflydns.net','null',694),(74,'www.eflypro.com',600,'ns2.eflydns.net','null',695),(75,'www.chancheng.gov.cn',600,'ns2.eflydns.net','null',698),(76,'www.chancheng.gov.cn',600,'ns1.eflydns.net','null',697),(77,'www.mi.com',600,'ns2.eflydns.net','null',700),(78,'www.mi.com',600,'ns1.eflydns.net','null',699),(79,'efly.d2okkk.net',600,'ns2.eflydns.net','null',702),(80,'efly.d2okkk.net',600,'ns1.eflydns.net','null',701),(90,'www.jv.com',600,'ns2.eflydns.net','null',723),(89,'www.jv.com',600,'ns1.eflydns.net','null',722),(88,'www.lw.com',600,'ns1.eflydns.net','null',717),(87,'www.lw.com',600,'ns2.eflydns.net','null',718);
+insert  into `domain_ns`(`id`,`domain`,`ttl`,`server`,`description`,`rid`) values (8,'hyb.com',600,'ns2.eflydns.net','null',577),(7,'fdsa.cn',600,'ns2.eflydns.net','null',575),(6,'hyb.com',600,'ns1.eflydns.net','null',576),(5,'fdsa.cn',600,'ns1.eflydns.net','null',574),(42,'abc.com',600,'ns1.eflydns.net','null',633),(34,'eflydns.com',600,'ns1.eflydns.net','null',618),(46,'dnspro.cn',600,'ns1.eflydns.net','null',643),(45,'dnspro.cn',600,'ns2.eflydns.net','null',644),(33,'eflydns.com',600,'ns2.eflydns.net','null',619),(32,'lkx.org',600,'ns1.eflydns.net','null',615),(31,'lkx.org',600,'ns2.eflydns.net','null',616),(41,'abc.com',600,'ns2.eflydns.net','null',634),(43,'None',600,'ns2.eflydns.net','null',639),(54,'daoba.com',600,'ns2.eflydns.net','null',655),(53,'daoba.com',600,'ns1.eflydns.net','null',654),(55,'gdzjwl.net',600,'ns1.eflydns.net','null',656),(56,'gdzjwl.net',600,'ns2.eflydns.net','null',657),(57,'testing.com',600,'ns2.eflydns.net','null',662),(58,'testing.com',600,'ns1.eflydns.net','null',661),(59,'baidu.com',600,'ns1.eflydns.net','null',675),(60,'baidu.com',600,'ns2.eflydns.net','null',676),(61,'lkx.com',600,'ns1.eflydns.net','null',677),(62,'lkx.com',600,'ns2.eflydns.net','null',678),(63,'www.efly.cc',600,'ns1.eflydns.net','null',680),(64,'www.efly.cc',600,'ns2.eflydns.net','null',681),(65,'o-ran.com',600,'ns1.eflydns.net','null',683),(66,'o-ran.com',600,'ns2.eflydns.net','null',684),(67,'he.com',600,'ns2.eflydns.net','null',687),(68,'he.com',600,'ns1.eflydns.net','null',686),(69,'tifa.com',600,'ns1.eflydns.net','null',689),(70,'tifa.com',600,'ns2.eflydns.net','null',690),(111,'test.com',600,'ns2.eflydns.net','null',764),(73,'www.eflypro.com',600,'ns1.eflydns.net','null',694),(74,'www.eflypro.com',600,'ns2.eflydns.net','null',695),(75,'www.chancheng.gov.cn',600,'ns2.eflydns.net','null',698),(76,'www.chancheng.gov.cn',600,'ns1.eflydns.net','null',697),(77,'www.mi.com',600,'ns2.eflydns.net','null',700),(78,'www.mi.com',600,'ns1.eflydns.net','null',699),(79,'efly.d2okkk.net',600,'ns2.eflydns.net','null',702),(80,'efly.d2okkk.net',600,'ns1.eflydns.net','null',701),(90,'www.jv.com',600,'ns2.eflydns.net','null',723),(89,'www.jv.com',600,'ns1.eflydns.net','null',722),(88,'www.lw.com',600,'ns1.eflydns.net','null',717),(87,'www.lw.com',600,'ns2.eflydns.net','null',718),(91,'eflypro.com',600,'ns1.eflydns.net','null',725),(92,'eflypro.com',600,'ns2.eflydns.net','null',726),(100,'www.jc.com',600,'ns2.eflydns.net','null',743),(99,'www.jc.com',600,'ns1.eflydns.net','null',742),(109,'www.gogogo.com',600,'ns2.eflydns.net','null',760),(112,'test.com',600,'ns1.eflydns.net','null',763),(110,'www.gogogo.com',600,'ns1.eflydns.net','null',759);
 
 /*Table structure for table `domain_zone` */
 
@@ -111,7 +111,7 @@ CREATE TABLE `domain_zone` (
 
 /*Data for the table `domain_zone` */
 
-insert  into `domain_zone`(`domain`,`zone`) values ('www.hyb.com','hyb.com'),('aaa.hyb.com','hyb.com'),('ttt.hyb.com','hyb.com'),('*.hyb.com','hyb.com'),('www.eflydns.com','eflydns.com'),('sss.hyb.com','hyb.com'),('www.hhyb.com','hhyb.com'),('www.lkx.cn','lkx.cn'),('www.lkx.org','lkx.org'),('likunxiang.lkx.org','lkx.org'),('ew.mysq.cn','mysq.cn'),('www.abc.com','abc.com'),('baidu.com.lkx.org','lkx.org'),('baidu.lkx.org','lkx.org'),('google.lkx.org','lkx.org'),('www.dnspro.cn','dnspro.cn'),('test.com','test.com'),('abc.com','abc.com'),('www.gdzjwl.net','gdzjwl.net'),('*.gdzjwl.net','gdzjwl.net'),('kkk.gdzjwl.net','gdzjwl.net'),('gdzjwl.net','gdzjwl.net'),('oo.gdzjwl.net','gdzjwl.net'),('eflydns.com','eflydns.com'),('*.eflydns.com','eflydns.com'),('kks.gdzjwl.net','gdzjwl.net'),('ss.gdzjwl.net','gdzjwl.net'),('sss.gdzjwl.net','gdzjwl.net'),('mm.gdzjwl.net','gdzjwl.net'),('cc.gdzjwl.net','gdzjwl.net'),('aaa.gdzjwl.net','gdzjwl.net'),('xxx.gdzjwl.net','gdzjwl.net'),('ooo.gdzjwl.net','gdzjwl.net'),('dnspro.cn','dnspro.cn'),('www.o-ran.com','o-ran.com'),('www.he.com','he.com'),('www.tifa.com','tifa.com'),('eee.abc.com','abc.com'),('www.efly.d2okkk.net','efly.d2okkk.net'),('bbb.gdzjwl.net','gdzjwl.net'),('ddd.abc.com','abc.com'),('ccc.abc.com','abc.com'),('www.efly.cc.gdzjwl.net','gdzjwl.net'),('www.eflypro.com.gdzjwl.net','gdzjwl.net'),('www.lw.com.www.lw.com','www.lw.com');
+insert  into `domain_zone`(`domain`,`zone`) values ('www.hyb.com','hyb.com'),('aaa.hyb.com','hyb.com'),('ttt.hyb.com','hyb.com'),('*.hyb.com','hyb.com'),('www.eflydns.com','eflydns.com'),('sss.hyb.com','hyb.com'),('www.hhyb.com','hhyb.com'),('www.lkx.cn','lkx.cn'),('www.lkx.org','lkx.org'),('likunxiang.lkx.org','lkx.org'),('ew.mysq.cn','mysq.cn'),('www.abc.com','abc.com'),('baidu.com.lkx.org','lkx.org'),('baidu.lkx.org','lkx.org'),('google.lkx.org','lkx.org'),('www.dnspro.cn','dnspro.cn'),('test.com','test.com'),('abc.com','abc.com'),('www.gdzjwl.net','gdzjwl.net'),('*.gdzjwl.net','gdzjwl.net'),('kkk.gdzjwl.net','gdzjwl.net'),('gdzjwl.net','gdzjwl.net'),('oo.gdzjwl.net','gdzjwl.net'),('eflydns.com','eflydns.com'),('*.eflydns.com','eflydns.com'),('kks.gdzjwl.net','gdzjwl.net'),('ss.gdzjwl.net','gdzjwl.net'),('sss.gdzjwl.net','gdzjwl.net'),('mm.gdzjwl.net','gdzjwl.net'),('cc.gdzjwl.net','gdzjwl.net'),('aaa.gdzjwl.net','gdzjwl.net'),('xxx.gdzjwl.net','gdzjwl.net'),('ooo.gdzjwl.net','gdzjwl.net'),('dnspro.cn','dnspro.cn'),('www.o-ran.com','o-ran.com'),('www.he.com','he.com'),('www.tifa.com','tifa.com'),('eee.abc.com','abc.com'),('www.efly.d2okkk.net','efly.d2okkk.net'),('bbb.gdzjwl.net','gdzjwl.net'),('ddd.abc.com','abc.com'),('ccc.abc.com','abc.com'),('www.efly.cc.gdzjwl.net','gdzjwl.net'),('www.eflypro.com.gdzjwl.net','gdzjwl.net'),('www.lw.com.www.lw.com','www.lw.com'),('www.eflypro.com','eflypro.com'),('abc.lkx.org','lkx.org'),('*.lkx.org','lkx.org'),('skynet.eflypro.com','eflypro.com'),('www.tttt.org','tttt.org'),('eflypro.com','eflypro.com'),('www.lw.com','www.lw.com'),('ww.eflydns.com','eflydns.com'),('www.www.lw.com','www.lw.com'),('ess.eflypro.com','eflypro.com'),('www.ghost.com','ghost.com'),('www.2014923.com','2014923.com'),('www.924.com','924.com'),('www.efly.cc','efly.cc'),('www.www.gogogo.com','www.gogogo.com'),('www.lkx.com','lkx.com'),('www.test.com','test.com');
 
 /*Table structure for table `mx_record` */
 
@@ -150,11 +150,11 @@ CREATE TABLE `ns_record` (
   `rid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_ns_record` (`rid`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 /*Data for the table `ns_record` */
 
-insert  into `ns_record`(`id`,`zone`,`name`,`ttl`,`server`,`description`,`state`,`enable`,`rid`) values (4,29,'gdzjwl.net',600,'ns1.eflydns.net','',0,0,656),(3,29,'gdzjwl.net',600,'ns2.eflydns.net','',0,0,657);
+insert  into `ns_record`(`id`,`zone`,`name`,`ttl`,`server`,`description`,`state`,`enable`,`rid`) values (4,29,'gdzjwl.net',600,'ns1.eflydns.net','',0,1,656),(3,29,'gdzjwl.net',600,'ns2.eflydns.net','',0,1,657);
 
 /*Table structure for table `snd_record` */
 
@@ -170,11 +170,11 @@ CREATE TABLE `snd_record` (
   `chktime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `opt` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1282629 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1282770 DEFAULT CHARSET=utf8;
 
 /*Data for the table `snd_record` */
 
-insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (1282624,'dns',1,1,'www.lw.com.www.lw.com',3,'2014-09-11 10:07:51',2),(1282625,'dns',1,1,'www.lw.com.www.lw.com',1,'2014-09-11 10:07:51',1),(1282626,'dns',1,4,'www.eflypro.com.gdzjwl.net',1,'2014-09-11 10:14:46',1),(1282627,'dns',1,1,'google.lkx.org',1,'2014-09-11 11:21:38',2),(1282628,'dns',1,2,'google.lkx.org',1,'2014-09-11 11:21:20',1);
+insert  into `snd_record`(`id`,`class`,`type`,`viewid`,`data`,`state`,`chktime`,`opt`) values (1282769,'dns',1,1,'www.test.com',1,'2014-09-25 14:17:11',1);
 
 /*Table structure for table `txt_record` */
 
@@ -245,11 +245,11 @@ CREATE TABLE `zone` (
   `description` varchar(256) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain` (`domain`,`view`)
-) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
 
 /*Data for the table `zone` */
 
-insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (2,1,'hyb.com',1,'2014-08-12 15:35:04',''),(3,1,'hyb.com',2,'2014-08-12 15:34:46',''),(15,1,'lkx.org',1,'2014-09-03 20:02:56',''),(16,1,'eflydns.com',1,'2014-08-28 09:11:16',''),(29,1,'gdzjwl.net',1,'2014-09-11 09:26:10',''),(27,1,'dnspro.cn',1,'2014-08-21 16:29:51',''),(26,1,'abc.com',1,'2014-09-10 14:22:10',''),(30,1,'gdzjwl.net',2,'2014-09-11 09:25:58',''),(31,1,'dnspro.cn',2,'2014-09-01 10:24:23',''),(32,1,'o-ran.com',1,'2014-09-03 10:58:40',''),(33,1,'he.com',1,'2014-09-03 11:00:31',''),(34,1,'tifa.com',1,'2014-09-03 11:20:40',''),(35,1,'lkx.org',2,'2014-09-11 11:21:20',''),(36,1,'efly.d2okkk.net',1,'2014-09-05 16:55:42',''),(37,1,'gdzjwl.net',3,'2014-09-11 09:26:20',''),(38,1,'www.lw.com',1,'2014-09-11 10:07:51',''),(39,1,'gdzjwl.net',4,'2014-09-11 10:14:46','');
+insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (2,1,'hyb.com',1,'2014-08-12 15:35:04',''),(3,1,'hyb.com',2,'2014-08-12 15:34:46',''),(15,1,'lkx.org',1,'2014-09-15 14:12:46',''),(16,1,'eflydns.com',1,'2014-09-17 17:47:13',''),(29,1,'gdzjwl.net',1,'2014-09-17 17:34:46',''),(27,1,'dnspro.cn',1,'2014-08-21 16:29:51',''),(26,1,'abc.com',1,'2014-09-10 14:22:10',''),(30,1,'gdzjwl.net',2,'2014-09-11 09:25:58',''),(31,1,'dnspro.cn',2,'2014-09-01 10:24:23',''),(32,1,'o-ran.com',1,'2014-09-03 10:58:40',''),(33,1,'he.com',1,'2014-09-03 11:00:31',''),(34,1,'tifa.com',1,'2014-09-03 11:20:40',''),(35,1,'lkx.org',2,'2014-09-11 19:38:04',''),(36,1,'efly.d2okkk.net',1,'2014-09-05 16:55:42',''),(37,1,'gdzjwl.net',3,'2014-09-11 09:26:20',''),(38,1,'www.lw.com',1,'2014-09-18 09:06:13',''),(39,1,'gdzjwl.net',4,'2014-09-11 10:14:46',''),(40,1,'eflypro.com',1,'2014-09-19 17:01:24',''),(41,1,'eflypro.com',2,'2014-09-23 15:40:58',''),(42,1,'eflypro.com',3,'2014-09-23 15:40:58',''),(48,1,'www.gogogo.com',1,'2014-09-24 11:58:42',''),(49,1,'lkx.com',1,'2014-09-24 14:58:12',''),(50,1,'test.com',1,'2014-09-25 14:17:11','');
 
 /* Trigger structure for table `a_record` */
 
