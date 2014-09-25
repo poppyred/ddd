@@ -14,7 +14,7 @@ class MySQL(object):
     '''
     conn = None
     cursor = None
-    def __init__(self,host='121.201.11.3',user='root',password='rjkj@rjkj',db='dnspro_core',charset='utf8', loger=None):
+    def __init__(self,host,user,password,db,charset='utf8', loger=None):
         """MySQL Database initialization """
         self.conn_error = True
         self.host = host
@@ -216,7 +216,7 @@ if __name__ == '__main__':
 
     print >> sys.stderr, 'test mysql'
 
-    mysql = MySQL(host=localhost,passwd='test',db='mysql')
+    mysql = MySQL(host=localhost, user='root', password='test',db='mysql')
     mysql.query('select * from users')
     result = mysql.show()
     print >> sys.stderr, len(result)

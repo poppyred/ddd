@@ -16,8 +16,8 @@ class mgr_handler4init(queue_thread.Qthread):
     def __init__(self, loger):
         queue_thread.Qthread.__init__(self, 'mgr_work_thread4init', self.handler_qsize, loger)
         self.dbip = mgr_conf.g_db_ip
-        self.dbcon = MySQL.MySQL(host=self.dbip, user=mgr_conf.g_db_user, password=mgr_conf.g_db_passwd,
-                db=mgr_conf.g_db_db, loger=loger)
+        self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd,
+                mgr_conf.g_db_db, loger=loger)
         if self.dbcon.conn_error:
             self.loger.error(traceback.format_exc())
             raise Exception("[mgr_handler4init] Database configure error!!!")
@@ -45,7 +45,8 @@ class mgr_handler4init(queue_thread.Qthread):
 
     def handler(self, data):
         if self.dbcon.conn_error:
-            self.dbcon = MySQL.MySQL(host=self.dbip, loger=self.loger)
+            self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd,
+                    mgr_conf.g_db_db, loger=self.loger)
         try:
             self.loger.care(_lineno(self), 'recv request class %s' % (data['class']))
             for case in switch(data['class']):
