@@ -10,6 +10,10 @@ g_size_perpack = 1024
 g_row_perpack = 10
 g_row_perpack4init = 500
 
+g_listen_port = 54321
+g_reply_port = 12345
+g_heart_port = 54321
+
 g_inner_chk_init_ok_time = 2
 g_inner_chk_snd_time = 10
 g_inner_chk_task_domain_time = 5

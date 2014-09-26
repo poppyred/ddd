@@ -147,11 +147,26 @@ class mgr_handler(queue_thread.Qthread):
                 if case(msg.g_class_inner_chk_task_db_heartbeat):
                     req_handler.handle_inner_chk_task_db_heartbeat(self)
                     break
+                if case(msg.g_class_proxy_heartbeat):
+                    req_handler.handle_proxy_heartbeat(self, data)
+                    break
                 if case():
                     self.loger.warn(_lineno(self), 'recv something else: ', data['class'])
         except Exception as e:
             self.loger.error(_lineno(self), 'inner error: ', repr(e))
             self.loger.error(traceback.format_exc())
+
+    def reply_echo(self, data, host, port):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            addre = (host, port)
+            encodedjson = json.dumps(data)
+            s.sendto(encodedjson, addre)
+        except socket.error, msg:
+            self.loger.error(_lineno(self), 'dip(%s) (%s): %s' % (host, msg.args[0],msg.args[1]))
+            self.loger.error(traceback.format_exc())
+        finally:
+            s.close()
 
     def reply(self, msgobj, head, addr):
         if addr == None or not self.proxy_addr.has_key(addr):
@@ -161,11 +176,11 @@ class mgr_handler(queue_thread.Qthread):
         self.loger.care(_lineno(self), 'sending:', encodedjson)
         str_fmt = "H" + str(len(encodedjson)) + "s"
         str_send = struct.pack(str_fmt, head, encodedjson)
-        self.__sendto_short__(str_send, self.proxy_addr[addr][0][0])
+        self.__sendto_short__(str_send, self.proxy_addr[addr][0][0], mgr_conf.g_reply_port)
 
     def __sendto_short__(self, data, host, port=12345):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(data)
         except socket.error, msg:
@@ -180,13 +195,13 @@ class mgr_handler(queue_thread.Qthread):
         if addr == None or not self.proxy_addr.has_key(addr):
             self.loger.error(_lineno(self), 'addr is error!!!! addr: ', repr(addr))
             return False
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             host = self.proxy_addr[addr][0][0]
             encodedjson = json.dumps(msgobj)
             str_fmt = "H" + str(len(encodedjson)) + "s"
             str_send = struct.pack(str_fmt, head, encodedjson)
 
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             cnt = len(str_send)
             self.loger.info(_lineno(self), 'need to send(%d)' % (cnt,))

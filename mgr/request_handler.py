@@ -147,13 +147,13 @@ class req_handler(object):
                     cur_cnt += 1
 
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
-                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns) != True:
+                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                         return
                     cur_cnt = 0
                     del msgobj[:]
 
         if cur_cnt > 0:
-            if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns) != True:
+            if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
 
         #query view
@@ -170,12 +170,12 @@ class req_handler(object):
                 count += 1
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
-                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view) != True:
+                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                         return
                     cur_cnt = 0
                     del msgobj[:]
             if cur_cnt > 0:
-                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view) != True:
+                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     return
 
         msg.g_init_resp_expect = count
@@ -379,6 +379,10 @@ class req_handler(object):
         if not result:
             g_req_loger.warn(_lineno(), 'reconnecting to mysql!!!!!')
             worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
+
+    @staticmethod
+    def handle_proxy_heartbeat(worker, data):
+        worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):
     loger = None

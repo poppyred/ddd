@@ -43,7 +43,7 @@ class mgr_factory(object):
     def get_repth_thread(self):
         if not self.reply_th:
             self.reply_th = mgr_reply.reply_thread(self.get_mgr_worker4init(), self.get_mgr_worker(),
-                    self.get_mgr_loger())
+                    self.get_mgr_loger(), port=mgr_conf.g_listen_port)
         return self.reply_th
 
     def get_http_thread(self):

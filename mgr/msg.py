@@ -53,6 +53,7 @@ g_dict_type = {'a_record':g_a_tbl, #'A':1, #指定计算机IP地址
 g_class_init = 'init'
 g_class_init_test = 'init_test'
 g_class_proxy_register = 'register'
+g_class_proxy_heartbeat = 'heartbeat'
 g_class_init_view_reply = 'view_reply'
 g_class_init_dns_reply = 'dns_reply'
 
