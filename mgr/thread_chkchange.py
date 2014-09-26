@@ -81,6 +81,10 @@ class thread_chkchange(threading.Thread):
                                         or case(msg.g_class_inner_chk_task_record):
                                     self.http_tq.put(msgobj, block=False)
                                     break
+                                if case(msg.g_class_inner_chk_task_db_heartbeat):
+                                    self.tq.put(msgobj, block=False)
+                                    self.tq4init.put(msgobj, block=False)
+                                    break
                                 if case():
                                     self.tq.put(msgobj, block=False)
                         except Queue.Full, e:

@@ -371,6 +371,14 @@ class req_handler(object):
         g_req_loger.debug(_lineno(), 'json error:', repr(decodejson['error']))
         g_req_loger.debug(_lineno(), 'json result:\n', repr(decodejson['result']))
 
+    @staticmethod
+    def handle_inner_chk_task_db_heartbeat(worker):
+        worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
+        result = worker.dbcon.show()
+        g_req_loger.care(_lineno(), repr(result))
+        if not result:
+            g_req_loger.warn(_lineno(), 'reconnecting to mysql!!!!!')
+            worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
 
 class req_hdl_abstract(object):
     loger = None

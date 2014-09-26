@@ -115,6 +115,8 @@ class MyDaemon(Daemon):
         time.sleep(1)
         g_factory.get_http_thread().start()
         g_factory.get_check_thread().start()
+        g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_db_heartbeat,
+                mgr_conf.g_inner_chk_task_db_heartbeat)
 
         #start_web()
 

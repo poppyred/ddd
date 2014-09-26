@@ -144,6 +144,9 @@ class mgr_handler(queue_thread.Qthread):
                 if case(msg.g_class_inner_chk_task_domain_reply) or case(msg.g_class_inner_chk_task_record_reply):
                     req_handler.handle_inner_chk_task_reply(self, data)
                     break
+                if case(msg.g_class_inner_chk_task_db_heartbeat):
+                    req_handler.handle_inner_chk_task_db_heartbeat(self)
+                    break
                 if case():
                     self.loger.warn(_lineno(self), 'recv something else: ', data['class'])
         except Exception as e:

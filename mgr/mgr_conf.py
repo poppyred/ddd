@@ -14,6 +14,7 @@ g_inner_chk_init_ok_time = 2
 g_inner_chk_snd_time = 10
 g_inner_chk_task_domain_time = 5
 g_inner_chk_task_record_time = 2
+g_inner_chk_task_db_heartbeat = 10
 
 g_url_inner_chk_task_ip = 'dnspro-database'
 g_url_inner_chk_task_url = 'http://' + g_url_inner_chk_task_ip + '/dnspro/dnsbroker/'

@@ -53,6 +53,9 @@ class mgr_handler4init(queue_thread.Qthread):
                 if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
                     req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
                     break
+                if case(msg.g_class_inner_chk_task_db_heartbeat):
+                    req_handler.handle_inner_chk_task_db_heartbeat(self)
+                    break
                 if case():
                     self.loger.warn(_lineno(self), 'recv something else: ', data['class'])
         except Exception as e:

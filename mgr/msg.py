@@ -63,6 +63,7 @@ g_class_inner_chk_task_domain_reply = 'chk_task_domain_reply'
 g_class_inner_chk_task_record = 'chk_task_record'
 g_class_inner_chk_task_record_reply = 'chk_task_record_reply'
 g_class_inner_chk_task_done = 'chk_task_done'
+g_class_inner_chk_task_db_heartbeat = 'chk_task_db_heartbeat'
 
 g_class_inner_reqtype_map = {g_class_inner_chk_task_domain:'domain', g_class_inner_chk_task_record:'record'}
 g_class_inner_map = {g_class_inner_chk_task_domain:g_class_inner_chk_task_domain_reply,
@@ -95,6 +96,8 @@ g_inner_sql_chksnd_view = 'SELECT viewid,`data`,`opt`,chktime FROM snd_record WH
 g_inner_sql_chksnd_dns = 'SELECT `type`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0 \
         and class=\'dns\' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND) \
         ORDER BY `id` ASC'
+
+g_inner_sql_db_heartbeat = 'SELECT 1'
 
 g_pack_head_init_view = 5
 g_pack_head_init_dns = 4
