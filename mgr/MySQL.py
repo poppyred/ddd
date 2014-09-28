@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
+# made by likunxiang
 
 import MySQLdb
 import sys

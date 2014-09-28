@@ -1,4 +1,6 @@
 #!/bin/bash
+# made by likunxiang
+
 sed -i -r '/MGRHOME|mgrhome|mgrtail|mgrstart|mgrstop|mgrps/'d  /etc/profile
 echo -e "export MGRHOME=/usr/local/dnspro\nalias mgrhome=\"cd \$MGRHOME\"\nalias mgrtail=\"tail -f \$MGRHOME/log/dnspro.log\"\
 \nalias mgrstart=\"sh \$MGRHOME/start.sh\"\nalias mgrstop=\"sh \$MGRHOME/stop.sh\"\nalias mgrps=\"sh \$MGRHOME/psmgr.sh\"\

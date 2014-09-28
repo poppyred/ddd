@@ -1,4 +1,5 @@
 #!/bin/bash
+# made by likunxiang
 
 # Function : transfer directory from localhost to remote node
 # args       : ip password local_dir remote_dir
@@ -29,7 +30,7 @@ oldline=`sed -n '/g_enable_stdin/p' msg.py`
 sed -i '/g_enable_stdin/c g_enable_stdin=0' msg.py
 
 oldloglevel=`sed -n '/log_level/p' mgr_conf.py`
-sed -i "/log_level/c log_level=\'info\'" mgr_conf.py
+sed -i "/log_level/c log_level=\'warn\'" mgr_conf.py
 
 oldlogdir=`sed -n '/log_direction/p' mgr_conf.py`
 sed -i "/log_direction/c log_direction=1" mgr_conf.py

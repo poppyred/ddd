@@ -1,4 +1,6 @@
 #!/bin/bash
+# made by likunxiang
+
 if [ $# -lt 1 ] ; then
     echo 'arguments lack'
     exit 1

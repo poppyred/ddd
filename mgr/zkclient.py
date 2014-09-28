@@ -1,5 +1,6 @@
 # coding: utf-8
 # modfied from https://github.com/phunt/zk-smoketest/blob/master/zkclient.py
+# made by likunxiang
 
 import zookeeper, time, threading
 from collections import namedtuple

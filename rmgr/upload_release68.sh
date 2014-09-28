@@ -38,14 +38,9 @@ sed -i "/log_direction/c log_direction=1" mgr_conf.py
 oldmgrsid=`sed -n '/g_mgr_sid/p' mgr_conf.py`
 sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp_bak'" mgr_conf.py
 
-python -c "import compileall; compileall.compile_dir('.')"
 mkdir -p $local_dir
 /bin/rm $local_dir/* -rf
-/bin/mv *.pyc $local_dir
-mkdir -p $local_dir/test
-/bin/mv test/*.pyc $local_dir/test
-#/bin/cp mgr_conf.py chlog.sh init.sh stop.sh start.sh psmgr.sh $local_dir -rf
-/bin/cp *.py chlog.sh init.sh stop.sh start.sh psmgr.sh $local_dir -rf
+/bin/cp *.py stop.sh start.sh psmgr.sh $local_dir -rf
 
 expect -c " 
         spawn scp -r -P $port $local_dir root@$ip:$remote_dir

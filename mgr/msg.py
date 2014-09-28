@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding:UTF-8 -*-
+# made by likunxiang
 
 g_isdebug = 1
 g_enable_stdin=0

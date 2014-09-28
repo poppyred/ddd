@@ -1,23 +1,20 @@
-﻿#!/usr/bin/python
-# -*- coding:UTF-8 -*-
-# made by likunxiang
-
+# 2014.09.28 17:32:46 CST
+#Embedded file name: ./queue_thread.py
 import threading
 import Queue
 import sys
 from mgr_misc import _lineno
 import traceback
 import time
-
 __all__ = ['Qthread']
 
 class Qthread(threading.Thread):
-    def __init__(self, name, qsize, loger):
+
+    def __init__(self, name, qsize):
         threading.Thread.__init__(self)
         self.thread_stop = False
         self.th_name = name
         self.tq = Queue.Queue(qsize)
-        self.loger = loger
         self.log_queue = False
         self.lock = threading.Lock()
 
@@ -33,12 +30,12 @@ class Qthread(threading.Thread):
                 time.sleep(1)
             else:
                 break
+
         self.tq.put(data, block=False)
         self.lock.release()
 
     def run(self):
         while not self.thread_stop:
-            #self.loger.debug(_lineno(self), '[', self.th_name, '] waiting for message...')
             try:
                 data = self.tq.get(block=True, timeout=1)
                 if self.thread_stop:
@@ -48,12 +45,17 @@ class Qthread(threading.Thread):
                 self.tq.task_done()
             except Queue.Empty as e:
                 if self.log_queue:
-                    self.loger.debug(_lineno(self), '[', self.th_name, ':run] taskq is ', repr(e))
-                    self.loger.debug(traceback.format_exc())
+                    print ('[',
+                     self.th_name,
+                     ':run] taskq is ',
+                     repr(e))
             except Exception as e:
                 self.tq.task_done()
-                self.loger.error(_lineno(self), '[', self.th_name, ':run] inner error:', repr(e))
-                self.loger.error(traceback.format_exc())
+                print ('[',
+                 self.th_name,
+                 ':run] inner error:',
+                 repr(e))
+
         self.onstop()
 
     def handler(self, data):
@@ -64,4 +66,6 @@ class Qthread(threading.Thread):
 
     def onstop(self):
         pass
-
++++ okay decompyling queue_thread.pyc 
+# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
+# 2014.09.28 17:32:46 CST

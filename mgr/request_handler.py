@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #coding: utf-8
+# made by likunxiang
 
 import MySQL
 import msg
@@ -382,6 +383,8 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_heartbeat(worker, data):
+        data['status'] = 0
+        data['message'] = ''
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):
