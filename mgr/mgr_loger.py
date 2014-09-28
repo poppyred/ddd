@@ -105,7 +105,7 @@ class mgr_loger(queue_thread.Qthread):
     def __wlog__(self, l, ldata):
         dlen = len(ldata)
         if dlen > 0 and l <= self.level:
-            self._w2file(self.dic_levelstr[l] + '(' + self.str_times[self.time_idx] + ')')
+            self._w2file('{made by likunxiang}' + self.dic_levelstr[l] + '(' + self.str_times[self.time_idx] + ')')
             #sys.stdout.write(self.dic_levelstr[l] + '(' + self.str_times[self.time_idx] + ')')
             for x in range(0, dlen):
                 if type(x) != types.StringType:
