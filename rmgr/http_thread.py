@@ -1,5 +1,7 @@
-# 2014.09.28 17:30:00 CST
-#Embedded file name: ./http_thread.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import queue_thread
 import sys
 import msg
@@ -38,6 +40,3 @@ class http_thread(queue_thread.Qthread):
         res = response.read()
         conn.close()
         return (res, response.status)
-+++ okay decompyling http_thread.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:30:00 CST

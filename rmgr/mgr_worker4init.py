@@ -1,5 +1,7 @@
-# 2014.09.28 17:31:45 CST
-#Embedded file name: ./mgr_worker4init.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import queue_thread
 import msg
 import mgr_conf
@@ -7,8 +9,6 @@ from request_handler import *
 import sys
 import MySQL
 import time
-from mgr_misc import _lineno
-import traceback
 
 class mgr_handler4init(queue_thread.Qthread):
     handler_qsize = 40000
@@ -53,6 +53,3 @@ class mgr_handler4init(queue_thread.Qthread):
 
         except Exception as e:
             print ('inner error: ', repr(e))
-+++ okay decompyling mgr_worker4init.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:31:45 CST

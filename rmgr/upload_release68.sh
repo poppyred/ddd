@@ -11,7 +11,7 @@ then
     echo "[ERROR] usage : ./send_dir ip source_dir dst_dir"
     exit 1
 fi
-ip='121.201.12.68'
+ip='121.201.12.57'
 #ip=$1
 port="22"
 passwd='rjkj@dnspro#0801'
@@ -40,7 +40,7 @@ sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp_bak'" mgr_conf.py
 
 mkdir -p $local_dir
 /bin/rm $local_dir/* -rf
-/bin/cp *.py stop.sh start.sh psmgr.sh $local_dir -rf
+/bin/cp *.py stop.sh start.sh $local_dir -rf
 
 expect -c " 
         spawn scp -r -P $port $local_dir root@$ip:$remote_dir

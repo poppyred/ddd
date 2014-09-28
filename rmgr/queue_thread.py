@@ -1,10 +1,10 @@
-# 2014.09.28 17:32:46 CST
-#Embedded file name: ./queue_thread.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import threading
 import Queue
 import sys
-from mgr_misc import _lineno
-import traceback
 import time
 __all__ = ['Qthread']
 
@@ -66,6 +66,3 @@ class Qthread(threading.Thread):
 
     def onstop(self):
         pass
-+++ okay decompyling queue_thread.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:32:46 CST

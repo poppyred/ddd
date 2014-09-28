@@ -40,7 +40,7 @@ sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp'" mgr_conf.py
 
 mkdir -p $local_dir
 /bin/rm $local_dir/* -rf
-/bin/cp *.py  stop.sh start.sh psmgr.sh $local_dir -rf
+/bin/cp *.py  stop.sh start.sh $local_dir -rf
 
 expect -c " 
         spawn scp -r -P $port $local_dir root@$ip:$remote_dir

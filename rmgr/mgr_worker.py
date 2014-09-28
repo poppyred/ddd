@@ -1,5 +1,7 @@
-# 2014.09.28 17:32:36 CST
-#Embedded file name: ./mgr_worker.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import queue_thread
 import msg
 import mgr_conf
@@ -10,8 +12,6 @@ import socket
 import struct
 import json
 import time
-from mgr_misc import _lineno
-import traceback
 
 class mgr_handler(queue_thread.Qthread):
     handler_qsize = 40000
@@ -219,6 +219,3 @@ class mgr_handler(queue_thread.Qthread):
 
     def onstop(self):
         self.m_handlers.clear()
-+++ okay decompyling mgr_worker.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:32:36 CST

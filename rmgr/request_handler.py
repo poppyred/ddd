@@ -1,13 +1,13 @@
-# 2014.09.28 17:32:01 CST
-#Embedded file name: ./request_handler.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import MySQL
 import msg
 import sys
 import json
 import types
 import mgr_conf
-from mgr_misc import _lineno
-import traceback
 import urllib
 
 class switch(object):
@@ -323,14 +323,14 @@ class req_handler(object):
          repr(test_de))
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip, mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
-            raise Exception(_lineno(), 'request task post code:', post_error)
-        print ('request task return:\n', repr(res))
+            raise Exception('request task post code:', post_error)
+        print ('request task return:\n' + repr(res))
         decodejson = json.loads(res)
         print ('json ret:', repr(decodejson['ret']))
         print ('json error:', repr(decodejson['error']))
         print ('json result:\n', repr(decodejson['result']))
         if decodejson['ret'] != 0:
-            raise Exception(_lineno(), 'request task return error!                     ret:%d error:%s' % (decodejson['ret'], decodejson['error']))
+            raise Exception('request task return error! ret:%d error:%s' % (decodejson['ret'], decodejson['error']))
         decodejson['class'] = msg.g_class_inner_map[_type]
         decodejson.pop('error')
         decodejson.pop('ret')
@@ -413,8 +413,8 @@ class req_handler(object):
         print ('post data:\n', repr(payload_encode))
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip, mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
-            raise Exception(_lineno(), 'request task post code:', post_error)
-        print ('request task return:\n', repr(res))
+            raise Exception('request task post code:', post_error)
+        print ('request task return:\n' + repr(res))
         decodejson = json.loads(res)
         print ('json ret:', repr(decodejson['ret']))
         print ('json error:', repr(decodejson['error']))
@@ -1025,6 +1025,3 @@ http_opt_str2int = {'add': msg.g_opt_add,
  'del': msg.g_opt_del}
 http_type_to_proxy_header = {'record': msg.g_pack_head_init_dns,
  'domain': msg.g_pack_head_init_view}
-+++ okay decompyling request_handler.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:32:02 CST

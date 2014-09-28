@@ -1,9 +1,9 @@
-# 2014.09.28 17:31:53 CST
-#Embedded file name: ./MySQL.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 import MySQLdb
 import sys
-from mgr_misc import _lineno
-import traceback
 __all__ = ['MySQL']
 
 class MySQL(object):
@@ -151,6 +151,3 @@ class MySQL(object):
     def __del__(self):
         """ Terminate the connection """
         self.__myclose__()
-+++ okay decompyling MySQL.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:31:53 CST

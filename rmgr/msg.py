@@ -1,5 +1,7 @@
-# 2014.09.28 17:31:23 CST
-#Embedded file name: ./msg.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
 g_isdebug = 1
 g_enable_stdin = 0
 old_settings = None
@@ -74,6 +76,3 @@ g_pack_head_init_dns = 4
 g_opt_add = 1
 g_opt_del = 2
 g_http_response_OK = 200
-+++ okay decompyling msg.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:31:23 CST

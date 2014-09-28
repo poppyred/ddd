@@ -1,5 +1,4 @@
 # 2014.09.28 17:32:18 CST
-#Embedded file name: ./mgr_conf.py
 log_level = 'warn'
 log_path = '/usr/local/dnspro/log'
 log_name = 'dnspro.log'
@@ -23,6 +22,3 @@ g_db_user = 'root'
 g_db_passwd = 'rjkj@rjkj'
 g_db_db = 'dnspro_core'
 g_zkClis = '121.201.12.58:2181,121.201.12.60:2181,121.201.12.68:2181'
-+++ okay decompyling mgr_conf.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:32:18 CST

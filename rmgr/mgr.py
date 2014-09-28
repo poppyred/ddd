@@ -1,5 +1,8 @@
-# 2014.09.28 17:31:35 CST
-#Embedded file name: ./mgr.py
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+# made by likunxiang
+
+
 import time
 import sys
 import msg
@@ -44,6 +47,3 @@ if __name__ == '__main__':
     g_factory.get_http_thread().start()
     g_factory.get_check_thread().start()
     main_loop()
-+++ okay decompyling mgr.pyc 
-# decompiled 1 files: 1 okay, 0 failed, 0 verify failed
-# 2014.09.28 17:31:35 CST
