@@ -10,7 +10,7 @@ import mgr_conf
 from mgr_misc import _lineno, switch
 import traceback
 import urllib
-from mgr_err_describe import g_err_desc
+import mgr_err_describe
 
 __all__ = ['req_handler', 'g_req_loger', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
@@ -209,7 +209,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                g_err_desc.add_view_timeout(row[2], row[0], row[1])
+                mgr_err_describe.g_err_desc.add_view_timeout(row[2], row[0], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
         del msgobj[:]
@@ -219,7 +219,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                g_err_desc.add_recored_timeout(row[2], row[1], row[2], row[0])
+                mgr_err_describe.g_err_desc.add_recored_timeout(row[2], row[1], row[2], row[0])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
@@ -365,8 +365,11 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_heartbeat(worker, data):
-        data['status'] = 0
-        data['message'] = ''
+        g_req_loger.debug(_lineno(), 'g_err_desc type is ', type(mgr_err_describe.g_err_desc))
+        objs = mgr_err_describe.g_err_desc.gen_msg()
+        data['message'] = objs
+        data['status'] = len(objs)>0 and -1 or 0
+        g_req_loger.debug(_lineno(), 'heatbeat payload:\n', repr(objs))
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):

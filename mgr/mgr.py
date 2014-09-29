@@ -92,8 +92,8 @@ class MyDaemon(Daemon):
     def run(self):
         signal.signal(signal.SIGINT,sigint_handler)
 
-        mgr_err_describe.g_err_desc = g_factory.get_err_info()
         request_handler.g_req_loger = g_factory.get_mgr_loger()
+        mgr_err_describe.g_err_desc = g_factory.get_err_info()
         #g_factory.get_mgr_loger().debug(_lineno(), 'starting')
         #sys.exit()
 
