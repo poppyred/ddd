@@ -10,8 +10,7 @@ import socket
 import msg
 import Queue
 import sys
-from request_handler import switch
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 import traceback
 
 class task_node():

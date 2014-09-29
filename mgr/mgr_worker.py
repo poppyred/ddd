@@ -12,7 +12,7 @@ import socket
 import struct
 import json
 import time
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 import traceback
 
 class mgr_handler(queue_thread.Qthread):

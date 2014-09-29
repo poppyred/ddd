@@ -15,6 +15,7 @@ import request_handler
 from mgr_misc import _lineno
 import traceback
 from mgr_daemon import Daemon
+import mgr_err_describe
 
 #values=[]
 #for i in range(20):
@@ -91,6 +92,7 @@ class MyDaemon(Daemon):
     def run(self):
         signal.signal(signal.SIGINT,sigint_handler)
 
+        mgr_err_describe.g_err_desc = g_factory.get_err_info()
         request_handler.g_req_loger = g_factory.get_mgr_loger()
         #g_factory.get_mgr_loger().debug(_lineno(), 'starting')
         #sys.exit()

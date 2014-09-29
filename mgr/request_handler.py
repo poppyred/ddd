@@ -2,41 +2,21 @@
 #coding: utf-8
 # made by likunxiang
 
-import MySQL
 import msg
 import sys
 import json
 import types
 import mgr_conf
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 import traceback
 import urllib
+from mgr_err_describe import g_err_desc
 
-__all__ = ['switch', 'req_handler', 'g_req_loger', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
+__all__ = ['req_handler', 'g_req_loger', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
         'req_handler_domain', 'req_handler_view_mask']
 
 g_req_loger = None
-
-class switch(object):
-    def __init__(self, value):
-        self.value = value
-        self.fall = False
-
-    def __iter__(self):
-        """Return the match method once, then stop"""
-        yield self.match
-        raise StopIteration
-
-    def match(self, *args):
-        """Indicate whether or not to enter a case suite"""
-        if self.fall or not args:
-            return True
-        elif self.value in args: # changed for v1.5, see below
-            self.fall = True
-            return True
-        else:
-            return False
 
 class req_handler(object):
     @staticmethod
@@ -229,6 +209,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
+                g_err_desc.add_view_timeout(row[2], row[0], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
         del msgobj[:]
@@ -238,6 +219,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
+                g_err_desc.add_recored_timeout(row[2], row[1], row[2], row[0])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod

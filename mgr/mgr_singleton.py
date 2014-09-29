@@ -10,11 +10,13 @@ import mgr_worker4init
 import mgr_loger
 import mgr_conf
 import zk_handler
+import mgr_err_describe
 
 __all__ = ['g_factory']
 
 class mgr_factory(object):
-    __slots__ = ('loger', 'mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th', 'zkhandler')
+    __slots__ = ('loger', 'mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th',
+            'zkhandler', 'err_info')
     def __init__(self):
         self.reply_th = None
         self.http_th = None
@@ -23,6 +25,7 @@ class mgr_factory(object):
         self.mgr_worker4init = None
         self.loger = None
         self.zkhandler = None
+        self.err_info = None
 
     def get_mgr_loger(self):
         if not self.loger:
@@ -66,6 +69,11 @@ class mgr_factory(object):
         if not self.zkhandler:
             self.zkhandler = zk_handler.LKXZookeeper(self.get_mgr_loger())
         return self.zkhandler
+
+    def get_err_info(self):
+        if not self.err_info:
+            self.err_info = mgr_err_describe.ErrInfo(self.get_mgr_loger())
+        return self.err_info
 
 g_factory = mgr_factory()
 

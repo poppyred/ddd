@@ -3,6 +3,7 @@
 # made by likunxiang
 
 import sys
+import datetime
 
 __all__ = ['_lineno']
 
@@ -20,3 +21,29 @@ def _lineno(obj=None):
     else:
         return '{' + fname + ':' + str(sys._getframe().f_back.f_lineno) + '}[' + \
                 sys._getframe().f_back.f_code.co_name + '] '
+
+def get_time():
+    now_tmp = datetime.datetime.now()
+    str_times = now_tmp.strftime("%Y-%m-%d %H:%M:%S")
+    return str_times
+
+class switch(object):
+    def __init__(self, value):
+        self.value = value
+        self.fall = False
+
+    def __iter__(self):
+        """Return the match method once, then stop"""
+        yield self.match
+        raise StopIteration
+
+    def match(self, *args):
+        """Indicate whether or not to enter a case suite"""
+        if self.fall or not args:
+            return True
+        elif self.value in args: # changed for v1.5, see below
+            self.fall = True
+            return True
+        else:
+            return False
+

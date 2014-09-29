@@ -6,6 +6,7 @@ import MySQLdb
 import sys
 from mgr_misc import _lineno
 import traceback
+import mgr_err_describe
 
 __all__ = ['MySQL']
 
@@ -30,6 +31,7 @@ class MySQL(object):
     def __myset_conn_error(self, e):
         if e.args[0] == 2006 or e.args[0] == 2003:
             self.conn_error = True
+            mgr_err_describe.g_err_desc.add_db_error('lose')
 
     def __myconnect__(self):
         try:
@@ -50,6 +52,7 @@ class MySQL(object):
         except MySQLdb.Error,e:
             self.loger.error(_lineno(self), 'Cannot connect to server\nERROR: ', e)
             self.conn_error= True
+            mgr_err_describe.g_err_desc.add_db_error('lose')
             self.cursor = None
             self.loger.error(traceback.format_exc())
             #raise Exception("Database configure error!!!")

@@ -9,7 +9,7 @@ from request_handler import *
 import sys
 import MySQL
 import time
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 import traceback
 
 class mgr_handler4init(queue_thread.Qthread):

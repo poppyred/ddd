@@ -5,10 +5,10 @@
 import queue_thread
 import sys
 import msg
-from request_handler import req_handler, switch
+from request_handler import req_handler
 import httplib
 #import urllib
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 
 class http_thread(queue_thread.Qthread):
     http_qsize = 40000

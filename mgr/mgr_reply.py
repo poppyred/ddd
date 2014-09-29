@@ -6,12 +6,12 @@ import socket
 import threading
 import json
 import msg
-from request_handler import req_handler, switch
+from request_handler import req_handler
 import struct
 import sys
 import Queue
 import select
-from mgr_misc import _lineno
+from mgr_misc import _lineno, switch
 import traceback
 
 class reply_thread(threading.Thread):

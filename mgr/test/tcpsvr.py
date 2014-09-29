@@ -3,14 +3,19 @@
 
 from SocketServer import TCPServer,StreamRequestHandler
 class Handler(StreamRequestHandler):
-	def handle(self):
-		addr = self.request.getpeername()
-		print 'Got connection from ',addr
-		while True:
-	        	data = self.request.recv(1024)
-	 		print len(data)
-	 		if len(data) <= 0:
-                        	break
+    def handle(self):
+        addr = self.request.getpeername()
+        print 'Got connection from ',addr
+        while True:
+            data = self.request.recv(1024)
+            print len(data)
+            if len(data) <= 0:
+                break
+
+data = raw_input('>')
+if data == 'ab' \
+        and len(data) == 2:
+    print data
 
 server = TCPServer(('',12345), Handler)	#实例化服务类对象
 
