@@ -23,6 +23,8 @@ class mgr_handler4init(queue_thread.Qthread):
             self.loger.error(traceback.format_exc())
             raise Exception("[mgr_handler4init] Database configure error!!!")
 
+        self.just4testcnt = 0
+
         #self.__test__()
 
     def __test__(self):
@@ -52,6 +54,7 @@ class mgr_handler4init(queue_thread.Qthread):
             self.loger.care(_lineno(self), 'recv request class %s' % (data['class']))
             for case in switch(data['class']):
                 if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
+                    self.just4testcnt += 1
                     req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
                     break
                 if case(msg.g_class_inner_chk_task_db_heartbeat):

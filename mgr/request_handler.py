@@ -182,10 +182,24 @@ class req_handler(object):
                 break
             if case():
                 state_set = 0
-        g_req_loger.debug(_lineno(), str_class, ' ', answ['type'], ' ', answ['viewid'], ' ', answ['data'], ' ', state_set, ' ', answ['opt'])
-        if True:
+        g_req_loger.debug(_lineno(), str_class, ' ', answ['type'], ' ', answ['viewid'], ' ', answ['data'],
+                ' ', state_set, ' ', answ['opt'])
+
+        if worker.just4testcnt > 0:
             worker.dbcon.call_proc(msg.g_proc_update_snd_req, (str_class, answ['type'], answ['viewid'],
                 answ['data'], state_set, answ['opt']))
+
+        if worker.just4testcnt > 0:
+            for case in switch(str_class):
+                if case('dns'):
+                    mgr_err_describe.g_err_desc.del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
+                    break
+                if case('view'):
+                    mgr_err_describe.g_err_desc.del_view_timeout(answ['opt'], answ['viewid'], answ['data'])
+                    break
+                if case():
+                    g_req_loger.warn(_lineno(), 'can not del error describe for unknow type ', str_class)
+
         #worker.dbcon.query(msg.g_proc_update_snd_req_ret)
         #update_ret = worker.dbcon.show()
         #g_req_loger.debug(_lineno(), str_class, ' update return:', repr(update_ret))
@@ -219,7 +233,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_recored_timeout(row[2], row[1], row[2], row[0])
+                mgr_err_describe.g_err_desc.add_record_timeout(row[3], row[1], row[2], row[0])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod

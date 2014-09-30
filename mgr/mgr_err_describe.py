@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding:UTF-8 -*-
 # made by likunxiang
 
@@ -9,57 +9,82 @@ import types
 g_err_desc = None
 
 class ErrInfo(object):
-    desc_lose = 'lose'
-    db_desc = {desc_lose:'lost connection'}
+    type_err_db = 'db'
+    type_err_view = 'view'
+    type_err_record = 'record'
+    db_desc_lose = 'lose'
+    db_desc = {db_desc_lose:'lost connection'}
     def __init__(self, loger):
-        self.desc = {'db':[], 'view':[], 'record':[]}
+        self.desc = {self.type_err_db:[], self.type_err_view:[], self.type_err_record:[]}
         self.lock = threading.Lock()
         self.loger = loger
 
     def add_view_timeout(self, opt, view, mask):
         self.lock.acquire()
-        oldobj = self.__del_item('view', opt, view, mask)
+        oldobj = self.__del_item(self.type_err_view, opt, view, mask)
         if oldobj and not self.__del_or_not4add(oldobj['sent'], oldobj['regain']):
-            self.desc['view'].append(oldobj)
+            self.desc[self.type_err_view].append(oldobj)
         else:
             obj = {'opt':opt, 'view':view, 'mask':mask, 'settime':get_time(), 'sent':0, 'regain':0}
-            self.desc['view'].append(obj)
+            self.desc[self.type_err_view].append(obj)
         self.__travel()
         self.lock.release()
 
-    def add_recored_timeout(self, opt, view, domain, rtype):
+    def del_view_timeout(self, opt, view, mask):
         self.lock.acquire()
-        oldobj = self.__del_item('record', opt, view, domain, rtype)
+        oldobj = self.__del_item(self.type_err_view, opt, view, mask)
+        if oldobj and not self.__del_or_not4del(oldobj['sent'], oldobj['regain']):
+            oldobj['sent'] = 0
+            oldobj['regain'] = 1
+            oldobj['settime'] = get_time()
+            self.desc[self.type_err_view].append(oldobj)
+        self.__travel()
+        self.lock.release()
+
+    def add_record_timeout(self, opt, view, domain, rtype):
+        self.lock.acquire()
+        oldobj = self.__del_item(self.type_err_record, opt, view, domain, rtype)
         if oldobj and not self.__del_or_not4add(oldobj['sent'], oldobj['regain']):
-            self.desc['record'].append(oldobj)
+            self.desc[self.type_err_record].append(oldobj)
         else:
             obj = {'opt':opt, 'view':view, 'domain':domain, 'type':rtype, 'settime':get_time(),
                     'sent':0, 'regain':0}
-            self.desc['record'].append(obj)
+            self.desc[self.type_err_record].append(obj)
+        self.__travel()
+        self.lock.release()
+
+    def del_record_timeout(self, opt, view, domain, rtype):
+        self.lock.acquire()
+        oldobj = self.__del_item(self.type_err_record, opt, view, domain, rtype)
+        if oldobj and not self.__del_or_not4del(oldobj['sent'], oldobj['regain']):
+            oldobj['sent'] = 0
+            oldobj['regain'] = 1
+            oldobj['settime'] = get_time()
+            self.desc[self.type_err_record].append(oldobj)
         self.__travel()
         self.lock.release()
 
     def add_db_error(self, desc):
         self.lock.acquire()
         if self.db_desc.has_key(desc):
-            oldobj = self.__del_item('db', desc)
+            oldobj = self.__del_item(self.type_err_db, desc)
             if oldobj and not self.__del_or_not4add(oldobj['sent'], oldobj['regain']):
-                self.desc['db'].append(oldobj)
+                self.desc[self.type_err_db].append(oldobj)
             else:
                 obj = {'desc':desc, 'settime':get_time(), 'sent':0, 'regain':0}
-                self.desc['db'].append(obj)
+                self.desc[self.type_err_db].append(obj)
             self.__travel()
         self.lock.release()
 
     def del_db_error(self, desc):
         self.lock.acquire()
         if self.db_desc.has_key(desc):
-            oldobj = self.__del_item('db', desc)
-            if oldobj and not __del_or_not4del(oldobj['sent'], oldobj['regain']):
+            oldobj = self.__del_item(self.type_err_db, desc)
+            if oldobj and not self.__del_or_not4del(oldobj['sent'], oldobj['regain']):
                 oldobj['sent'] = 0
                 oldobj['regain'] = 1
                 oldobj['settime'] = get_time()
-                self.desc['db'].append(oldobj)
+                self.desc[self.type_err_db].append(oldobj)
             self.__travel()
         self.lock.release()
 
@@ -78,13 +103,13 @@ class ErrInfo(object):
             return False
         return True
 
-    def __del_item(self, clean, _type, *args):
+    def __del_item(self, _type, *args):
         retobj = None
         if not self.desc.has_key(_type):
             return retobj
         arr = self.desc[_type]
         for case in switch(_type):
-            if case('view'):
+            if case(self.type_err_view):
                 for i in range(len(arr)-1,-1,-1):
                     if arr[i]['opt'] == args[0] \
                             and arr[i]['view'] == args[1] \
@@ -92,7 +117,7 @@ class ErrInfo(object):
                         retobj = arr[i]
                         del arr[i]
                 break
-            if case('record'):
+            if case(self.type_err_record):
                 for i in range(len(arr)-1,-1,-1):
                     if arr[i]['opt'] == args[0] \
                             and arr[i]['view'] == args[1] \
@@ -102,7 +127,7 @@ class ErrInfo(object):
                         del arr[i]
                         break
                 break
-            if case('db'):
+            if case(self.type_err_db):
                 for i in range(len(arr)-1,-1,-1):
                     if arr[i]['desc'] == args[0]:
                         retobj = arr[i]
@@ -130,12 +155,12 @@ class ErrInfo(object):
         objs = []
         for k in self.desc:
             v = self.desc.get(k)
-            if type(v) is types.ListType: #如果数据是list类型，继续遍历
+            if type(v) is types.ListType:
                 for j in v:
                     if j['sent'] == 1:
                         continue
                     j['sent'] = 1
-                    if k == 'db':
+                    if k == self.type_err_db:
                         j['detail'] = self.db_desc[j['desc']]
                     objs.append({'etype':k, 'desc':j})
         return objs
@@ -143,6 +168,6 @@ class ErrInfo(object):
     def __travel(self):
         for k in self.desc:
             v = self.desc.get(k)
-            if type(v) is types.ListType: #如果数据是list类型，继续遍历
+            if type(v) is types.ListType:
                 self.loger.info(_lineno(self), k, '---', v)
 
