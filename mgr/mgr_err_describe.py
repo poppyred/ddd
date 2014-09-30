@@ -152,17 +152,48 @@ class ErrInfo(object):
         return ret_msg
 
     def __to_array(self):
-        objs = []
+        objs = [[],[]]
+        objs_err = objs[0]
+        objs_regain = objs[1]
         for k in self.desc:
             v = self.desc.get(k)
             if type(v) is types.ListType:
                 for j in v:
-                    if j['sent'] == 1:
+                    if 1 == j['sent']:
                         continue
                     j['sent'] = 1
-                    if k == self.type_err_db:
-                        j['detail'] = self.db_desc[j['desc']]
-                    objs.append({'etype':k, 'desc':j})
+                    item = {'etype':k, 'desc':{}}
+                    set_where = -1 # -1 or 1 or 0 not set
+                    for case in switch(k):
+                        if case(self.type_err_db):
+                            item['desc']['regain'] = j['regain']
+                            item['desc']['settime'] = j['settime']
+                            item['desc']['detail'] = self.db_desc[j['desc']]
+                            item['desc']['desc'] = j['desc']
+                            break
+                        if case(self.type_err_view):
+                            item['desc']['regain'] = j['regain']
+                            item['desc']['settime'] = j['settime']
+                            item['desc']['opt'] = j['opt']
+                            item['desc']['view'] = j['view']
+                            item['desc']['mask'] = j['mask']
+                            break
+                        if case(self.type_err_record):
+                            item['desc']['regain'] = j['regain']
+                            item['desc']['settime'] = j['settime']
+                            item['desc']['opt'] = j['opt']
+                            item['desc']['view'] = j['view']
+                            item['desc']['domain'] = j['domain']
+                            item['desc']['type'] = j['type']
+                            break
+                        if case():
+                            set_where = 0
+                            self.loger.warn(_lineno(self), 'type %s not implemented!' % (k,))
+                    if 0 != set_where:
+                        if 1 == j['regain']:
+                            objs_regain.append(item)
+                        else:
+                            objs_err.append(item)
         return objs
 
     def __travel(self):

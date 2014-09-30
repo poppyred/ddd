@@ -382,7 +382,7 @@ class req_handler(object):
         g_req_loger.debug(_lineno(), 'g_err_desc type is ', type(mgr_err_describe.g_err_desc))
         objs = mgr_err_describe.g_err_desc.gen_msg()
         data['message'] = objs
-        data['status'] = len(objs)>0 and -1 or 0
+        data['status'] = len(objs[0])>0 and -1 or 0
         g_req_loger.debug(_lineno(), 'heatbeat payload:\n', repr(objs))
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
