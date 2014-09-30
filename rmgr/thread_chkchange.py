@@ -10,7 +10,6 @@ import socket
 import msg
 import Queue
 import sys
-from request_handler import switch
 
 class task_node:
 
@@ -75,16 +74,15 @@ class thread_chkchange(threading.Thread):
                     for timeout in newtns:
                         msgobj = {'class': timeout.nname}
                         try:
-                            for case in switch(timeout.nname):
-                                if case(msg.g_class_inner_chk_task_domain) or case(msg.g_class_inner_chk_task_record):
-                                    self.http_tq.put(msgobj, block=False)
-                                    break
-                                if case(msg.g_class_inner_chk_task_db_heartbeat):
-                                    self.tq.put(msgobj, block=False)
-                                    self.tq4init.put(msgobj, block=False)
-                                    break
-                                if case():
-                                    self.tq.put(msgobj, block=False)
+                            if timeout.nname == msg.g_class_inner_chk_task_domain or timeout.nname == msg.g_class_inner_chk_task_record:
+                                self.http_tq.put(msgobj, block=False)
+
+                            elif timeout.nname == msg.g_class_inner_chk_task_db_heartbeat:
+                                self.tq.put(msgobj, block=False)
+                                self.tq4init.put(msgobj, block=False)
+
+                            else:
+                                self.tq.put(msgobj, block=False)
 
                         except Queue.Full as e:
                             print ('taskq is ', repr(e))

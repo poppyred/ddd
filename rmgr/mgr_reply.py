@@ -6,7 +6,7 @@ import socket
 import threading
 import json
 import msg
-from request_handler import req_handler, switch
+from request_handler import req_handler
 import struct
 import sys
 import Queue
@@ -40,10 +40,7 @@ class reply_thread(threading.Thread):
                     continue
                 for s in rs:
                     data, addr = s.recvfrom(self.BUFSIZE)
-                    print ('received from ',
-                     addr,
-                     ' data:',
-                     data)
+                    print ('received from ', addr, ' data:', data)
                     if data == None:
                         print 'recv data none'
                         continue
@@ -52,12 +49,10 @@ class reply_thread(threading.Thread):
                         continue
                     decodejson = json.loads(data)
                     decodejson['inner_addr'] = addr
-                    for case in switch(decodejson['class']):
-                        if case(msg.g_class_init_view_reply) or case(msg.g_class_init_dns_reply):
-                            self.worker4init.put(decodejson)
-                            break
-                        if case():
-                            self.worker.put(decodejson)
+                    if decodejson['class'] == msg.g_class_init_view_reply or decodejson['class'] == msg.g_class_init_dns_reply:
+                        self.worker4init.put(decodejson)
+                    else:
+                        self.worker.put(decodejson)
 
             except Exception as e:
                 print ('inner error:', repr(e))

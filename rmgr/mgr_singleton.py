@@ -8,10 +8,10 @@ import thread_chkchange
 import mgr_worker
 import mgr_worker4init
 import mgr_conf
-__all__ = ['g_factory']
+import mgr_err_describe
 
 class mgr_factory(object):
-    __slots__ = ('mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th', 'zkhandler')
+    __slots__ = ('mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th', 'err_info')
 
     def __init__(self):
         self.reply_th = None
@@ -19,7 +19,7 @@ class mgr_factory(object):
         self.chkchange_th = None
         self.mgr_worker = None
         self.mgr_worker4init = None
-        self.zkhandler = None
+        self.err_info = None
 
     def get_mgr_worker4init(self):
         if not self.mgr_worker4init:
@@ -45,5 +45,10 @@ class mgr_factory(object):
         if not self.chkchange_th:
             self.chkchange_th = thread_chkchange.thread_chkchange(self.get_mgr_worker4init().tq, self.get_mgr_worker().tq, self.get_http_thread().tq)
         return self.chkchange_th
+
+    def get_err_info(self):
+        if not self.err_info:
+            self.err_info = mgr_err_describe.ErrInfo()
+        return self.err_info
 
 g_factory = mgr_factory()

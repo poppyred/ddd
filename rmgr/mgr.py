@@ -9,6 +9,7 @@ import msg
 import mgr_conf
 from mgr_singleton import g_factory
 import request_handler
+import mgr_err_describe
 
 def stop_all():
     if g_factory.get_check_thread().isAlive():
@@ -37,6 +38,7 @@ def main_loop():
 
 
 if __name__ == '__main__':
+    mgr_err_describe.g_err_desc = g_factory.get_err_info()
     g_factory.get_repth_thread()
     g_factory.get_http_thread()
     g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())

@@ -5,7 +5,7 @@
 import queue_thread
 import sys
 import msg
-from request_handler import req_handler, switch
+from request_handler import req_handler
 import httplib
 
 class http_thread(queue_thread.Qthread):
@@ -17,15 +17,10 @@ class http_thread(queue_thread.Qthread):
 
     def handler(self, data):
         print ('msg class: ', data['class'])
-        for case in switch(data['class']):
-            if case(msg.g_class_inner_chk_task_domain) or case(msg.g_class_inner_chk_task_record):
-                req_handler.handle_inner_chk_task(self, self.worker, data['class'])
-                break
-            if case(msg.g_class_inner_chk_task_done):
-                req_handler.handle_inner_chk_task_done(self, data)
-                break
-            if case():
-                print ('recv something else: ', data['class'])
+        if data['class'] == msg.g_class_inner_chk_task_domain or data['class'] == msg.g_class_inner_chk_task_record:
+            req_handler.handle_inner_chk_task(self, self.worker, data['class'])
+        if data['class'] == msg.g_class_inner_chk_task_done:
+            req_handler.handle_inner_chk_task_done(self, data)
 
     def http_send_post(self, _dip, _url, _body):
         headerdata = {'Host': _dip,
