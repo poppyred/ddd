@@ -329,7 +329,7 @@ class req_handler(object):
         objs = mgr_err_describe.g_err_desc.gen_msg()
         data['message'] = objs
         data['status'] = len(objs[0])>0 and -1 or 0
-        #print('heatbeat payload:\n' + repr(objs))
+        print('heatbeat payload:\n' + repr(objs))
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):

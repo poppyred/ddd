@@ -4,7 +4,7 @@
 
 import MySQLdb
 import sys
-__all__ = ['MySQL']
+import mgr_err_describe
 
 class MySQL(object):
     """
@@ -27,6 +27,7 @@ class MySQL(object):
     def __myset_conn_error(self, e):
         if e.args[0] == 2006 or e.args[0] == 2003:
             self.conn_error = True
+            mgr_err_describe.g_err_desc.add_db_error(mgr_err_describe.ErrInfo.db_desc_lose)
 
     def __myconnect__(self):
         try:
@@ -47,8 +48,10 @@ class MySQL(object):
                     self.conn.close()
                 self.conn = MySQLdb.connect(self.host, self.user, self.passwd, self.db, port=3306)
             self.conn_error = False
+            mgr_err_describe.g_err_desc.del_db_error(mgr_err_describe.ErrInfo.db_desc_lose)
         except MySQLdb.Error as e:
             print ('Cannot connect to server\nERROR: ', e)
+            mgr_err_describe.g_err_desc.add_db_error(mgr_err_describe.ErrInfo.db_desc_lose)
             self.conn_error = True
             self.cursor = None
             return
