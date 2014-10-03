@@ -2,7 +2,6 @@
 # -*- coding:UTF-8 -*-
 # made by likunxiang
 
-import queue_thread
 import msg
 import mgr_conf
 from request_handler import *
@@ -13,13 +12,11 @@ import struct
 import json
 import time
 
-class mgr_handler(queue_thread.Qthread):
-    handler_qsize = 40000
+class mgr_handler(object):
     proxy_health = 3
     m_handlers = {}
 
     def __init__(self):
-        queue_thread.Qthread.__init__(self, 'mgr_work_thread', self.handler_qsize)
         self.check_thd = None
         self.proxy_addr = {}
         self.dbip = mgr_conf.g_db_ip
@@ -39,22 +36,6 @@ class mgr_handler(queue_thread.Qthread):
         self.m_handlers['view_mask'] = {}
         self.m_handlers['view_mask']['__any__'] = req_handler_view_mask()
         print ('handlers map:', repr(self.m_handlers))
-
-    def __test__(self):
-        if False:
-            del_ret = self.dbcon.call_proc(msg.g_proc_del_a_record, ('a_record', 189))
-            result = self.dbcon.fetch_proc_reset()
-            print '1: delret:', del_ret, 'result:', result
-            time.sleep(2)
-            add_ret = self.dbcon.call_proc(msg.g_proc_add_a_record, ('a_record', 't3.test.com', 'test.com', 2, 10, '3.3.3.3', 0, 1, 190))
-            raa = self.dbcon.fetch_proc_reset()
-            print '2: add_ret:', add_ret, 'result:', raa
-        if True:
-            self.dbcon.query(msg.g_init_sql_chk_init_ok)
-            result = self.dbcon.show()
-            print repr(result)
-            print result[0][0]
-        sys.exit()
 
     def set_buddy_thread(self, http_th, check_thd):
         self.http_th = http_th
@@ -202,5 +183,3 @@ class mgr_handler(queue_thread.Qthread):
         finally:
             s.close()
 
-    def onstop(self):
-        self.m_handlers.clear()

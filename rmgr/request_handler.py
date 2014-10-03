@@ -240,7 +240,7 @@ class req_handler(object):
         decodejson['class'] = msg.g_class_inner_map[_type]
         decodejson.pop('error')
         decodejson.pop('ret')
-        worker.put(decodejson)
+        worker.handler(decodejson)
 
     @staticmethod
     def handle_inner_chk_task_reply(worker, data):
@@ -298,7 +298,7 @@ class req_handler(object):
                     continue
 
         req_handler.notify_flush(worker, msgobj)
-        worker.http_th.put(replymsg)
+        worker.http_th.handler(replymsg)
 
     @staticmethod
     def handle_inner_chk_task_done(http_th, data_done):

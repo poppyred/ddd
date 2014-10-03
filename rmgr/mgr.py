@@ -11,30 +11,13 @@ from mgr_singleton import g_factory
 import request_handler
 import mgr_err_describe
 
-def stop_all():
-    if g_factory.get_check_thread().isAlive():
-        g_factory.get_check_thread().stop()
-        g_factory.get_check_thread().join()
-    if g_factory.get_http_thread().isAlive():
-        g_factory.get_http_thread().stop()
-        g_factory.get_http_thread().join()
-    if g_factory.get_repth_thread().isAlive():
-        g_factory.get_repth_thread().stop()
-        g_factory.get_repth_thread().join()
-    if g_factory.get_mgr_worker4init().isAlive():
-        g_factory.get_mgr_worker4init().stop()
-        g_factory.get_mgr_worker4init().join()
-    if g_factory.get_mgr_worker().isAlive():
-        g_factory.get_mgr_worker().stop()
-        g_factory.get_mgr_worker().join()
-
 
 def main_loop():
-    while 1:
+    while True:
         msg.g_now += 1
         time.sleep(1)
-
-    stop_all()
+        g_factory.get_repth_thread().check_event()
+        g_factory.get_check_thread().check_event()
 
 
 if __name__ == '__main__':
@@ -42,10 +25,8 @@ if __name__ == '__main__':
     g_factory.get_repth_thread()
     g_factory.get_http_thread()
     g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())
-    g_factory.get_mgr_worker4init().start()
-    g_factory.get_mgr_worker().start()
-    g_factory.get_repth_thread().start()
+    g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_db_heartbeat,
+            mgr_conf.g_inner_chk_task_db_heartbeat)
     time.sleep(1)
-    g_factory.get_http_thread().start()
-    g_factory.get_check_thread().start()
     main_loop()
+

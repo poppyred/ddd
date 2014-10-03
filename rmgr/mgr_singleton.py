@@ -43,7 +43,7 @@ class mgr_factory(object):
 
     def get_check_thread(self):
         if not self.chkchange_th:
-            self.chkchange_th = thread_chkchange.thread_chkchange(self.get_mgr_worker4init().tq, self.get_mgr_worker().tq, self.get_http_thread().tq)
+            self.chkchange_th = thread_chkchange.thread_chkchange(self.get_mgr_worker4init(), self.get_mgr_worker(), self.get_http_thread())
         return self.chkchange_th
 
     def get_err_info(self):

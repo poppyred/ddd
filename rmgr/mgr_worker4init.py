@@ -2,7 +2,6 @@
 # -*- coding:UTF-8 -*-
 # made by likunxiang
 
-import queue_thread
 import msg
 import mgr_conf
 from request_handler import *
@@ -10,11 +9,9 @@ import sys
 import MySQL
 import time
 
-class mgr_handler4init(queue_thread.Qthread):
-    handler_qsize = 40000
+class mgr_handler4init(object):
 
     def __init__(self):
-        queue_thread.Qthread.__init__(self, 'mgr_work_thread4init', self.handler_qsize)
         self.dbip = mgr_conf.g_db_ip
         self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
         if self.dbcon.conn_error:

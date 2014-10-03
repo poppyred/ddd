@@ -2,21 +2,18 @@
 # -*- coding:UTF-8 -*-
 # made by likunxiang
 
-import queue_thread
 import sys
 import msg
 from request_handler import req_handler
 import httplib
 
-class http_thread(queue_thread.Qthread):
-    http_qsize = 40000
+class http_thread(object):
 
     def __init__(self, worker):
-        queue_thread.Qthread.__init__(self, 'http_thread', self.http_qsize)
         self.worker = worker
 
     def handler(self, data):
-        print ('msg class: ', data['class'])
+        print ('msg class: ' + data['class'])
         if data['class'] == msg.g_class_inner_chk_task_domain or data['class'] == msg.g_class_inner_chk_task_record:
             req_handler.handle_inner_chk_task(self, self.worker, data['class'])
         if data['class'] == msg.g_class_inner_chk_task_done:
@@ -35,3 +32,4 @@ class http_thread(queue_thread.Qthread):
         res = response.read()
         conn.close()
         return (res, response.status)
+
