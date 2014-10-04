@@ -10,13 +10,12 @@ import mgr_conf
 from mgr_misc import _lineno, switch
 import traceback
 import urllib
-import mgr_err_describe
+import mgr_singleton
 
-__all__ = ['req_handler', 'g_req_loger', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
+__all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
         'req_handler_domain', 'req_handler_view_mask']
 
-g_req_loger = None
 
 class req_handler(object):
     @staticmethod
@@ -28,19 +27,19 @@ class req_handler(object):
                 if msgobj[i].has_key('pkt_head'):
                     cur_pkt_head = msgobj[i].pop('pkt_head')
                 else:
-                    g_req_loger.error(_lineno(), 'no pkt_head key-->', repr(msgobj[i]))
+                    mgr_singleton.g_singleton.get_loger().error(_lineno(), 'no pkt_head key-->', repr(msgobj[i]))
                     cur_pkt_head = None
                 if cur_pkt_head and (pre_pkt_head and cur_pkt_head != pre_pkt_head):
-                    g_req_loger.info(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:i]))
+                    mgr_singleton.g_singleton.get_loger().info(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:i]))
                     worker.reply(msgobj[pre_i:i], pre_pkt_head, addr)
                     pre_i = i
                 if cur_pkt_head:
                     pre_pkt_head = cur_pkt_head
 
             if pre_pkt_head == None:
-                g_req_loger.error(_lineno(), 'no pkt_head key-->', repr(msgobj))
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), 'no pkt_head key-->', repr(msgobj))
             else:
-                g_req_loger.care(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:]))
+                mgr_singleton.g_singleton.get_loger().care(_lineno(), 'pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:]))
                 worker.reply(msgobj[pre_i:], pre_pkt_head, addr)
 
             del msgobj[:]
@@ -63,7 +62,7 @@ class req_handler(object):
             if not result:
                 continue
             for row in result:
-                g_req_loger.debug(_lineno(), "dns query %s res: %s" % (atbl, row))
+                mgr_singleton.g_singleton.get_loger().debug(_lineno(), "dns query %s res: %s" % (atbl, row))
                 worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                     0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type[atbl],
@@ -72,7 +71,7 @@ class req_handler(object):
                 req_handler.notify_proxy(worker, msgobj, addr)
 
                 if atbl == 'cname_record':
-                    g_req_loger.debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
+                    mgr_singleton.g_singleton.get_loger().debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
                         0, msg.g_opt_add))
                     msgobj.append({'opt':msg.g_opt_add, 'domain':row[0], 'view':row[1], 'type':msg.g_dict_type['a_record'],
@@ -88,7 +87,7 @@ class req_handler(object):
         result = worker.dbcon.show()
         if result:
             for row in result:
-                g_req_loger.debug(_lineno(), row)
+                mgr_singleton.g_singleton.get_loger().debug(_lineno(), row)
                 worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
                 count += 1
@@ -110,7 +109,7 @@ class req_handler(object):
             if not result:
                 continue
             for row in result:
-                g_req_loger.debug(_lineno(), "dns query %s res: %s" % (atbl, row))
+                mgr_singleton.g_singleton.get_loger().debug(_lineno(), "dns query %s res: %s" % (atbl, row))
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                         0, msg.g_opt_add))
@@ -119,7 +118,7 @@ class req_handler(object):
                 cur_cnt += 1
 
                 if atbl == 'cname_record':
-                    g_req_loger.debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
+                    mgr_singleton.g_singleton.get_loger().debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
                     if False:
                         worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
                             0, msg.g_opt_add))
@@ -144,7 +143,7 @@ class req_handler(object):
         cur_cnt = 0
         if result:
             for row in result:
-                g_req_loger.debug(_lineno(), row)
+                mgr_singleton.g_singleton.get_loger().debug(_lineno(), row)
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1]})
@@ -164,7 +163,7 @@ class req_handler(object):
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-        g_req_loger.info(_lineno(), 'set timers')
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), 'set timers')
 
     @staticmethod
     def handle_proxy_init_reply(worker, answ, addr):
@@ -182,7 +181,7 @@ class req_handler(object):
                 break
             if case():
                 state_set = 0
-        g_req_loger.debug(_lineno(), str_class, ' ', answ['type'], ' ', answ['viewid'], ' ', answ['data'],
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), str_class, ' ', answ['type'], ' ', answ['viewid'], ' ', answ['data'],
                 ' ', state_set, ' ', answ['opt'])
 
         if worker.just4testcnt > 0:
@@ -192,19 +191,19 @@ class req_handler(object):
         if worker.just4testcnt > 0:
             for case in switch(str_class):
                 if case('dns'):
-                    mgr_err_describe.g_err_desc.del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
+                    mgr_singleton.g_singleton.get_err_info().del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
                     break
                 if case('view'):
-                    mgr_err_describe.g_err_desc.del_view_timeout(answ['opt'], answ['viewid'], answ['data'])
+                    mgr_singleton.g_singleton.get_err_info().del_view_timeout(answ['opt'], answ['viewid'], answ['data'])
                     break
                 if case():
-                    g_req_loger.warn(_lineno(), 'can not del error describe for unknow type ', str_class)
+                    mgr_singleton.g_singleton.get_loger().warn(_lineno(), 'can not del error describe for unknow type ', str_class)
 
         #worker.dbcon.query(msg.g_proc_update_snd_req_ret)
         #update_ret = worker.dbcon.show()
-        #g_req_loger.debug(_lineno(), str_class, ' update return:', repr(update_ret))
+        #mgr_singleton.g_singleton.get_loger().debug(_lineno(), str_class, ' update return:', repr(update_ret))
         #if not update_ret or update_ret[0][0] != 1 :
-        #    g_req_loger.error(_lineno(), '%s update database fail!!!!' % (str_class))
+        #    mgr_singleton.g_singleton.get_loger().error(_lineno(), '%s update database fail!!!!' % (str_class))
 
     @staticmethod
     def handle_inner_chk_init_ok(worker):
@@ -223,7 +222,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_view_timeout(row[2], row[0], row[1])
+                mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[2], row[0], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
         del msgobj[:]
@@ -233,7 +232,7 @@ class req_handler(object):
             for row in result:
                 msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_record_timeout(row[3], row[1], row[2], row[0])
+                mgr_singleton.g_singleton.get_err_info().add_record_timeout(row[3], row[1], row[2], row[0])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
@@ -255,24 +254,24 @@ class req_handler(object):
                 "ioopt":"中文",
                 "data":{"sid":mgr_conf.g_mgr_sid} }
         payload_encode= 'data='+json.dumps(payload)
-        g_req_loger.debug(_lineno(), 'post encode data:\n', repr(payload_encode))
-        g_req_loger.debug(_lineno(), 'test decode data:\n', repr(json.loads(payload_encode[5:])))
-        g_req_loger.debug(_lineno(), 'test pre ioopt--> utf8:', repr(payload['ioopt']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'post encode data:\n', repr(payload_encode))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'test decode data:\n', repr(json.loads(payload_encode[5:])))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'test pre ioopt--> utf8:', repr(payload['ioopt']))
         test_de = json.loads(payload_encode[5:])['ioopt']
-        g_req_loger.debug(_lineno(), 'test enc and dec ioopt:', test_de.encode("UTF-8"), ', utf8:', repr(test_de.encode("UTF-8")), ', unicode:', repr(test_de))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'test enc and dec ioopt:', test_de.encode("UTF-8"), ', utf8:', repr(test_de.encode("UTF-8")), ', unicode:', repr(test_de))
 
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip,
                 mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
-            g_req_loger.warn(traceback.format_exc())
+            mgr_singleton.g_singleton.get_loger().warn(traceback.format_exc())
             raise Exception(_lineno(), 'request task post code:', post_error)
-        g_req_loger.debug(_lineno(), 'request task return:\n', repr(res))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'request task return:\n', repr(res))
         decodejson = json.loads(res)
-        g_req_loger.debug(_lineno(), 'json ret:', repr(decodejson['ret']))
-        g_req_loger.debug(_lineno(), 'json error:', repr(decodejson['error']))
-        g_req_loger.debug(_lineno(), 'json result:\n', repr(decodejson['result']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json ret:', repr(decodejson['ret']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json error:', repr(decodejson['error']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json result:\n', repr(decodejson['result']))
         if decodejson['ret'] != 0:
-            g_req_loger.warn(traceback.format_exc())
+            mgr_singleton.g_singleton.get_loger().warn(traceback.format_exc())
             raise Exception(_lineno(), 'request task return error! \
                     ret:%d error:%s'%(decodejson['ret'], decodejson['error']))
         decodejson['class'] = msg.g_class_inner_map[_type]
@@ -284,7 +283,7 @@ class req_handler(object):
     def handle_inner_chk_task_reply(worker, data):
         dic_result = data['result']
         if len(dic_result) < 1:
-            g_req_loger.info(_lineno(), data['class'], ' no task')
+            mgr_singleton.g_singleton.get_loger().info(_lineno(), data['class'], ' no task')
             return
 
         replymsg = {'class': msg.g_class_inner_chk_task_done,
@@ -296,13 +295,13 @@ class req_handler(object):
         msgobj = []
         for task_id in dic_result:
             task_data = dic_result.get(task_id)
-            g_req_loger.info(_lineno(), task_id, '\t:', task_data)
+            mgr_singleton.g_singleton.get_loger().info(_lineno(), task_id, '\t:', task_data)
 
             try:
                 dedata = json.loads(task_data['data'])
             except Exception,e:
-                g_req_loger.error(_lineno(), 'load json data error!', repr(e))
-                g_req_loger.error(traceback.format_exc())
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), 'load json data error!', repr(e))
+                mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                 continue
 
             task_type = task_data['type']
@@ -329,8 +328,8 @@ class req_handler(object):
             try:
                 db_ret, go_on, old_data = worker.m_handlers[task_type][ali].callme(worker, dedata, ali, task_data['opt'])
             except Exception as e:
-                g_req_loger.error(_lineno(), '!!!!--->', repr(e))
-                g_req_loger.error(traceback.format_exc())
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), '!!!!--->', repr(e))
+                mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                 #ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':repr(e)}
                 ptr_tasks[task_id] = {'ret':1, 'result':'task id '+task_id + ' failed', 'error':'set db failed!'}
                 continue
@@ -343,8 +342,8 @@ class req_handler(object):
                 try:
                     worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
                 except Exception as e:
-                    g_req_loger.error(_lineno(), 'notify proxy error!!!!--->', repr(e))
-                    g_req_loger.error(traceback.format_exc())
+                    mgr_singleton.g_singleton.get_loger().error(_lineno(), 'notify proxy error!!!!--->', repr(e))
+                    mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                     continue
 
         req_handler.notify_flush(worker, msgobj)
@@ -354,36 +353,35 @@ class req_handler(object):
     def handle_inner_chk_task_done(http_th, data_done):
         data_done.pop('class')
         payload_encode= 'data='+json.dumps(data_done)
-        g_req_loger.debug(_lineno(), 'post data:\n', repr(payload_encode))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'post data:\n', repr(payload_encode))
 
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip,
                 mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
-            g_req_loger.warn(traceback.format_exc())
+            mgr_singleton.g_singleton.get_loger().warn(traceback.format_exc())
             raise Exception(_lineno(), 'request task post code:', post_error)
-        g_req_loger.debug(_lineno(), 'request task return:\n', repr(res))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'request task return:\n', repr(res))
 
         decodejson = json.loads(res)
-        g_req_loger.debug(_lineno(), 'json ret:', repr(decodejson['ret']))
-        g_req_loger.debug(_lineno(), 'json error:', repr(decodejson['error']))
-        g_req_loger.debug(_lineno(), 'json result:\n', repr(decodejson['result']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json ret:', repr(decodejson['ret']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json error:', repr(decodejson['error']))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'json result:\n', repr(decodejson['result']))
 
     @staticmethod
     def handle_inner_chk_task_db_heartbeat(worker):
         worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
         result = worker.dbcon.show()
-        g_req_loger.care(_lineno(), repr(result))
+        mgr_singleton.g_singleton.get_loger().care(_lineno(), repr(result))
         if not result:
-            g_req_loger.warn(_lineno(), 'reconnecting to mysql!!!!!')
+            mgr_singleton.g_singleton.get_loger().warn(_lineno(), 'reconnecting to mysql!!!!!')
             worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
 
     @staticmethod
     def handle_proxy_heartbeat(worker, data):
-        g_req_loger.debug(_lineno(), 'g_err_desc type is ', type(mgr_err_describe.g_err_desc))
-        objs = mgr_err_describe.g_err_desc.gen_msg()
+        objs = mgr_singleton.g_singleton.get_err_info().gen_msg()
         data['message'] = objs
         data['status'] = len(objs[0])>0 and -1 or 0
-        g_req_loger.debug(_lineno(), 'heatbeat payload:\n', repr(objs))
+        mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'heatbeat payload:\n', repr(objs))
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):
@@ -595,7 +593,7 @@ class req_handler_record_cname(req_handler_impl):
 
     def send1more(self, worker, msgobj, tblname, domain, view, ropt):
         if tblname == 'cname_record':
-            g_req_loger.debug(_lineno(), "send 1 more A for CNAME : %s, opt : %s" % (domain, ropt))
+            mgr_singleton.g_singleton.get_loger().debug(_lineno(), "send 1 more A for CNAME : %s, opt : %s" % (domain, ropt))
             msgobj.append({'opt':http_opt_str2int[ropt], 'domain':domain, 'view':view, 'type':msg.g_dict_type['a_record'],
                 'pkt_head':msg.g_pack_head_init_dns})
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)

@@ -10,12 +10,12 @@ import select
 import termios
 import tty
 import mgr_conf
-from mgr_singleton import g_factory
-import request_handler
+import mgr_singleton
+from mgr_factory import g_factory
 from mgr_misc import _lineno
 import traceback
 from mgr_daemon import Daemon
-import mgr_err_describe
+import request_handler
 
 #values=[]
 #for i in range(20):
@@ -25,24 +25,24 @@ import mgr_err_describe
 #conn.commit()
 
 def stop_all():
-    if g_factory.get_check_thread().isAlive():
-        g_factory.get_check_thread().stop()
-        g_factory.get_check_thread().join()
-    if g_factory.get_http_thread().isAlive():
-        g_factory.get_http_thread().stop()
-        g_factory.get_http_thread().join()
-    if g_factory.get_repth_thread().isAlive():
-        g_factory.get_repth_thread().stop()
-        g_factory.get_repth_thread().join()
-    if g_factory.get_mgr_worker4init().isAlive():
-        g_factory.get_mgr_worker4init().stop()
-        g_factory.get_mgr_worker4init().join()
-    if g_factory.get_mgr_worker().isAlive():
-        g_factory.get_mgr_worker().stop()
-        g_factory.get_mgr_worker().join()
-    if g_factory.get_mgr_loger().isAlive():
-        g_factory.get_mgr_loger().stop()
-        g_factory.get_mgr_loger().join()
+    if mgr_singleton.g_singleton.get_check_thread().isAlive():
+        mgr_singleton.g_singleton.get_check_thread().stop()
+        mgr_singleton.g_singleton.get_check_thread().join()
+    if mgr_singleton.g_singleton.get_http_thread().isAlive():
+        mgr_singleton.g_singleton.get_http_thread().stop()
+        mgr_singleton.g_singleton.get_http_thread().join()
+    if mgr_singleton.g_singleton.get_reply_thread().isAlive():
+        mgr_singleton.g_singleton.get_reply_thread().stop()
+        mgr_singleton.g_singleton.get_reply_thread().join()
+    if mgr_singleton.g_singleton.get_worker4init().isAlive():
+        mgr_singleton.g_singleton.get_worker4init().stop()
+        mgr_singleton.g_singleton.get_worker4init().join()
+    if mgr_singleton.g_singleton.get_worker().isAlive():
+        mgr_singleton.g_singleton.get_worker().stop()
+        mgr_singleton.g_singleton.get_worker().join()
+    if mgr_singleton.g_singleton.get_loger().isAlive():
+        mgr_singleton.g_singleton.get_loger().stop()
+        mgr_singleton.g_singleton.get_loger().join()
 
 def start_web():
     webs.run_websvr()
@@ -50,8 +50,8 @@ def start_web():
 def main_loop():
     while 1:
         msg.g_now += 1
-        g_factory.get_mgr_loger()._uptime()
-        #g_factory.get_mgr_loger().debug(_lineno(), msg.g_now)
+        mgr_singleton.g_singleton.get_loger()._uptime()
+        #mgr_singleton.g_singleton.get_loger().debug(_lineno(), msg.g_now)
         if not msg.g_enable_stdin:
             time.sleep(1)
         else:
@@ -64,16 +64,16 @@ def main_loop():
                     if not line or line.rstrip()=='wwq':
                         break
             except KeyboardInterrupt as e:
-                g_factory.get_mgr_loger().error(_lineno(), 'KeyboardInterrupt:%s' % e) #可以
-                g_factory.get_mgr_loger().error(traceback.format_exc())
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), 'KeyboardInterrupt:%s' % e) #可以
+                mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                 break
             except IOError as e:
-                g_factory.get_mgr_loger().error(_lineno(), 'IOError:%s' % (e)) #可以
-                g_factory.get_mgr_loger().error(traceback.format_exc())
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), 'IOError:%s' % (e)) #可以
+                mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                 break
             except Exception as e:
-                g_factory.get_mgr_loger().error(_lineno(), 'exception:%s' % (e,)) #可以
-                g_factory.get_mgr_loger().error(traceback.format_exc())
+                mgr_singleton.g_singleton.get_loger().error(_lineno(), 'exception:%s' % (e,)) #可以
+                mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
                 break
 
     if msg.g_enable_stdin and msg.old_settings:
@@ -92,33 +92,32 @@ class MyDaemon(Daemon):
     def run(self):
         signal.signal(signal.SIGINT,sigint_handler)
 
-        request_handler.g_req_loger = g_factory.get_mgr_loger()
-        mgr_err_describe.g_err_desc = g_factory.get_err_info()
-        #g_factory.get_mgr_loger().debug(_lineno(), 'starting')
+        mgr_singleton.g_singleton = mgr_singleton.mgr_singleton(g_factory)
+        #mgr_singleton.g_singleton.get_loger().debug(_lineno(), 'starting')
         #sys.exit()
 
-        g_factory.get_repth_thread()
-        g_factory.get_http_thread()
+        mgr_singleton.g_singleton.get_reply_thread()
+        mgr_singleton.g_singleton.get_http_thread()
         if False:
-            g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_init_ok, mgr_conf.g_inner_chk_init_ok_time)
-        #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
-        #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
-        #g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
+            mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_init_ok, mgr_conf.g_inner_chk_init_ok_time)
+        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
+        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
         if False: #test
-            g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_init_test, mgr_conf.g_inner_chk_init_ok_time)
-        g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())
+            mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_init_test, mgr_conf.g_inner_chk_init_ok_time)
+        mgr_singleton.g_singleton.get_worker().set_buddy_thread(mgr_singleton.g_singleton.get_http_thread(), mgr_singleton.g_singleton.get_check_thread())
 
-        g_factory.get_mgr_loger().start()
+        mgr_singleton.g_singleton.get_loger().start()
         time.sleep(1)
-        g_factory.get_zkhandler()
+        mgr_singleton.g_singleton.get_zkhandler()
 
-        g_factory.get_mgr_worker4init().start()
-        g_factory.get_mgr_worker().start()
-        g_factory.get_repth_thread().start()
+        mgr_singleton.g_singleton.get_worker4init().start()
+        mgr_singleton.g_singleton.get_worker().start()
+        mgr_singleton.g_singleton.get_reply_thread().start()
         time.sleep(1)
-        g_factory.get_http_thread().start()
-        g_factory.get_check_thread().start()
-        g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_db_heartbeat,
+        mgr_singleton.g_singleton.get_http_thread().start()
+        mgr_singleton.g_singleton.get_check_thread().start()
+        mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_db_heartbeat,
                 mgr_conf.g_inner_chk_task_db_heartbeat)
 
         #start_web()
@@ -128,8 +127,8 @@ class MyDaemon(Daemon):
                 msg.old_settings = termios.tcgetattr(sys.stdin)
                 tty.setcbreak(sys.stdin.fileno())
         except Exception as e:
-            g_factory.get_mgr_loger().error(_lineno(), 'Exception:%s' % (e,))
-            g_factory.get_mgr_loger().error(traceback.format_exc())
+            mgr_singleton.g_singleton.get_loger().error(_lineno(), 'Exception:%s' % (e,))
+            mgr_singleton.g_singleton.get_loger().error(traceback.format_exc())
         finally:
             main_loop()
 

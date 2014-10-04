@@ -6,14 +6,14 @@ import threading
 from mgr_misc import _lineno, switch, get_time
 import types
 
-g_err_desc = None
-
 class ErrInfo(object):
+
     type_err_db = 'db'
     type_err_view = 'view'
     type_err_record = 'record'
     db_desc_lose = 'lose'
     db_desc = {db_desc_lose:'lost connection'}
+
     def __init__(self, loger):
         self.desc = {self.type_err_db:[], self.type_err_view:[], self.type_err_record:[]}
         self.lock = threading.Lock()

@@ -6,7 +6,6 @@ import socket
 import threading
 import json
 import msg
-from request_handler import req_handler
 import struct
 import sys
 import Queue
