@@ -22,19 +22,19 @@ class req_handler(object):
                 if msgobj[i].has_key('pkt_head'):
                     cur_pkt_head = msgobj[i].pop('pkt_head')
                 else:
-                    print ('no pkt_head key-->', repr(msgobj[i]))
+                    print ('no pkt_head key-->' + repr(msgobj[i]))
                     cur_pkt_head = None
                 if cur_pkt_head and pre_pkt_head and cur_pkt_head != pre_pkt_head:
-                    print ('pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:i]))
+                    print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:i]))
                     worker.reply(msgobj[pre_i:i], pre_pkt_head, addr)
                     pre_i = i
                 if cur_pkt_head:
                     pre_pkt_head = cur_pkt_head
 
             if pre_pkt_head == None:
-                print ('no pkt_head key-->', repr(msgobj))
+                print ('no pkt_head key-->' + repr(msgobj))
             else:
-                print ('pkt piece head:', pre_pkt_head, ' -->', repr(msgobj[pre_i:]))
+                print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:]))
                 worker.reply(msgobj[pre_i:], pre_pkt_head, addr)
             del msgobj[:]
 
@@ -161,7 +161,7 @@ class req_handler(object):
         if answ['result'] == 2:
             state_set = 2
 
-        print (str_class, ' ',  answ['type'],  ' ', answ['viewid'], ' ',  answ['data'],  ' ', state_set,  ' ',  answ['opt'])
+        print (str_class + ' ' + str(answ['type']) + ' ' + str(answ['viewid']) + ' ' + str(answ['data']) + ' ' + str(state_set) + ' ' + str(answ['opt']))
 
         if worker.just4testcnt > 0:
             worker.dbcon.call_proc(msg.g_proc_update_snd_req, (str_class, answ['type'], answ['viewid'],
@@ -210,13 +210,13 @@ class req_handler(object):
         for k in decodejson:
             v = decodejson.get(k)
             if type(v) is types.ListType:
-                print >> sys.stderr, k, '---'
+                print >> sys.stderr, str(k) + '---'
                 for kk, vv in enumerate(v):
-                    print >> sys.stderr, kk, vv
+                    print >> sys.stderr, str(kk) + str(vv)
                     print >> sys.stderr, '---'
 
             else:
-                print >> sys.stderr, k, '\t:', decodejson.get(k)
+                print >> sys.stderr, str(k) + '\t:' + str(decodejson.get(k))
 
     @staticmethod
     def handle_inner_chk_task(http_th, worker, _type):
@@ -225,16 +225,16 @@ class req_handler(object):
                 'ioopt': '\xe4\xb8\xad\xe6\x96\x87',
                 'data': {'sid': mgr_conf.g_mgr_sid}}
         payload_encode = 'data=' + json.dumps(payload)
-        print ('post encode data:\n', repr(payload_encode))
+        print ('post encode data:\n' + repr(payload_encode))
         test_de = json.loads(payload_encode[5:])['ioopt']
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip, mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
             raise Exception('request task post code:', post_error)
         print ('request task return:\n' + repr(res))
         decodejson = json.loads(res)
-        print ('json ret:', repr(decodejson['ret']))
-        print ('json error:', repr(decodejson['error']))
-        print ('json result:\n', repr(decodejson['result']))
+        print ('json ret:' + repr(decodejson['ret']))
+        print ('json error:' + repr(decodejson['error']))
+        print ('json result:\n' + repr(decodejson['result']))
         if decodejson['ret'] != 0:
             raise Exception('request task return error! ret:%d error:%s' % (decodejson['ret'], decodejson['error']))
         decodejson['class'] = msg.g_class_inner_map[_type]
@@ -246,7 +246,7 @@ class req_handler(object):
     def handle_inner_chk_task_reply(worker, data):
         dic_result = data['result']
         if len(dic_result) < 1:
-            print (data['class'], ' no task')
+            print (data['class'] + ' no task')
             return
         replymsg = {'class': msg.g_class_inner_chk_task_done,
                 'opt': 'set',
@@ -256,11 +256,11 @@ class req_handler(object):
         msgobj = []
         for task_id in dic_result:
             task_data = dic_result.get(task_id)
-            print (task_id, '\t:', task_data)
+            print (task_id + '\t:' + repr(task_data))
             try:
                 dedata = json.loads(task_data['data'])
             except Exception as e:
-                print ('load json data error!', repr(e))
+                print ('load json data error!' + repr(e))
                 continue
 
             task_type = task_data['type']
@@ -282,7 +282,7 @@ class req_handler(object):
             try:
                 db_ret, go_on, old_data = worker.m_handlers[task_type][ali].callme(worker, dedata, ali, task_data['opt'])
             except Exception as e:
-                print ('!!!!--->', repr(e))
+                print ('!!!!--->' + repr(e))
                 ptr_tasks[task_id] = {'ret': 1, 'result': 'task id ' + task_id + ' failed', 'error': 'set db failed!'}
                 continue
 
@@ -294,7 +294,7 @@ class req_handler(object):
                 try:
                     worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
                 except Exception as e:
-                    print ('notify proxy error!!!!--->', repr(e))
+                    print ('notify proxy error!!!!--->' + repr(e))
                     continue
 
         req_handler.notify_flush(worker, msgobj)
@@ -304,15 +304,15 @@ class req_handler(object):
     def handle_inner_chk_task_done(http_th, data_done):
         data_done.pop('class')
         payload_encode = 'data=' + json.dumps(data_done)
-        print ('post data:\n', repr(payload_encode))
+        print ('post data:\n' + repr(payload_encode))
         res, post_error = http_th.http_send_post(mgr_conf.g_url_inner_chk_task_ip, mgr_conf.g_url_inner_chk_task_url, payload_encode)
         if not res:
             raise Exception('request task post code:', post_error)
         print ('request task return:\n' + repr(res))
         decodejson = json.loads(res)
-        print ('json ret:', repr(decodejson['ret']))
-        print ('json error:', repr(decodejson['error']))
-        print ('json result:\n', repr(decodejson['result']))
+        print ('json ret:' + repr(decodejson['ret']))
+        print ('json error:' + repr(decodejson['error']))
+        print ('json result:\n' + repr(decodejson['result']))
 
     @staticmethod
     def handle_inner_chk_task_db_heartbeat(worker):
@@ -333,8 +333,6 @@ class req_handler(object):
         worker.reply_echo(data, data['inner_addr'][0], data['inner_addr'][1])
 
 class req_hdl_abstract(object):
-    handlers = []
-
     def __init__(self):
         pass
 
@@ -362,11 +360,10 @@ class req_hdl_abstract(object):
         elif opt == 'del':
             return self.delete(worker, data, ali_tbl)
         else:
-            print ('opt:', opt, ' not implement')
+            print ('opt:' + str(opt) + ' not implement')
             raise Exception('opt not implement')
 
 class req_handler_impl(req_hdl_abstract):
-
     def __init__(self):
         req_hdl_abstract.__init__(self)
 
@@ -387,7 +384,7 @@ class req_handler_impl(req_hdl_abstract):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (add_ret, True, result)
 
     def set(self, worker, data, ali_tbl):
@@ -407,13 +404,13 @@ class req_handler_impl(req_hdl_abstract):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
         result = worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         if result[0][0] == None or result[0][1] == None:
             result = None
         return (True, True, result)
@@ -421,7 +418,7 @@ class req_handler_impl(req_hdl_abstract):
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         if len(worker.proxy_addr.keys()) < 1:
             return
-        print ('opt:', opt, ' data:', data)
+        print ('opt:' + str(opt) + ' data:' + str(data))
 
         if opt == 'add':
             if odata and len(odata) > 0 and len(odata[0]) >= 4:
@@ -470,15 +467,15 @@ class req_handler_record_a(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:a_record into database')
+        print ('adding name:' + str(data['name']) + ' table:a_record into database')
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:a_record into database')
+        print ('updating name:' + str(data['name']) + ' table:a_record into database')
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:a_record rid:', data['rid'], ' from database')
+        print ('deleting name:a_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -491,19 +488,19 @@ class req_handler_record_aaaa(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:aaaa_record into database')
+        print ('adding name:' + str(data['name']) + ' table:aaaa_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
-        print ('decode aaaa:', data[ali_tbl])
+        print ('decode aaaa:' + str(data[ali_tbl]))
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:aaaa_record into database')
+        print ('updating name:' + str(data['name']) + ' table:aaaa_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
-        print ('decode aaaa:', data[ali_tbl])
+        print ('decode aaaa:' + str(data[ali_tbl]))
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:aaaa_record rid:', data['rid'], ' from database')
+        print ('deleting name:aaaa_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -516,15 +513,15 @@ class req_handler_record_cname(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:cname_record into database')
+        print ('adding name:' + str(data['name']) + ' table:cname_record into database')
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:cname_record into database')
+        print ('updating name:' + str(data['name']) + ' table:cname_record into database')
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:cname_record rid:', data['rid'], ' from database')
+        print ('deleting name:cname_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -540,7 +537,7 @@ class req_handler_record_cname(req_handler_impl):
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         if len(worker.proxy_addr.keys()) < 1:
             return
-        print ('opt:', opt, ' data:', data)
+        print ('opt:' + str(opt) + ' data:' + str(data))
         if opt == 'add':
             if odata and len(odata) > 0 and len(odata[0]) >= 4:
                 odata0 = odata[0]
@@ -592,15 +589,15 @@ class req_handler_record_ns(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:ns_record into database')
+        print ('adding name:' + str(data['name']) + ' table:ns_record into database')
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:ns_record into database')
+        print ('updating name:' + str(data['name']) + ' table:ns_record into database')
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:ns_record rid:', data['rid'], ' from database')
+        print ('deleting name:ns_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -613,19 +610,19 @@ class req_handler_record_txt(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:txt_record into database')
+        print ('adding name:' + str(data['name']) + ' table:txt_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
-        print ('decode TXT:', data[ali_tbl])
+        print ('decode TXT:' + str(data[ali_tbl]))
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:txt_record into database')
+        print ('updating name:' + str(data['name']) + ' table:txt_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
-        print ('decode TXT:', data[ali_tbl])
+        print ('decode TXT:' + str(data[ali_tbl]))
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:txt_record rid:', data['rid'], ' from database')
+        print ('deleting name:txt_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -638,7 +635,7 @@ class req_handler_record_mx(req_handler_impl):
         req_handler_impl.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding name:', data['name'], ' table:mx_record into database')
+        print ('adding name:' + str(data['name']) + ' table:mx_record into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
@@ -654,11 +651,11 @@ class req_handler_record_mx(req_handler_impl):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (add_ret, True, result)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating name:', data['name'], ' table:mx_record into database')
+        print ('updating name:' + str(data['name']) + ' table:mx_record into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
@@ -674,11 +671,11 @@ class req_handler_record_mx(req_handler_impl):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
-        print ('deleting name:mx_record rid:', data['rid'], ' from database')
+        print ('deleting name:mx_record rid:' + str(data['rid']) + ' from database')
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
@@ -691,14 +688,14 @@ class req_handler_record_domain_ns(req_hdl_abstract):
         req_hdl_abstract.__init__(self)
 
     def add(self, worker, data, ali_tbl):
-        print ('adding domain_ns:', data['main'], '-->', data['domain_ns'], ' into database')
+        print ('adding domain_ns:' + str(data['main']) + '-->' + str(data['domain_ns']) + ' into database')
         add_ret = worker.dbcon.query(msg.g_sql_add_a_domain_ns % (data['main'], int(data['ttl']), data['domain_ns'],
             data['rid'], data['main'], int(data['ttl']), data['domain_ns']))
-        print ('add return ', add_ret)
+        print ('add return ' + str(add_ret))
         return (add_ret, False, None)
 
     def set(self, worker, data, ali_tbl):
-        print ('updating domain_ns:', data['main'], '-->', data['domain_ns'], ' into database')
+        print ('updating domain_ns:' + str(data['main']) + '-->' + str(data['domain_ns']) + ' into database')
         add_ret = worker.dbcon.query(msg.g_sql_add_a_domain_ns % (data['main'], int(data['ttl']), data['domain_ns'],
             data['rid'], data['main'], int(data['ttl']), data['domain_ns']))
         return (add_ret, False, None)
@@ -714,7 +711,7 @@ class req_handler_domain(req_handler_impl):
 
     def set(self, worker, data, ali_tbl):
         n_enable = 1 if int(data['enable']) == 0 else 0
-        print ('update domain:', data['name'], '[', n_enable, '] from database')
+        print ('update domain:' + str(data['name']) + '[' + str(n_enable) + '] from database')
         worker.dbcon.call_proc(msg.g_proc_set_a_domain, (data['name'], n_enable))
         result = []
         ars = worker.dbcon.show()
@@ -726,14 +723,14 @@ class req_handler_domain(req_handler_impl):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (True, True, result)
 
     def delete(self, worker, data, ali_tbl):
         if False:
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
-        print ('deleting domain:', data['name'], ' from database')
+        print ('deleting domain:' + str(data['name']) + ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
         result = []
         ars = worker.dbcon.show()
@@ -745,26 +742,21 @@ class req_handler_domain(req_handler_impl):
             ars = worker.dbcon.show()
 
         worker.dbcon.fetch_proc_reset()
-        print ('select old:', result)
+        print ('select old:' + str(result))
         return (True, True, result)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         self.donotify(worker, msgobj, opt, data, odata)
 
     def donotify(self, worker, msgobj, opt = None, data = None, odata = None, real_tbl = None):
-        print ('enter opt:',
-         opt,
-         ' data:',
-         data,
-         ' odata:',
-         odata)
+        print ('enter opt:' + str(opt) + ' data:' + str(data) + ' odata:' + str(odata))
         if len(worker.proxy_addr.keys()) < 1:
             return
 
         if opt == 'del':
             for od in odata:
                 if len(od) >= 3 and od[0] and od[1] != None and od[2]:
-                    print ('notify od for del:', od)
+                    print ('notify od for del:' + str(od))
                     msgobj.append({'opt': http_opt_str2int[opt],
                         'domain': od[0],
                         'view': od[1],
@@ -778,7 +770,7 @@ class req_handler_domain(req_handler_impl):
                 ropt = 'del'
             for od in odata:
                 if len(od) >= 3 and od[0] and od[1] != None and od[2]:
-                    print ('notify od for set:', od)
+                    print ('notify od for set:' + str(od))
                     msgobj.append({'opt': http_opt_str2int[ropt],
                         'domain': od[0],
                         'view': od[1],
@@ -787,7 +779,6 @@ class req_handler_domain(req_handler_impl):
                     req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
 
 class req_handler_view_mask(req_handler_impl):
-
     def __init__(self):
         req_handler_impl.__init__(self)
 
@@ -804,21 +795,14 @@ class req_handler_view_mask(req_handler_impl):
         return req_hdl_abstract.notify(self, worker, msgobj, opt, data, odata, '', flush, direct)
 
 
-http_tbl_alise = ('A',
- 'AAAA',
- 'CNAME',
- 'NS',
- 'TXT',
- 'MX',
- 'domain_ns')
+http_tbl_alise = ('A', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
 http_tbl_realname = {'A': 'a_record',
- 'AAAA': 'aaaa_record',
- 'CNAME': 'cname_record',
- 'NS': 'ns_record',
- 'TXT': 'txt_record',
- 'MX': 'mx_record',
- 'domain_ns': 'domain_ns'}
-http_opt_str2int = {'add': msg.g_opt_add,
- 'del': msg.g_opt_del}
-http_type_to_proxy_header = {'record': msg.g_pack_head_init_dns,
- 'domain': msg.g_pack_head_init_view}
+        'AAAA': 'aaaa_record',
+        'CNAME': 'cname_record',
+        'NS': 'ns_record',
+        'TXT': 'txt_record',
+        'MX': 'mx_record',
+        'domain_ns': 'domain_ns'}
+http_opt_str2int = {'add': msg.g_opt_add, 'del': msg.g_opt_del}
+http_type_to_proxy_header = {'record': msg.g_pack_head_init_dns, 'domain': msg.g_pack_head_init_view}
+

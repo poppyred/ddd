@@ -30,4 +30,4 @@ class mgr_handler4init(object):
                 req_handler.handle_inner_chk_task_db_heartbeat(self)
 
         except Exception as e:
-            print ('inner error: ', repr(e))
+            print ('inner error: ' + repr(e))

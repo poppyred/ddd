@@ -386,7 +386,6 @@ class req_handler(object):
 
 class req_hdl_abstract(object):
     loger = None
-    handlers = []
     def __init__(self, loger):
         self.loger = loger
 

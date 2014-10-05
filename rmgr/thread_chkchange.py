@@ -65,7 +65,7 @@ class thread_chkchange(object):
             if self.tasknodeds[pos].deadline <= msg.g_now:
                 newtns = self.tasknodeds[pos:]
                 del self.tasknodeds[pos:]
-                print ('newtns-->', repr(newtns))
+                print ('newtns-->' + repr(newtns))
                 for timeout in newtns:
                     msgobj = {'class': timeout.nname}
                     try:
@@ -80,7 +80,7 @@ class thread_chkchange(object):
                             self.tq.handler(msgobj)
 
                     except Exception as e:
-                        print ('error taskq is ', repr(e))
+                        print ('error taskq is ' + repr(e))
                     finally:
                         timeout.deadline = msg.g_now + timeout.interval
                         self.add_tasknode(timeout)

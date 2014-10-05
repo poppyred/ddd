@@ -33,7 +33,7 @@ class reply_thread(object):
                 return
             for s in rs:
                 data, addr = s.recvfrom(self.BUFSIZE)
-                print ('received from ', addr, ' data:', data)
+                print ('received from ' + str(addr) + ' data:' + str(data))
                 if data == None:
                     print 'recv data none'
                     continue
@@ -48,7 +48,7 @@ class reply_thread(object):
                     self.worker.handler(decodejson)
 
         except Exception as e:
-            print ('inner error:', repr(e))
+            print ('inner error:' + repr(e))
 
         #self.udpSerSock.close()
 

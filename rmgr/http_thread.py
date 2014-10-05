@@ -13,7 +13,7 @@ class http_thread(object):
         self.worker = worker
 
     def handler(self, data):
-        print ('msg class: ' + data['class'])
+        print ('msg class: ' + str(data['class']))
         if data['class'] == msg.g_class_inner_chk_task_domain or data['class'] == msg.g_class_inner_chk_task_record:
             req_handler.handle_inner_chk_task(self, self.worker, data['class'])
         if data['class'] == msg.g_class_inner_chk_task_done:
@@ -26,7 +26,7 @@ class http_thread(object):
         conn.request(method='POST', url=_url, body=_body, headers=headerdata)
         response = conn.getresponse()
         if msg.g_http_response_OK != response.status:
-            print ('request task response: ', response.status)
+            print ('request task response: ' + str(response.status))
             conn.close()
             return (None, response.status)
         res = response.read()
