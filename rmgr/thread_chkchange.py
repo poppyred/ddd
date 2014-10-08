@@ -44,9 +44,9 @@ class thread_chkchange(object):
                 break
 
         if not added:
-            print ('add tasknodeds-->' + repr(self.tasknodeds))
+            #print 'add tasknodeds-->' + repr(self.tasknodeds)
             self.tasknodeds.append(node)
-        print ('after add tasknodeds-->' + repr(self.tasknodeds))
+        #print 'after add tasknodeds-->' + repr(self.tasknodeds)
 
     def del_tasknode_byname_lock(self, name):
         self.lock.acquire()
@@ -60,12 +60,12 @@ class thread_chkchange(object):
 
     def check_event(self):
         self.lock.acquire()
-        print ('tasknodeds***-->' + repr(self.tasknodeds))
+        #print 'tasknodeds***-->' + repr(self.tasknodeds)
         for pos in range(len(self.tasknodeds)):
             if self.tasknodeds[pos].deadline <= msg.g_now:
                 newtns = self.tasknodeds[pos:]
                 del self.tasknodeds[pos:]
-                print ('newtns-->' + repr(newtns))
+                #print 'newtns-->' + repr(newtns)
                 for timeout in newtns:
                     msgobj = {'class': timeout.nname}
                     try:
