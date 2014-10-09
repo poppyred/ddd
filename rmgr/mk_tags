@@ -1,6 +1,0 @@
-#!/bin/sh
-# made by likunxiang
-
-find . -name "*.py" > cscope.files
-cscope -bkq -i cscope.files
-ctags -R
