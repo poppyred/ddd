@@ -26,7 +26,7 @@ class ErrInfo(object):
         else:
             obj = {'opt':opt, 'view':view, 'mask':mask, 'settime':get_time(), 'sent':0, 'regain':0}
             self.desc[self.type_err_view].append(obj)
-        self.__travel()
+        #self.__travel()
         self.lock.release()
 
     def del_view_timeout(self, opt, view, mask):
@@ -37,7 +37,7 @@ class ErrInfo(object):
             oldobj['regain'] = 1
             oldobj['settime'] = get_time()
             self.desc[self.type_err_view].append(oldobj)
-        self.__travel()
+        #self.__travel()
         self.lock.release()
 
     def add_record_timeout(self, opt, view, domain, rtype):
@@ -49,7 +49,7 @@ class ErrInfo(object):
             obj = {'opt':opt, 'view':view, 'domain':domain, 'type':rtype, 'settime':get_time(),
                     'sent':0, 'regain':0}
             self.desc[self.type_err_record].append(obj)
-        self.__travel()
+        #self.__travel()
         self.lock.release()
 
     def del_record_timeout(self, opt, view, domain, rtype):
@@ -60,7 +60,7 @@ class ErrInfo(object):
             oldobj['regain'] = 1
             oldobj['settime'] = get_time()
             self.desc[self.type_err_record].append(oldobj)
-        self.__travel()
+        #self.__travel()
         self.lock.release()
 
     def add_db_error(self, desc):
@@ -72,7 +72,7 @@ class ErrInfo(object):
             else:
                 obj = {'desc':desc, 'settime':get_time(), 'sent':0, 'regain':0}
                 self.desc[self.type_err_db].append(obj)
-            self.__travel()
+            #self.__travel()
         self.lock.release()
 
     def del_db_error(self, desc):
@@ -84,7 +84,7 @@ class ErrInfo(object):
                 oldobj['regain'] = 1
                 oldobj['settime'] = get_time()
                 self.desc[self.type_err_db].append(oldobj)
-            self.__travel()
+            #self.__travel()
         self.lock.release()
 
     def del_item_lock(self, _type, *args):

@@ -25,7 +25,7 @@ class req_handler(object):
                     print ('no pkt_head key-->' + repr(msgobj[i]))
                     cur_pkt_head = None
                 if cur_pkt_head and pre_pkt_head and cur_pkt_head != pre_pkt_head:
-                    print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:i]))
+                    #print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:i]))
                     worker.reply(msgobj[pre_i:i], pre_pkt_head, addr)
                     pre_i = i
                 if cur_pkt_head:
@@ -34,7 +34,7 @@ class req_handler(object):
             if pre_pkt_head == None:
                 print ('no pkt_head key-->' + repr(msgobj))
             else:
-                print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:]))
+                #print ('pkt piece head:' + str(pre_pkt_head) + ' -->' + repr(msgobj[pre_i:]))
                 worker.reply(msgobj[pre_i:], pre_pkt_head, addr)
             del msgobj[:]
 
