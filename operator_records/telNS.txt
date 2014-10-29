@@ -1,0 +1,1 @@
+dns21.org. 	10 	mail.dns21.org.

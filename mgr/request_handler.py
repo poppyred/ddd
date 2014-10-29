@@ -11,6 +11,7 @@ from mgr_misc import _lineno, switch
 import traceback
 import urllib
 import mgr_singleton
+import time
 
 __all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
@@ -103,13 +104,14 @@ class req_handler(object):
         msgobj = []
         count = 0
         cur_cnt = 0
+
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
             if not result:
                 continue
             for row in result:
-                mgr_singleton.g_singleton.get_loger().debug(_lineno(), "dns query %s res: %s" % (atbl, row))
+                mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                         0, msg.g_opt_add))
@@ -118,7 +120,7 @@ class req_handler(object):
                 cur_cnt += 1
 
                 if atbl == 'cname_record':
-                    mgr_singleton.g_singleton.get_loger().debug(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
+                    mgr_singleton.g_singleton.get_loger().care(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
                     if False:
                         worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
                             0, msg.g_opt_add))
@@ -131,19 +133,23 @@ class req_handler(object):
                         return
                     cur_cnt = 0
                     del msgobj[:]
+                    time.sleep(1)
 
         if cur_cnt > 0:
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
+            time.sleep(1)
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), "sent %d records" % (count,));
 
         #query view
         del msgobj[:]
+        cur_cnt = 0
+
         worker.dbcon.query(msg.g_init_sql_view)
         result = worker.dbcon.show()
-        cur_cnt = 0
         if result:
             for row in result:
-                mgr_singleton.g_singleton.get_loger().debug(_lineno(), row)
+                mgr_singleton.g_singleton.get_loger().care(_lineno(), row)
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1]})

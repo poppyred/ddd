@@ -1,0 +1,4 @@
+dns21.org. 	ns4.efly.cc.
+dns21.org. 	ns5.efly.cc.
+dns21.org. 	ns6.efly.cc.
+dns21.org. 	ns7.efly.cc.
