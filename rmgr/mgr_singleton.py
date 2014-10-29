@@ -9,10 +9,9 @@ import mgr_worker
 import mgr_worker4init
 import mgr_conf
 import mgr_err_describe
-import tick_thread
 
 class mgr_factory(object):
-    __slots__ = ('mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th', 'tick_th','err_info')
+    __slots__ = ('mgr_worker', 'mgr_worker4init', 'reply_th', 'http_th', 'chkchange_th', 'err_info')
 
     def __init__(self):
         self.reply_th = None
@@ -20,7 +19,6 @@ class mgr_factory(object):
         self.chkchange_th = None
         self.mgr_worker = None
         self.mgr_worker4init = None
-        self.tick_th = None
         self.err_info = None
 
     def get_mgr_worker4init(self):
@@ -52,10 +50,5 @@ class mgr_factory(object):
         if not self.err_info:
             self.err_info = mgr_err_describe.ErrInfo()
         return self.err_info
-
-    def get_tick_thread(self):
-        if not self.tick_th:
-            self.tick_th = tick_thread.Tick_thread()
-        return self.tick_th
 
 g_factory = mgr_factory()
