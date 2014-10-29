@@ -200,5 +200,5 @@ class ErrInfo(object):
         for k in self.desc:
             v = self.desc.get(k)
             if type(v) is types.ListType:
-                self.loger.info(_lineno(self), k, '---', v)
+                self.loger.care(_lineno(self), k, '---', v)
 
