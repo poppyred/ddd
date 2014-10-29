@@ -10,6 +10,7 @@ import types
 import mgr_conf
 import urllib
 import mgr_err_describe
+import time
 
 class req_handler(object):
 
@@ -46,9 +47,22 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_init(worker, addr):
-        worker.dbcon.query(msg.g_sql_clean_snd_req)
         msgobj = []
         count = 0
+        worker.dbcon.query(msg.g_init_sql_view)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                print row
+                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
+                msgobj.append({'opt': msg.g_opt_add, 'view': row[0], 'mask': row[1], 'pkt_head': msg.g_pack_head_init_view})
+                count += 1
+                req_handler.notify_proxy(worker, msgobj, addr)
+
+            req_handler.notify_proxy(worker, msgobj, addr, True)
+
+        del msgobj[:]
+        worker.dbcon.query(msg.g_sql_clean_snd_req)
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % atbl)
             result = worker.dbcon.show()
@@ -73,26 +87,16 @@ class req_handler(object):
 
             req_handler.notify_proxy(worker, msgobj, addr, True)
 
-        del msgobj[:]
-        worker.dbcon.query(msg.g_init_sql_view)
-        result = worker.dbcon.show()
-        if result:
-            for row in result:
-                print row
-                worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
-                msgobj.append({'opt': msg.g_opt_add, 'view': row[0], 'mask': row[1], 'pkt_head': msg.g_pack_head_init_view})
-                count += 1
-                req_handler.notify_proxy(worker, msgobj, addr)
-
-            req_handler.notify_proxy(worker, msgobj, addr, True)
         msg.g_init_resp_expect = count
 
     @staticmethod
     def handle_proxy_init_new(worker, addr):
         worker.dbcon.query(msg.g_sql_clean_snd_req)
+
         msgobj = []
         count = 0
         cur_cnt = 0
+
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % atbl)
             result = worker.dbcon.show()
@@ -119,14 +123,19 @@ class req_handler(object):
                         return
                     cur_cnt = 0
                     del msgobj[:]
+                    time.sleep(1)
 
         if cur_cnt > 0:
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
+            time.sleep(1)
+        print("sent %d records" % (count,));
+
         del msgobj[:]
+        cur_cnt = 0
+
         worker.dbcon.query(msg.g_init_sql_view)
         result = worker.dbcon.show()
-        cur_cnt = 0
         if result:
             for row in result:
                 print row
@@ -144,6 +153,7 @@ class req_handler(object):
             if cur_cnt > 0:
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     return
+
         msg.g_init_resp_expect = count
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)

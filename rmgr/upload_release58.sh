@@ -29,12 +29,6 @@ remote_dir='/usr/local'
 oldline=`sed -n '/g_enable_stdin/p' msg.py`
 sed -i '/g_enable_stdin/c g_enable_stdin=0' msg.py
 
-oldloglevel=`sed -n '/log_level/p' mgr_conf.py`
-sed -i "/log_level/c log_level=\'warn\'" mgr_conf.py
-
-oldlogdir=`sed -n '/log_direction/p' mgr_conf.py`
-sed -i "/log_direction/c log_direction=1" mgr_conf.py
-
 oldmgrsid=`sed -n '/g_mgr_sid/p' mgr_conf.py`
 sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp'" mgr_conf.py
 
@@ -63,7 +57,5 @@ expect -c "
         expect eof"
 
 sed -i "/g_enable_stdin/c $oldline" msg.py
-sed -i "/log_level/c $oldloglevel" mgr_conf.py
-sed -i "/log_direction/c $oldlogdir" mgr_conf.py
 sed -i "/g_mgr_sid/c $oldmgrsid" mgr_conf.py
 /bin/rm $local_dir/* -rf
