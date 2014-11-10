@@ -14,6 +14,7 @@ import time
 import sys
 
 class req_handler(object):
+    lockdb = False
 
     @staticmethod
     def notify_proxy(worker, msgobj, addr, flush = False):
@@ -92,6 +93,7 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_init_new(worker, addr):
+        req_handler.lockdb = True
         worker.dbcon.query(msg.g_sql_clean_snd_req)
 
         msgobj = []
@@ -121,6 +123,7 @@ class req_handler(object):
                     cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                        req_handler.lockdb = False
                         return
                     cur_cnt = 0
                     del msgobj[:]
@@ -128,6 +131,7 @@ class req_handler(object):
 
         if cur_cnt > 0:
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                req_handler.lockdb = False
                 return
             time.sleep(1)
         print >> sys.stderr, ("sent %d records" % (count,));
@@ -147,13 +151,17 @@ class req_handler(object):
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
+                        req_handler.lockdb = False
                         return
                     cur_cnt = 0
                     del msgobj[:]
 
             if cur_cnt > 0:
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
+                    req_handler.lockdb = False
                     return
+
+        req_handler.lockdb = False
 
         msg.g_init_resp_expect = count
         worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
@@ -327,6 +335,9 @@ class req_handler(object):
 
     @staticmethod
     def handle_inner_chk_task_db_heartbeat(worker):
+        if req_handler.lockdb == True:
+            return
+
         worker.dbcon.query(msg.g_inner_sql_db_heartbeat)
         result = worker.dbcon.show()
         print >> sys.stderr,  repr(result)
