@@ -357,7 +357,7 @@ static void accept_cb(int fd, short n, void *arg)
     }
 
     /*·Ç¶ÂÈû*/
-    evutil_make_socket_nonblocking(client_fd);
+    //evutil_make_socket_nonblocking(client_fd);
     
     //hyb_debug("Accepted connection from %s\n",client_addr.sun_path);
 

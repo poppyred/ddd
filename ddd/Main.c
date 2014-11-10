@@ -141,8 +141,8 @@ static void dns_deal_ptr_answer(struct fio_nic *src,struct fio_rxdata *rxdata,
         struct fio_txdata *txdata,int pktlen,char *domain,int domainlen,
         struct sockaddr_in *client)
 {   
-    if (fio_nic_is_myarpa(src, domain))
-    {
+    //if (fio_nic_is_myarpa(src, domain))  
+   // {
 		int len = make_ptr_answer(txdata->pdata, pktlen, domain, domainlen);
 		txdata->dmac = &rxdata->smac;
 		txdata->dstip = client->sin_addr.s_addr;
@@ -154,7 +154,7 @@ static void dns_deal_ptr_answer(struct fio_nic *src,struct fio_rxdata *rxdata,
         hyb_debug("Rarp Answer =>[%s] to user[%s:%d]\n",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
         dns_rsyslog("Rarp Answer =>[%s] to user[%s:%d]",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
 
-    }
+   // }
     
 }
 
@@ -228,6 +228,11 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
         if (ret)
         {
             /*ÕÒ²»µ½*/
+            struct sockaddr_in *dst = (struct sockaddr_in *)client;
+            dns_lcllog_errdst_count();
+			dns_lcllog_errdst_viewcount(view_id);
+			dns_lcllog_errdst(NIC_EXTRA_CONTEXT(src)->me,view_id,
+										domain,dst->sin_addr.s_addr);
             if (q_type == 0x001c)
             {
                 ///hyb_debug("AAAA NULL ANSWER!\n");
@@ -895,7 +900,7 @@ static void send_pkt_debug(char *domain,int type)
     
     char buf[1500] = {0};
     
-    int buflen = dns_pack_query(buf,domain,strlen(domain),2,type);
+    int buflen = dns_pack_query(buf,domain,strlen(domain),1,type);
 
     if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
         fprintf(stderr,"IP error:%sn",strerror(errno));

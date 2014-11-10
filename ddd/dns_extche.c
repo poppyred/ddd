@@ -10,6 +10,7 @@
 #include "dns_tool.h"
 #include <stdio.h>
 #include "dns_comdef.h"
+#include "dns_lcllog.h"
 
 #define he_debug(fmt, args ...) \
     do {fprintf(stderr,"[%s][%d][he]:"fmt, __FILE__, __LINE__,##args);}while(0)
@@ -32,6 +33,7 @@ extern time_t global_now;
 #define MAX_LINE_SIZE	(256)
 #define MAX_DIVIDE_SIZE	(4)
 
+#define MAX_DOMAIN_LEVEL    (10)
 #define EXTEND_MEMORY_FILE	"extend_memory.txt"
 #define EXTEND_DIFF_FILE	"extend_differ.txt"
 
@@ -42,12 +44,12 @@ static int g_extche_view_node_size;
 static char * g_extche_view_node_output;
 
 //ºìºÚÊ÷
-h_rbtree_st * g_a_tree;
-h_rbtree_st * g_aaaa_tree;
-h_rbtree_st * g_mx_tree;
-h_rbtree_st * g_ns_tree;
-h_rbtree_st * g_cname_tree;
-h_rbtree_st * g_txt_tree;
+h_rbtree_st * g_a_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_aaaa_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_mx_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_ns_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_cname_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_txt_tree[MAX_DOMAIN_LEVEL];
 
 
 struct list_head g_extche_delete_list;
@@ -123,34 +125,34 @@ typedef struct extend_syn
 static int domain_to_q_name(char*domain,int len,char*qname);
 
 
-static h_rbtree_st* tree_select(unsigned short type)
+static h_rbtree_st* tree_select(unsigned short type,int level)
 {
     h_rbtree_st * select_table = NULL;
     
     switch(type)
     {
     case 0x0001:
-        select_table = g_a_tree;
+        select_table = g_a_tree[level];
         break;
         
     case 0x0002:
-        select_table = g_ns_tree;
+        select_table = g_ns_tree[level];
         break;
         
     case 0x0005:
-        select_table = g_cname_tree;
+        select_table = g_cname_tree[level];
         break;
         
     case 0x000F:
-        select_table = g_mx_tree;
+        select_table = g_mx_tree[level];
         break;
         
     case 0x0010:
-        select_table = g_txt_tree;
+        select_table = g_txt_tree[level];
         break;
 
     case 0x001c:
-        select_table = g_aaaa_tree;
+        select_table = g_aaaa_tree[level];
         break;
         
     default:
@@ -370,24 +372,48 @@ FAILED:
     return -1;   
 }
 
+static int get_domain_level(char *str,int strlen)
+{
+    int i = 0;
+    int count = 0;
+    for(i = 0;i < strlen;i++)
+    {
+        if(str[i] == '.')
+        {
+            count ++;
+        }
+    }
+    if (count > MAX_DOMAIN_LEVEL)
+    {
+        return MAX_DOMAIN_LEVEL-1;
+    }
+    if (count > 0)
+    {
+        return count-1;
+    }
+    return 0;
+}
 static
 st_extche_view_node * get_extche_veiw_node(char * domain,int domain_len,ushort view_id,unsigned short type)
 {
+    int i = 0;
 	st_extend_view_array *temp = NULL;
 	st_extche_view_node*node = NULL;
 
-
-    h_rbtree_st * tree = tree_select(type);
+    int level = get_domain_level(domain,domain_len);
+    for (i=level;i >= 0;i--)
+    {
+        h_rbtree_st * tree = tree_select(type,i);
     if (!tree)
     {
-        return NULL;
+            continue;
     }
         
 	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
 	{
 		/*hash find failed*/
 		//he_debug("[get_extend_veiw_node] extend not exist,get_extend_veiw_node failed!\n");
-		return NULL;
+		    continue;
 	}
 	
 	node = temp->view[view_id];
@@ -400,6 +426,8 @@ st_extche_view_node * get_extche_veiw_node(char * domain,int domain_len,ushort v
     {
         return temp->view[1];
     }
+    }
+    return NULL;
 }
 
 static 
@@ -470,49 +498,52 @@ int dns_ext_cache_init()
 {
 
     INIT_LIST_HEAD(&g_extche_delete_list);
-    g_a_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_a_tree)
+    int i = 0;
+    for(i=0;i<MAX_DOMAIN_LEVEL;i++)
+    {
+        g_a_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_a_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-    g_aaaa_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_aaaa_tree)
+        g_aaaa_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_aaaa_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-    g_cname_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_cname_tree)
+        g_cname_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_cname_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-    g_txt_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_txt_tree)
+        g_txt_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_txt_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-    g_mx_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_mx_tree)
+        g_mx_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_mx_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-    g_ns_tree = h_rbtree_create(extche_member_destroy,extche_member_compare);
-    if (!g_ns_tree)
+        g_ns_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_ns_tree[i])
     {
         he_debug("[dns extend init fail!]\n");
         //extend_syn_from_mysql();
         return -1;
     }
-
+    }
     return 0;
 }
 
@@ -528,41 +559,45 @@ void dns_ext_cache_destroy()
 {
 	st_extche_view_node *pos =NULL;
     st_extche_view_node *n =NULL;
+    int i = 0;
     
-    if (g_a_tree)
+    for(i=0;i<MAX_DOMAIN_LEVEL;i++)
     {
-        h_rbtree_destroy(g_a_tree);
-        g_a_tree = NULL;
+        if (g_a_tree[i])
+    {
+            h_rbtree_destroy(g_a_tree[i]);
+            g_a_tree[i] = NULL;
     }   
 
-    if (g_aaaa_tree)
+        if (g_aaaa_tree[i])
     {
-        h_rbtree_destroy(g_aaaa_tree);
-        g_aaaa_tree = NULL;
+            h_rbtree_destroy(g_aaaa_tree[i]);
+            g_aaaa_tree[i] = NULL;
     }
     
-    if (g_cname_tree)
+        if (g_cname_tree[i])
     {
-        h_rbtree_destroy(g_cname_tree);
-        g_cname_tree = NULL;
+            h_rbtree_destroy(g_cname_tree[i]);
+            g_cname_tree[i] = NULL;
     }
     
-    if (g_mx_tree)
+        if (g_mx_tree[i])
     {
-        h_rbtree_destroy(g_mx_tree);
-        g_mx_tree = NULL;
+            h_rbtree_destroy(g_mx_tree[i]);
+            g_mx_tree[i] = NULL;
     } 
     
-    if (g_ns_tree)
+        if (g_ns_tree[i])
     {
-        h_rbtree_destroy(g_ns_tree);
-        g_ns_tree = NULL;
+            h_rbtree_destroy(g_ns_tree[i]);
+            g_ns_tree[i] = NULL;
     } 
 
-    if (g_txt_tree)
+        if (g_txt_tree[i])
     {
-        h_rbtree_destroy(g_txt_tree);
-        g_txt_tree = NULL;
+            h_rbtree_destroy(g_txt_tree[i]);
+            g_txt_tree[i] = NULL;
+        } 
     } 
     list_for_each_entry_safe(pos,n,&g_extche_delete_list,list)
     {
@@ -594,7 +629,8 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 	st_extend_view_array *temp = NULL;
     st_extend_view_array *new_domain = NULL;
 
-    h_rbtree_st * tree = tree_select(type);
+    int level = get_domain_level(domain,domain_len);
+    h_rbtree_st * tree = tree_select(type,level);
     if (!tree)
     {
         return -1;
@@ -658,7 +694,8 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id,unsigned short
 		return -1;
 	}
 
-    h_rbtree_st * tree = tree_select(type);
+    int level = get_domain_level(domain,domain_len);
+    h_rbtree_st * tree = tree_select(type,level);
     if (!tree)
     {
         return -1;
@@ -708,7 +745,8 @@ int dns_ext_cache_del(char *domain,int domain_len,unsigned short type)
 		return -1;
 	}
     
-    h_rbtree_st * tree = tree_select(type);
+    int level = get_domain_level(domain,domain_len);
+    h_rbtree_st * tree = tree_select(type,level);
     if (!tree)
     {
         return -1;
