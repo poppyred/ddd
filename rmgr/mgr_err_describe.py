@@ -5,6 +5,7 @@
 import threading
 from mgr_misc import get_time
 import types
+import sys
 
 g_err_desc = None
 
@@ -189,5 +190,5 @@ class ErrInfo(object):
         for k in self.desc:
             v = self.desc.get(k)
             if type(v) is types.ListType:
-                print(k + '---' + str(v))
+                print >> sys.stderr, (k + '---' + str(v))
 

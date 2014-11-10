@@ -22,7 +22,7 @@ class mgr_handler4init(object):
         if self.dbcon.conn_error:
             self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
         try:
-            print 'recv request class %s' % data['class']
+            print >> sys.stderr,  'recv request class %s' % data['class']
             if data['class'] == msg.g_class_init_view_reply or data['class'] == msg.g_class_init_dns_reply:
                 self.just4testcnt += 1
                 req_handler.handle_proxy_init_reply(self, data, data['inner_addr'][0])
@@ -30,4 +30,4 @@ class mgr_handler4init(object):
                 req_handler.handle_inner_chk_task_db_heartbeat(self)
 
         except Exception as e:
-            print ('inner error: ' + repr(e))
+            print >> sys.stderr,  ('inner error: ' + repr(e))

@@ -37,12 +37,12 @@ class reply_thread(threading.Thread):
                     continue
                 for s in rs:
                     data, addr = s.recvfrom(self.BUFSIZE)
-                    print ('received from ' + str(addr) + ' data:' + str(data))
+                    print >> sys.stderr,  ('received from ' + str(addr) + ' data:' + str(data))
                     if data == None:
-                        print 'recv data none'
+                        print >> sys.stderr,  'recv data none'
                         continue
                     if len(data) == 0:
-                        print 'recv data len 0'
+                        print >> sys.stderr,  'recv data len 0'
                         continue
                     decodejson = json.loads(data)
                     decodejson['inner_addr'] = addr
@@ -52,7 +52,7 @@ class reply_thread(threading.Thread):
                         self.worker.handler(decodejson)
 
             except Exception as e:
-                print ('inner error:' + repr(e))
+                print >> sys.stderr,  ('inner error:' + repr(e))
         self.udpSerSock.close()
 
     def stop(self):

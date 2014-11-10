@@ -31,7 +31,7 @@ class MySQL(object):
 
     def __myconnect__(self):
         try:
-            print 'host[%s], user[%s], passwd[%s], db[%s]' % (self.host, self.user, self.passwd, self.db)
+            print >> sys.stderr,  'host[%s], user[%s], passwd[%s], db[%s]' % (self.host, self.user, self.passwd, self.db)
             if self.db == '':
                 if self.cursor:
                     self.cursor.close()
@@ -47,7 +47,7 @@ class MySQL(object):
             self.conn_error = False
             mgr_err_describe.g_err_desc.del_db_error(mgr_err_describe.ErrInfo.db_desc_lose)
         except MySQLdb.Error as e:
-            print ('Cannot connect to server\nERROR: ' + repr(e))
+            print >> sys.stderr,  ('Cannot connect to server\nERROR: ' + repr(e))
             mgr_err_describe.g_err_desc.add_db_error(mgr_err_describe.ErrInfo.db_desc_lose)
             self.conn_error = True
             self.cursor = None
