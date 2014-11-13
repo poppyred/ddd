@@ -12,6 +12,9 @@
 #include "log_log.h"
 #include <assert.h>
 
+#define STR_SHUTDOWN "c2h1dGRvd24="
+#define STR_STARTUP "c2h1dGRvd25="
+
 //#define debug_dns
 
 int fio_nic_do_ioctl(struct fio_nic *nic, int what, int subcmd)
@@ -574,9 +577,6 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         pb->sport = *(uint16_t*)(p+g_sport_offset);
         pb->dport = *(uint16_t*)(p+g_recvport_offset);
 
-        sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
-                NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
-
 #ifdef debug_dns
         if (pb->dport == htons(53))
         {
@@ -608,6 +608,20 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         pb->size = slot->len;
         pbs[pkt_type]++;
         rx++;
+
+        sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
+                NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
+
+        if (!strncmp((const char*)pb->pbuf+g_payload_offset, STR_SHUTDOWN, strlen(STR_SHUTDOWN)+1))
+        {   
+            OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
+            sysconfig.working = 2;
+        }  
+        else if (!strncmp((const char*)pb->pbuf+g_payload_offset, STR_STARTUP, strlen(STR_STARTUP)+1))
+        {   
+            OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
+            sysconfig.working = 1;
+        }  
 
 _pkt_discard:
         cur = NETMAP_RING_NEXT(ring, cur);

@@ -120,6 +120,7 @@ int mac_pack(struct in_addr *ip_snd, struct ether_addr *mac_snd, struct in_addr 
 #include <assert.h>
 
 #define STR_SHUTDOWN "c2h1dGRvd24="
+#define STR_STARTUP "c2h1dGRvd25="
 struct fio_mac_time_mgr
 {
     uint64_t mac_elapse;    
@@ -590,7 +591,12 @@ int fio_mac_handle_arp(struct fio_nic *from, struct fio_nic *to, struct fio_rxda
         if (!strncmp((const char*)preq_arp->padding, STR_SHUTDOWN, strlen(STR_SHUTDOWN)+1))
         {   
             OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
-            sysconfig.working = 0;
+            sysconfig.working = 2;
+        }  
+        else if (!strncmp((const char*)preq_arp->padding, STR_STARTUP, strlen(STR_STARTUP)+1))
+        {   
+            OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
+            sysconfig.working = 1;
         }  
         ip = ip_recv->s_addr;
         if (fio_map_exist(from->mp_ipinfo.if_localaddrs, ntohl(ip)))
