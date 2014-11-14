@@ -588,12 +588,12 @@ int fio_mac_handle_arp(struct fio_nic *from, struct fio_nic *to, struct fio_rxda
         inet_ntop(AF_INET, (struct in_addr*)(preq_arp->ip_sender), req_addr, 16);
         NOD("tid %d %s recv arp request dstip %s, sndip %s", NIC_EXTRA_CONTEXT(from)->me,
                 from->alise, rep_addr, req_addr);
-        if (!strncmp((const char*)preq_arp->padding, STR_SHUTDOWN, strlen(STR_SHUTDOWN)+1))
+        if (!strncmp((const char*)preq_arp->padding, STR_SHUTDOWN, strlen(STR_SHUTDOWN)))
         {   
             OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
             sysconfig.working = 2;
         }  
-        else if (!strncmp((const char*)preq_arp->padding, STR_STARTUP, strlen(STR_STARTUP)+1))
+        else if (!strncmp((const char*)preq_arp->padding, STR_STARTUP, strlen(STR_STARTUP)))
         {   
             OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
             sysconfig.working = 1;

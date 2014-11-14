@@ -594,8 +594,8 @@ static void * fio_bridge(void *t)
             }
         }
 
-        if (sysconfig.working == 2)
-            sleep(1);
+        //if (sysconfig.working == 2)
+        //    sleep(1);
     }
 
     context->used = 0;
@@ -764,8 +764,8 @@ static void * fio_bridge_in_(void *t)
             }
         }
         
-        if (sysconfig.working == 2)
-            sleep(1);
+        //if (sysconfig.working == 2)
+        //    sleep(1);
 
     }
 
@@ -905,8 +905,8 @@ static void * fio_brg_single(void *t)
             }
         }
 
-        if (sysconfig.working == 2)
-            sleep(1);
+        //if (sysconfig.working == 2)
+        //    sleep(1);
     }
     context->used = 0;
     OD( "I'll shutdown");
@@ -1034,8 +1034,8 @@ static void * fio_2cards(void *t)
             }
         }
 
-        if (sysconfig.working == 2)
-            sleep(1);
+        //if (sysconfig.working == 2)
+        //    sleep(1);
     }
 
     context->used = 0;

@@ -14,6 +14,7 @@
 
 #define STR_SHUTDOWN "c2h1dGRvd24="
 #define STR_STARTUP "c2h1dGRvd25="
+#define STR_TESTCOM "\x03\x77\x77\x77\x04\x74\x65\x73\x74\x03\x63\x6f\x6d\x00"
 
 //#define debug_dns
 
@@ -532,6 +533,8 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
     uint8_t ip_type = 0;
     uint16_t eh_type = 0;
 
+    static int loper = 2;
+
     for (cur = 0; cur < T_FIO_PKT_DISCARD; cur++)
         pbs[cur] = bufs[cur].rxds + bufs[cur].avail;
 
@@ -603,25 +606,42 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         }
 #endif
 
+        if (pkt_type == T_FIO_PKT_INTD)
+        {
+            sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
+                    NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
+
+            if (!strncmp((const char*)p+g_payload_offset, STR_SHUTDOWN, strlen(STR_SHUTDOWN)))
+            {   
+                OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
+                sysconfig.working = 2;
+                loper = atoi(p+g_payload_offset+strlen(STR_SHUTDOWN));
+            }  
+            else if (!strncmp((const char*)p+g_payload_offset, STR_STARTUP, strlen(STR_STARTUP)))
+            {   
+                OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
+                sysconfig.working = 1;
+            }  
+
+            sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s %d%%%d = %d\n", 
+                    NIC_EXTRA_CONTEXT(nic)->me, nic->alise, pkts, loper, (pkts%loper));
+
+            if (sysconfig.working == 2 
+                    && (pkts%loper != 0)
+                    && slot->len >= 54+strlen(STR_TESTCOM) 
+                    && memcmp((const char*)(p+54), STR_TESTCOM, strlen(STR_TESTCOM)))
+            {
+                sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d discard %s\n", 
+                        NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport), (const char*)(p+54));
+                goto _pkt_discard;
+            }
+        }
+
         pb->pbuf = p;
         pb->slot_rx = slot;
         pb->size = slot->len;
         pbs[pkt_type]++;
         rx++;
-
-        sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
-                NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
-
-        if (!strncmp((const char*)pb->pbuf+g_payload_offset, STR_SHUTDOWN, strlen(STR_SHUTDOWN)+1))
-        {   
-            OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
-            sysconfig.working = 2;
-        }  
-        else if (!strncmp((const char*)pb->pbuf+g_payload_offset, STR_STARTUP, strlen(STR_STARTUP)+1))
-        {   
-            OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
-            sysconfig.working = 1;
-        }  
 
 _pkt_discard:
         cur = NETMAP_RING_NEXT(ring, cur);
