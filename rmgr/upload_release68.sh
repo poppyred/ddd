@@ -30,7 +30,7 @@ oldline=`sed -n '/g_enable_stdin/p' msg.py`
 sed -i '/g_enable_stdin/c g_enable_stdin=0' msg.py
 
 oldmgrsid=`sed -n '/g_mgr_sid/p' mgr_conf.py`
-sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_primary_zs_bgp_bak'" mgr_conf.py
+sed -i "/g_mgr_sid/c g_mgr_sid='node_mgr_secondary_zs_bgp'" mgr_conf.py
 
 mkdir -p $local_dir
 /bin/rm $local_dir/* -rf
