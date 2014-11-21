@@ -15,7 +15,7 @@ import time
 
 __all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
-        'req_handler_domain', 'req_handler_view_mask']
+        'req_handler_domain', 'req_handler_view','req_handler_mask']
 
 
 class req_handler(object):
@@ -849,21 +849,73 @@ class req_handler_domain(req_handler_impl):
             if case():
                 self.loger.warn(_lineno(), 'opt:', opt, ' has not been implemented!')
 
-class req_handler_view_mask(req_handler_impl):
+class req_handler_view(req_handler_impl):
     def __init__(self, loger):
         req_handler_impl.__init__(self, loger)
 
     def add(self, worker, data, ali_tbl):
-        return req_hdl_abstract.add(self, worker, data, ali_tbl)
+        data['vname'] = urllib.unquote(str(data['vname']))
+        data['comment'] = urllib.unquote(str(data['comment']))
+        data['ttl'] = int(data['ttl'])
+        data['vid'] = int(data['vid'])
+        self.loger.info(_lineno(), 'adding view name:', data['vname'], ' vid:', str(data['vid']),
+                ' comment:', data['comment'], ' ttl:', str(data['ttl']))
+        add_ret = worker.dbcon.query(msg.g_sql_add_a_view % (data['vid'], data['vname'], data['comment'],
+            data['ttl'], data['comment'], data['ttl']))
+        return add_ret, False, None
 
     def set(self, worker, data, ali_tbl):
-        return req_hdl_abstract.set(self, worker, data, ali_tbl)
+        data['vname'] = urllib.unquote(str(data['vname']))
+        data['comment'] = urllib.unquote(str(data['comment']))
+        data['ttl'] = int(data['ttl'])
+        data['vid'] = int(data['vid'])
+        self.loger.info(_lineno(), 'updating view name:', data['vname'], ' vid:', str(data['vid']),
+                ' comment:', data['comment'], ' ttl:', str(data['ttl']))
+        add_ret = worker.dbcon.query(msg.g_sql_add_a_view % (data['vid'], data['vname'], data['comment'],
+            data['ttl'], data['comment'], data['ttl']))
+        return add_ret, False, None
 
     def delete(self, worker, data, ali_tbl):
-        return req_hdl_abstract.delete(self, worker, data, ali_tbl)
+        data['vid'] = int(data['vid'])
+        self.loger.info(_lineno(), 'deleting view id:', str(data['vid']), ' from database')
+        del_ret = worker.dbcon.query(msg.g_sql_del_a_view % (data['vid'],))
+        return del_ret, False, None
 
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None, flush=False, direct=False):
-        return req_hdl_abstract.notify(self, worker, msgobj, opt, data, odata, '', flush, direct)
+class req_handler_mask(req_handler_impl):
+    def __init__(self, loger):
+        req_handler_impl.__init__(self, loger)
+
+    def add(self, worker, data, ali_tbl):
+        #{“mask”:”123.150.107.0/24”,”vid”:2}
+        data['vid'] = int(data['vid'])
+        self.loger.info(_lineno(), 'adding mask mask:', data['mask'], ' vid:', str(data['vid']));
+        add_ret = worker.dbcon.query(msg.g_sql_add_a_mask % (data['mask'], data['vid']), data['vid'])
+        return add_ret, True, None
+
+    def delete(self, worker, data, ali_tbl):
+        #{“mask”:”123.150.107.0/24”,”vid”:2}
+        data['vid'] = int(data['vid'])
+        self.loger.info(_lineno(), 'adding mask mask:', data['mask'], ' vid:', str(data['vid']));
+        del_ret = worker.dbcon.query(msg.g_sql_del_a_mask % (data['mask'], data['vid']))
+        return del_ret, True, None
+
+    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
+        self.donotify(worker, msgobj, opt, data, odata)
+
+    def donotify(self, worker, msgobj, opt=None, data=None, odata=None, real_tbl=None):
+        self.loger.debug(_lineno(), 'opt:', opt, ' data:', data)
+        if len(worker.proxy_addr.keys()) < 1:
+            return
+        for case in switch(opt):
+            if case('del'):
+            if case('add'):
+                msgobj.append({'opt':http_opt_str2int[opt], 'view':data['vid'], 'mask':data['mask']),
+                        'pkt_head':msg.g_pack_head_init_view})
+                break
+            if case():
+                self.loger.warn(_lineno(), 'opt:', opt, ' has not been implemented!')
+
+        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
 
 http_tbl_alise = ('A', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
 http_tbl_realname = {'A' : 'a_record',

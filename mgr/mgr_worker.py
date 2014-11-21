@@ -42,8 +42,11 @@ class mgr_handler(queue_thread.Qthread):
         self.m_handlers['domain'] = {}
         self.m_handlers['domain']['__any__'] = req_handler_domain(self.loger)
 
-        self.m_handlers['view_mask'] = {}
-        self.m_handlers['view_mask']['__any__'] = req_handler_view_mask(self.loger)
+        self.m_handlers['view'] = {}
+        self.m_handlers['view']['__any__'] = req_handler_view(self.loger)
+
+        self.m_handlers['mask'] = {}
+        self.m_handlers['mask']['__any__'] = req_handler_mask(self.loger)
 
         self.loger.info(_lineno(), 'handlers map:', repr(self.m_handlers))
 

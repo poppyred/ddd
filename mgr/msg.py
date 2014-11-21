@@ -91,6 +91,12 @@ g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
 #        ON ar.`zone`=ze.`id` WHERE ar.`enable`=1 AND ar.rid=%s'
 g_sql_add_a_domain_ns = 'INSERT INTO domain_ns(domain,ttl,`server`,`rid`)VALUES(\'%s\',%d,\'%s\',%d) \
         ON DUPLICATE KEY UPDATE domain=\'%s\',ttl=%d,`server`=\'%s\''
+g_sql_add_a_view = 'INSERT INTO `view_index` (`id`,`view_name`,`comment`,`ttl`,`status`) VALUES \
+        (%d,\'%s\',\'%s\',%d,\'true\') on DUPLICATE KEY UPDATE `comment`=\'%s\',`ttl`=%d,`status`=\'true\''
+g_sql_del_a_view = 'DELETE FROM `view_index` WHERE `id`=%d'
+g_sql_add_a_mask = 'insert into `view_mask` (`network`,`viewid`,`status`) values (\'%s\',%d,\'true\') \
+        ON DUPLICATE KEY UPDATE `viewid`=%d,`status`=\'true\''
+g_sql_del_a_mask = 'DELETE FROM `view_mask` WHERE `network`=\'%s\' and `viewid`=%d'
 
 g_inner_sql_chksnd_view = 'SELECT viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0 \
         and class=\'view\' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND) \
