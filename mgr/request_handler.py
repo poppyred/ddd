@@ -907,10 +907,9 @@ class req_handler_mask(req_handler_impl):
         if len(worker.proxy_addr.keys()) < 1:
             return
         for case in switch(opt):
-            if case('del'):
-            if case('add'):
-                msgobj.append({'opt':http_opt_str2int[opt], 'view':data['vid'], 'mask':data['mask']),
-                        'pkt_head':msg.g_pack_head_init_view})
+            if case('del') or case('add'):
+                msgobj.append({'opt':http_opt_str2int[opt], 'view':data['vid'], 'mask':data['mask'],
+                    'pkt_head':msg.g_pack_head_init_view})
                 break
             if case():
                 self.loger.warn(_lineno(), 'opt:', opt, ' has not been implemented!')

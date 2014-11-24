@@ -2,7 +2,7 @@
 SQLyog Ultimate v11.31 (32 bit)
 MySQL - 5.1.73 : Database - dnspro_core
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -55,9 +55,6 @@ CREATE TABLE `aaaa_record` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `one_aaaa_record` (`rid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-
-/*Data for the table `aaaa_record` */
-
 /*Table structure for table `cname_record` */
 
 DROP TABLE IF EXISTS `cname_record`;
@@ -251,6 +248,24 @@ CREATE TABLE `zone` (
 
 insert  into `zone`(`id`,`client_id`,`domain`,`view`,`update_time`,`description`) values (85,1,'dns21.org',1,'2014-10-30 10:53:47',''),(74,1,'ttt222.com',1,'2014-10-21 14:52:31',''),(16,1,'eflydns.com',1,'2014-10-21 15:21:11',''),(29,1,'gdzjwl.net',1,'2014-10-17 15:19:49',''),(27,1,'dnspro.cn',1,'2014-08-21 16:29:51',''),(65,1,'test555.com',1,'2014-10-21 14:28:24',''),(30,1,'gdzjwl.net',2,'2014-09-11 09:25:58',''),(31,1,'dnspro.cn',2,'2014-09-01 10:24:23',''),(32,1,'o-ran.com',1,'2014-09-03 10:58:40',''),(33,1,'he.com',1,'2014-09-03 11:00:31',''),(34,1,'tifa.com',1,'2014-09-03 11:20:40',''),(55,1,'eflypro.net',1,'2014-10-22 10:22:49',''),(36,1,'efly.d2okkk.net',1,'2014-09-05 16:55:42',''),(37,1,'gdzjwl.net',3,'2014-09-11 09:26:20',''),(39,1,'gdzjwl.net',4,'2014-09-11 10:14:46',''),(40,1,'eflypro.com',1,'2014-09-19 17:01:24',''),(41,1,'eflypro.com',2,'2014-09-23 15:40:58',''),(42,1,'eflypro.com',3,'2014-09-23 15:40:58',''),(48,1,'www.gogogo.com',1,'2014-09-24 11:58:42',''),(49,1,'lkx.com',1,'2014-09-24 14:58:12',''),(50,1,'test.com',1,'2014-10-21 10:40:13',''),(81,1,'ceshi.com',1,'2014-10-21 15:17:35',''),(82,1,'cscs.com',1,'2014-10-21 15:18:14',''),(83,1,'test123.com',1,'2014-10-22 12:00:28',''),(76,1,'aaa222.com',1,'2014-10-21 14:56:51',''),(86,1,'dns21.org',3,'2014-10-30 10:58:02',''),(87,1,'dns21.org',2,'2014-10-30 10:53:25',''),(88,1,'efly.cc',1,'2014-10-30 10:58:58','');
 
+/*Table structure for table `ptr_record` */
+
+DROP TABLE IF EXISTS `ptr_record`;
+
+CREATE TABLE `ptr_record` (
+  `id` int(32) NOT NULL AUTO_INCREMENT,
+  `zone` int(32) NOT NULL,
+  `ipaddr` varchar(16) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `ttl` int(32) NOT NULL,
+  `description` varchar(256) NOT NULL,
+  `state` int(11) NOT NULL,
+  `enable` int(11) NOT NULL,
+  `rid` int(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `one_ptr_record` (`rid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 /* Trigger structure for table `a_record` */
 
 DELIMITER $$
@@ -272,14 +287,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_a_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_a_record` AFTER UPDATE ON `a_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_a_record` AFTER UPDATE ON `a_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -291,11 +306,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `insert_aaaa_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_aaaa_record` AFTER INSERT ON `aaaa_record` FOR EACH ROW BEGIN
-
-call update_domain_zone(new.name,new.zone);
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_aaaa_record` AFTER INSERT ON `aaaa_record` FOR EACH ROW BEGIN
+
+call update_domain_zone(new.name,new.zone);
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -307,14 +322,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_aaaa_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_aaaa_record` AFTER UPDATE ON `aaaa_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_aaaa_record` AFTER UPDATE ON `aaaa_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -326,11 +341,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `insert_cname_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_cname_record` AFTER INSERT ON `cname_record` FOR EACH ROW BEGIN
-
-call update_domain_zone(new.name,new.zone);
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_cname_record` AFTER INSERT ON `cname_record` FOR EACH ROW BEGIN
+
+call update_domain_zone(new.name,new.zone);
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -342,14 +357,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_cname_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_cname_record` AFTER UPDATE ON `cname_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_cname_record` AFTER UPDATE ON `cname_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -361,11 +376,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `insert_mx_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_mx_record` AFTER INSERT ON `mx_record` FOR EACH ROW BEGIN
-
-call update_domain_zone(new.name,new.zone);
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_mx_record` AFTER INSERT ON `mx_record` FOR EACH ROW BEGIN
+
+call update_domain_zone(new.name,new.zone);
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -377,14 +392,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_mx_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_mx_record` AFTER UPDATE ON `mx_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_mx_record` AFTER UPDATE ON `mx_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -396,11 +411,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `insert_ns_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_ns_record` AFTER INSERT ON `ns_record` FOR EACH ROW BEGIN
-
-call update_domain_zone(new.name,new.zone);
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_ns_record` AFTER INSERT ON `ns_record` FOR EACH ROW BEGIN
+
+call update_domain_zone(new.name,new.zone);
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -412,14 +427,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_ns_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_ns_record` AFTER UPDATE ON `ns_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_ns_record` AFTER UPDATE ON `ns_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -431,11 +446,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `insert_txt_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_txt_record` AFTER INSERT ON `txt_record` FOR EACH ROW BEGIN
-
-call update_domain_zone(new.name,new.zone);
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `insert_txt_record` AFTER INSERT ON `txt_record` FOR EACH ROW BEGIN
+
+call update_domain_zone(new.name,new.zone);
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -447,14 +462,14 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `monthly_txt_record` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_txt_record` AFTER UPDATE ON `txt_record` FOR EACH ROW BEGIN
-
-IF NEW.name != OLD.name THEN       
-call update_domain_zone(new.name,new.zone);
-END IF;
-
-call update_zone(new.zone);
-	
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'%' */ /*!50003 TRIGGER `monthly_txt_record` AFTER UPDATE ON `txt_record` FOR EACH ROW BEGIN
+
+IF NEW.name != OLD.name THEN       
+call update_domain_zone(new.name,new.zone);
+END IF;
+
+call update_zone(new.zone);
+	
 END */$$
 
 
@@ -924,45 +939,45 @@ DELIMITER ;
 DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `del_a_record`(IN `tab_name` VARCHAR(255), IN `n_rid` INT)
-BEGIN
+BEGIN
         
         
-	SET @oname = NULL;
-	SET @oview = NULL;
-	SET @ozid = NULL;
-	SET @sqlcmd = CONCAT("SELECT ar.name,ze.view,ar.zone into @oname,@oview,@ozid FROM ",tab_name,
-		" ar LEFT JOIN zone ze ON ar.zone=ze.id WHERE ar.enable=1 AND ar.rid=",n_rid," LIMIT 1");
-	PREPARE stmt FROM @sqlcmd;
-	EXECUTE stmt;
+	SET @oname = NULL;
+	SET @oview = NULL;
+	SET @ozid = NULL;
+	SET @sqlcmd = CONCAT("SELECT ar.name,ze.view,ar.zone into @oname,@oview,@ozid FROM ",tab_name,
+		" ar LEFT JOIN zone ze ON ar.zone=ze.id WHERE ar.enable=1 AND ar.rid=",n_rid," LIMIT 1");
+	PREPARE stmt FROM @sqlcmd;
+	EXECUTE stmt;
 	
-	
 	
-	SET @sqlcmd = CONCAT('delete from ',tab_name,' WHERE rid=',n_rid);
-	PREPARE stmt FROM @sqlcmd;
-	EXECUTE stmt;
-	
-	SET @same_dn_cnt = 0;	
-	if @oname is not null and @ozid IS NOT NULL then
-		SET @sqlcmd = CONCAT("SELECT count(*) into @same_dn_cnt FROM ",tab_name,
-			" WHERE `name`='",@oname,"' AND `zone`=",@ozid," AND `enable`=1");
-		PREPARE stmt FROM @sqlcmd;
-		EXECUTE stmt;
-	end if;
-	
-	DEALLOCATE PREPARE stmt;
-	
-	if @ozid is not null then
-		update zone set update_time=NOW() where id=@ozid;
-	end if;
-    
-	if @oview is not null and @oname is not null then
-		if @same_dn_cnt > 0 then
-			CALL add_snd_req('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 1);
-		else
-			CALL add_snd_req('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 2);
-		end if;
-	end if;
-	SELECT @oname,@oview,@same_dn_cnt;
+	
+	SET @sqlcmd = CONCAT('delete from ',tab_name,' WHERE rid=',n_rid);
+	PREPARE stmt FROM @sqlcmd;
+	EXECUTE stmt;
+	
+	SET @same_dn_cnt = 0;	
+	if @oname is not null and @ozid IS NOT NULL then
+		SET @sqlcmd = CONCAT("SELECT count(*) into @same_dn_cnt FROM ",tab_name,
+			" WHERE `name`='",@oname,"' AND `zone`=",@ozid," AND `enable`=1");
+		PREPARE stmt FROM @sqlcmd;
+		EXECUTE stmt;
+	end if;
+	
+	DEALLOCATE PREPARE stmt;
+	
+	if @ozid is not null then
+		update zone set update_time=NOW() where id=@ozid;
+	end if;
+    
+	if @oview is not null and @oname is not null then
+		if @same_dn_cnt > 0 then
+			CALL add_snd_req('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 1);
+		else
+			CALL add_snd_req('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 2);
+		end if;
+	end if;
+	SELECT @oname,@oview,@same_dn_cnt;
     END */$$
 DELIMITER ;
 
@@ -1493,11 +1508,11 @@ DELIMITER ;
 DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `update_domain_zone`(IN `sub` VARCHAR(100), IN `nid` INT)
-begin
-declare v_main varchar(256) default null;    
-select `domain` INTO v_main from `zone` where `id`=nid limit 1;
-INSERT INTO `domain_zone`(`domain`,`zone`) VALUES(sub,v_main) 
-	on duplicate key update zone=v_main;
+begin
+declare v_main varchar(256) default null;    
+select `domain` INTO v_main from `zone` where `id`=nid limit 1;
+INSERT INTO `domain_zone`(`domain`,`zone`) VALUES(sub,v_main) 
+	on duplicate key update zone=v_main;
 end */$$
 DELIMITER ;
 
@@ -1530,8 +1545,8 @@ DELIMITER ;
 DELIMITER $$
 
 /*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `update_zone`(IN `idin` INT)
-begin
-update `zone` set update_time=now() where `id`=idin;
+begin
+update `zone` set update_time=now() where `id`=idin;
 end */$$
 DELIMITER ;
 
