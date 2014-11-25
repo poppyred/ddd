@@ -663,6 +663,17 @@ class req_handler_record_ns(req_handler_impl):
     def __init__(self, loger):
         req_handler_impl.__init__(self, loger)
 
+    def add_subrecord_inline(self, worker, str_main, n_vid, add_data):
+        add_ret = worker.dbcon.call_proc(msg.g_proc_get_subrecord_inline, (str_main, n_vid))
+        ars = worker.dbcon.show()
+        while ars and len(ars) > 0:
+            for i in range(len(ars)):
+                add_data.append(ars[i])
+            worker.dbcon.nextset()
+            ars = worker.dbcon.show()
+        worker.dbcon.fetch_proc_reset()
+        return add_ret
+
     def add(self, worker, data, ali_tbl):
         self.loger.info(_lineno(), 'adding name:', data['name'], ' table:ns_record into database')
         return req_handler_impl.add(self, worker, data, ali_tbl)
@@ -677,6 +688,25 @@ class req_handler_record_ns(req_handler_impl):
 
     def notify(self, worker, msgobj, opt=None, data=None, odata=None):
         self.donotify(worker, msgobj, opt, data, odata, 'ns_record')
+        sub_data = []
+        sub_ret = self.add_subrecord_inline(worker, data['main'], int(data['viewid']), sub_data)
+        if not sub_ret:
+            return
+        self.loger.info(_lineno(), 'updating subrecord:', sub_ret)
+        cur_cnt = 0
+        msgobj = []
+        for record in sub_data:
+            msgobj.append({'opt':msg.g_opt_add, 'domain':record[0], 'view':int(data['viewid']), 'type':record[1]})
+            if cur_cnt >= mgr_conf.g_row_perpack4init:
+                if worker.sendto_(msgobj, worker.proxy_addr.keys()[0], msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                    return
+                cur_cnt = 0
+                del msgobj[:]
+                time.sleep(1)
+        if cur_cnt > 0:
+            if worker.sendto_(msgobj, worker.proxy_addr.keys()[0], msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                return
+            time.sleep(1)
 
 class req_handler_record_txt(req_handler_impl):
     def __init__(self, loger):
