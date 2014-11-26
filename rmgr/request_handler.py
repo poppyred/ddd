@@ -450,6 +450,9 @@ class req_handler_impl(req_hdl_abstract):
         print >> sys.stderr,  ('select old:' + str(result))
         if result[0][0] == None or result[0][1] == None:
             result = None
+        else:
+            data['main'] = result[0][0]
+            data['viewid'] = int(result[0][1])
         return (True, True, result)
 
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
