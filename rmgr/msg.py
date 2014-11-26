@@ -52,8 +52,7 @@ g_class_inner_chk_task_record = 'chk_task_record'
 g_class_inner_chk_task_record_reply = 'chk_task_record_reply'
 g_class_inner_chk_task_done = 'chk_task_done'
 g_class_inner_chk_task_db_heartbeat = 'chk_task_db_heartbeat'
-g_class_inner_reqtype_map = {g_class_inner_chk_task_domain: 'domain',
- g_class_inner_chk_task_record: 'record'}
+g_class_inner_reqtype_map = {g_class_inner_chk_task_domain: 'domain', g_class_inner_chk_task_record: 'record'}
 g_class_inner_map = {g_class_inner_chk_task_domain: g_class_inner_chk_task_domain_reply,
  g_class_inner_chk_task_record: g_class_inner_chk_task_record_reply}
 g_init_sql_view = "SELECT viewid as view, network as mask from view_mask         mk left join view_index idx on mk.viewid=idx.id where mk.status='true' "
@@ -66,6 +65,7 @@ g_proc_add_mx_record = 'add_mx_record'
 g_proc_del_a_record = 'del_a_record'
 g_proc_del_a_domain = 'del_a_domain'
 g_proc_set_a_domain = 'onoff_a_domain'
+g_proc_get_subrecord_inline = 'get_subrecord_inline'
 g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
 g_sql_add_a_domain_ns = "INSERT INTO domain_ns(domain,ttl,`server`,`rid`)VALUES('%s',%d,'%s',%d)         ON DUPLICATE KEY UPDATE domain='%s',ttl=%d,`server`='%s'"
 g_inner_sql_chksnd_view = "SELECT viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0         and class='view' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND)         ORDER BY `id` ASC"

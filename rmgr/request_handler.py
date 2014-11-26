@@ -273,6 +273,7 @@ class req_handler(object):
                     'tasks': {}}}
         ptr_tasks = replymsg['data']['tasks']
         msgobj = []
+        bat_task = []
         for task_id in dic_result:
             task_data = dic_result.get(task_id)
             print >> sys.stderr,  (task_id + '\t:' + repr(task_data))
@@ -311,7 +312,10 @@ class req_handler(object):
             ptr_tasks[task_id] = {'ret': 0, 'result': 'task id ' + task_id + ' succ', 'error': ''}
             if go_on:
                 try:
-                    worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
+                    is_bat_task = worker.m_handlers[task_type][ali].notify(worker, msgobj, opt=task_data['opt'], data=dedata, odata=old_data)
+                    if is_bat_task:
+                        dedata['handle_class'] = worker.m_handlers[task_type][ali]
+                        bat_task.append(dedata)
                 except Exception as e:
                     print >> sys.stderr,  ('notify proxy error!!!!--->' + repr(e))
                     continue
@@ -319,6 +323,13 @@ class req_handler(object):
         req_handler.notify_flush(worker, msgobj)
         worker.http_th.handler(replymsg)
 
+        print >> sys.stderr, ('bat tasks:' + repr(bat_task))
+        for dedata in bat_task:
+            try:
+                dedata['handle_class'].bat_notify(worker, dedata)
+            except Exception as e:
+                print >> sys.stderr, ('handle bat task:' + repr(dedata), '\n\terror!!!!--->' + repr(e))
+                continue
     @staticmethod
     def handle_inner_chk_task_done(http_th, data_done):
         data_done.pop('class')
@@ -372,7 +383,11 @@ class req_hdl_abstract(object):
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         print >> sys.stderr,  'not implement'
-        raise Exception('opt not implement')
+        raise Exception('notify not implement')
+
+    def bat_notify(self, worker, data):
+        print >> sys.stderr,  'not implement'
+        raise Exception('bat_notify not implement')
 
     def callme(self, worker, data, ali_tbl, opt):
         if opt == 'add':
@@ -439,7 +454,7 @@ class req_handler_impl(req_hdl_abstract):
 
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         if len(worker.proxy_addr.keys()) < 1:
-            return
+            return False
         print >> sys.stderr,  ('opt:' + str(opt) + ' data:' + str(data))
 
         if opt == 'add':
@@ -481,7 +496,7 @@ class req_handler_impl(req_hdl_abstract):
                     'type': msg.g_dict_type[real_tbl], 'pkt_head': msg.g_pack_head_init_dns})
 
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
-
+        return False
 
 class req_handler_record_a(req_handler_impl):
 
@@ -501,7 +516,7 @@ class req_handler_record_a(req_handler_impl):
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        self.donotify(worker, msgobj, opt, data, odata, 'a_record')
+        return self.donotify(worker, msgobj, opt, data, odata, 'a_record')
 
 
 class req_handler_record_aaaa(req_handler_impl):
@@ -526,7 +541,7 @@ class req_handler_record_aaaa(req_handler_impl):
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        self.donotify(worker, msgobj, opt, data, odata, 'aaaa_record')
+        return self.donotify(worker, msgobj, opt, data, odata, 'aaaa_record')
 
 
 class req_handler_record_cname(req_handler_impl):
@@ -558,7 +573,7 @@ class req_handler_record_cname(req_handler_impl):
 
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         if len(worker.proxy_addr.keys()) < 1:
-            return
+            return False
         print >> sys.stderr,  ('opt:' + str(opt) + ' data:' + str(data))
         if opt == 'add':
             if odata and len(odata) > 0 and len(odata[0]) >= 4:
@@ -603,12 +618,28 @@ class req_handler_record_cname(req_handler_impl):
                 self.send1more(worker, msgobj, real_tbl, odata0[0], odata0[1], ropt)
 
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
-
+        return False
 
 class req_handler_record_ns(req_handler_impl):
 
     def __init__(self):
         req_handler_impl.__init__(self)
+
+    def add_subrecord_inline(self, worker, str_main, n_vid, add_data):
+        add_ret = worker.dbcon.call_proc(msg.g_proc_get_subrecord_inline, (str_main, n_vid))
+        ars = worker.dbcon.show()
+        hasnext = True
+        while hasnext == True:
+            if ars and len(ars) > 0:
+                for i in range(len(ars)):
+                    add_data.append(ars[i])
+            hasnext = worker.dbcon.nextset()
+            if None == hasnext:
+                hasnext = False
+            else:
+                ars = worker.dbcon.show()
+        worker.dbcon.fetch_proc_reset()
+        return add_ret
 
     def add(self, worker, data, ali_tbl):
         print >> sys.stderr,  ('adding name:' + str(data['name']) + ' table:ns_record into database')
@@ -624,7 +655,30 @@ class req_handler_record_ns(req_handler_impl):
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         self.donotify(worker, msgobj, opt, data, odata, 'ns_record')
+        return True
 
+    def bat_notify(self, worker, data):
+        if len(worker.proxy_addr.keys()) < 1:
+            return
+        print >> sys.stderr, ('bat_data:' + repr(data))
+        sub_data = []
+        sub_ret = self.add_subrecord_inline(worker, data['main'], int(data['viewid']), sub_data)
+        print >> sys.stderr, ('updating subrecord:' + repr(sub_data))
+        cur_cnt = 0
+        msgobj = []
+        for record in sub_data:
+            msgobj.append({'opt':msg.g_opt_add, 'domain':record[0], 'view':int(data['viewid']), 'type':record[1]})
+            cur_cnt += 1
+            if cur_cnt >= mgr_conf.g_row_perpack4init:
+                if worker.sendto_(msgobj, worker.proxy_addr.keys()[0], msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                    return
+                cur_cnt = 0
+                del msgobj[:]
+                time.sleep(1)
+        if cur_cnt > 0:
+            if worker.sendto_(msgobj, worker.proxy_addr.keys()[0], msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                return
+            time.sleep(1)
 
 class req_handler_record_txt(req_handler_impl):
 
@@ -648,7 +702,7 @@ class req_handler_record_txt(req_handler_impl):
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        self.donotify(worker, msgobj, opt, data, odata, 'txt_record')
+        return self.donotify(worker, msgobj, opt, data, odata, 'txt_record')
 
 
 class req_handler_record_mx(req_handler_impl):
@@ -701,7 +755,7 @@ class req_handler_record_mx(req_handler_impl):
         return req_handler_impl.delete(self, worker, data, ali_tbl)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        self.donotify(worker, msgobj, opt, data, odata, 'mx_record')
+        return self.donotify(worker, msgobj, opt, data, odata, 'mx_record')
 
 
 class req_handler_record_domain_ns(req_hdl_abstract):
@@ -768,12 +822,12 @@ class req_handler_domain(req_handler_impl):
         return (True, True, result)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        self.donotify(worker, msgobj, opt, data, odata)
+        return self.donotify(worker, msgobj, opt, data, odata)
 
     def donotify(self, worker, msgobj, opt = None, data = None, odata = None, real_tbl = None):
         print >> sys.stderr,  ('enter opt:' + str(opt) + ' data:' + str(data) + ' odata:' + str(odata))
         if len(worker.proxy_addr.keys()) < 1:
-            return
+            return False
 
         if opt == 'del':
             for od in odata:
@@ -799,6 +853,7 @@ class req_handler_domain(req_handler_impl):
                         'type': msg.g_dict_type[od[2]],
                         'pkt_head': msg.g_pack_head_init_dns})
                     req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
+        return False
 
 class req_handler_view_mask(req_handler_impl):
     def __init__(self):

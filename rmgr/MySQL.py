@@ -104,11 +104,12 @@ class MySQL(object):
 
     def nextset(self):
         try:
-            self.cursor.nextset()
+            return self.cursor.nextset()
         except MySQLdb.Error as e:
             self.__myset_conn_error(e)
+            return None
         except Exception as e:
-            pass
+            return None
 
     def fetch_proc_reset(self):
         try:
