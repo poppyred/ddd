@@ -151,14 +151,16 @@ class MySQL(object):
     def nextset(self):
         try:
             if not self.conn_error:
-                self.cursor.nextset()
+                return self.cursor.nextset()
         except MySQLdb.Error,e:
             self.loger.error(_lineno(self), "Mysql Error:", e)
             self.__myset_conn_error(e)
             self.loger.error(traceback.format_exc())
+            return None
         except Exception,e:
             self.loger.error(_lineno(self), "Exception: ", repr(e))
             self.loger.error(traceback.format_exc())
+            return None
 
     def fetch_proc_reset(self):
         try:

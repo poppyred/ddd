@@ -86,7 +86,7 @@ g_proc_add_mx_record = 'add_mx_record'
 g_proc_del_a_record = 'del_a_record'
 g_proc_del_a_domain = 'del_a_domain'
 g_proc_set_a_domain = 'onoff_a_domain'
-g_proc_get_subrecord_inline = 'get_suubrecord_inline'
+g_proc_get_subrecord_inline = 'get_subrecord_inline'
 g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
 #g_sql_get_a_record_in_set = 'SELECT ar.name,ze.view FROM a_record ar LEFT JOIN zone ze \
 #        ON ar.`zone`=ze.`id` WHERE ar.`enable`=1 AND ar.rid=%s'
