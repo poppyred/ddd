@@ -13,7 +13,7 @@ import urllib
 import mgr_singleton
 import time
 
-__all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_aaaa', 'req_handler_record_cname',
+__all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_ptr', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
         'req_handler_domain', 'req_handler_view','req_handler_mask']
 
@@ -405,28 +405,30 @@ class req_handler(object):
 
 class req_hdl_abstract(object):
     loger = None
-    def __init__(self, loger):
+    record_type = None
+    def __init__(self, loger, rtype):
         self.loger = loger
+        self.record_type = rtype
 
     def add(self, worker, data, ali_tbl):
-        self.loger.error(_lineno(), 'not implement')
-        raise Exception('opt not implement')
+        self.loger.error(_lineno(), self.record_type, ' not implement')
+        raise Exception(self.record_type + ' add not implement')
 
     def set(self, worker, data, ali_tbl):
-        self.loger.error(_lineno(), 'not implement')
-        raise Exception('opt not implement')
+        self.loger.error(_lineno(), self.record_type, ' not implement')
+        raise Exception(self.record_type + ' set not implement')
 
     def delete(self, worker, data, ali_tbl):
-        self.loger.error(_lineno(), 'not implement')
-        raise Exception('opt not implement')
+        self.loger.error(_lineno(), self.record_type, ' not implement')
+        raise Exception(self.record_type + ' delete not implement')
 
     def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        self.loger.error(_lineno(), 'not implement')
-        raise Exception('notify not implement')
+        self.loger.error(_lineno(), self.record_type, ' not implement')
+        raise Exception(self.record_type + ' notify not implement')
 
     def bat_notify(self, worker, data):
-        self.loger.error(_lineno(), 'not implement')
-        raise Exception('bat_notify not implement')
+        self.loger.error(_lineno(), self.record_type, ' not implement')
+        raise Exception(self.record_type + ' bat_notify not implement')
 
     def callme(self, worker, data, ali_tbl, opt):
         for case in switch(opt):
@@ -437,14 +439,15 @@ class req_hdl_abstract(object):
             if case('del'):
                 return self.delete(worker, data, ali_tbl)
             if case():
-                self.loger.error(_lineno(), 'opt:', opt, ' not implement')
-                raise Exception('opt not implement')
+                self.loger.error(_lineno(), self.record_type, ' opt:', opt, ' not implement')
+                raise Exception(self.record_type + ' opt:' + opt + ' not implement')
 
 class req_handler_impl(req_hdl_abstract):
-    def __init__(self, loger):
-        req_hdl_abstract.__init__(self, loger)
+    def __init__(self, loger, rtype):
+        req_hdl_abstract.__init__(self, loger, rtype)
 
     def add(self, worker, data, ali_tbl):
+        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:', self.record_type, ' into database')
         #{"name":"go","A":"1.2.3.4","ttl":"10","viewid":"0"}
         n_enable = 1
         if data.has_key('enable'):
@@ -469,7 +472,7 @@ class req_handler_impl(req_hdl_abstract):
 
     def set(self, worker, data, ali_tbl):
         #'{"name":"t4.test.com","main":"test.com","rid":133,"A":"4.4.4.4","ttl":"10","viewid":"2"}
-        #self.loger.info(_lineno(), 'updating name:', data['name'], ' table:', http_tbl_realname[ali_tbl], ' into database')
+        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:', self.record_type, ' into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
@@ -493,7 +496,7 @@ class req_handler_impl(req_hdl_abstract):
 
     def delete(self, worker, data, ali_tbl):
         #{"rid":133,"A":"4.4.4.4"}
-        #self.loger.info(_lineno(), 'deleting name:', http_tbl_realname[ali_tbl], ' rid:', data['rid'], ' from database')
+        self.loger.info(_lineno(), 'deleting name:', self.record_type, ' rid:', data['rid'], ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
         result = worker.dbcon.fetch_proc_reset()
         self.loger.info(_lineno(), 'select old:', result)
@@ -503,6 +506,9 @@ class req_handler_impl(req_hdl_abstract):
             data['main'] = result[0][0]
             data['viewid'] = int(result[0][1])
         return True, True, result
+
+    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
+        return self.donotify(worker, msgobj, opt, data, odata, self.record_type)
 
     def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         if len(worker.proxy_addr.keys()) < 1:
@@ -558,64 +564,29 @@ class req_handler_impl(req_hdl_abstract):
 
 class req_handler_record_a(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'a_record')
 
-    def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:a_record into database')
-        return req_handler_impl.add(self, worker, data, ali_tbl)
-
-    def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:a_record into database')
-        return req_handler_impl.set(self, worker, data, ali_tbl)
-
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:a_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata, 'a_record')
+class req_handler_record_ptr(req_handler_impl):  #跟A的处理差不多
+    def __init__(self, loger):
+        req_handler_impl.__init__(self, loger, 'ptr_record')
 
 class req_handler_record_aaaa(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'aaaa_record')
 
     def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:aaaa_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
         self.loger.info(_lineno(), 'decode aaaa:', data[ali_tbl])
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:aaaa_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl]))
         self.loger.info(_lineno(), 'decode aaaa:', data[ali_tbl])
         return req_handler_impl.set(self, worker, data, ali_tbl)
-
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:aaaa_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata, 'aaaa_record')
 
 class req_handler_record_cname(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
-
-    def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:cname_record into database')
-        return req_handler_impl.add(self, worker, data, ali_tbl)
-
-    def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:cname_record into database')
-        return req_handler_impl.set(self, worker, data, ali_tbl)
-
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:cname_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata, 'cname_record')
+        req_handler_impl.__init__(self, loger, 'cname_record')
 
     def send1more(self, worker, msgobj, tblname, domain, view, ropt):
         if tblname == 'cname_record':
@@ -683,7 +654,7 @@ class req_handler_record_cname(req_handler_impl):
 
 class req_handler_record_ns(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'ns_record')
 
     def add_subrecord_inline(self, worker, str_main, n_vid, add_data):
         add_ret = worker.dbcon.call_proc(msg.g_proc_get_subrecord_inline, (str_main, n_vid))
@@ -703,24 +674,12 @@ class req_handler_record_ns(req_handler_impl):
         worker.dbcon.fetch_proc_reset()
         return add_ret
 
-    def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:ns_record into database')
-        return req_handler_impl.add(self, worker, data, ali_tbl)
-
-    def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:ns_record into database')
-        return req_handler_impl.set(self, worker, data, ali_tbl)
-
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:ns_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
     def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        self.donotify(worker, msgobj, opt, data, odata, 'ns_record')
+        req_handler_impl.notify(self, worker, msgobj, opt, data, odata)
         return True
 
     def bat_notify(self, worker, data):
-        if len(worker.proxy_addr.keys()) < 1:
+        if len(worker.proxy_addr.keys()) < 1 or not data.has_key('main'):
             return
         self.loger.care(_lineno(), 'bat_data:', repr(data))
         sub_data = []
@@ -744,33 +703,24 @@ class req_handler_record_ns(req_handler_impl):
 
 class req_handler_record_txt(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'txt_record')
 
     def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:txt_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl])) #.decode('UTF-8').encode("UTF-8")
         self.loger.info(_lineno(), 'decode TXT:', data[ali_tbl])
         return req_handler_impl.add(self, worker, data, ali_tbl)
 
     def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating name:', data['name'], ' table:txt_record into database')
         data[ali_tbl] = urllib.unquote(str(data[ali_tbl])) #.decode('UTF-8').encode("UTF-8")
         self.loger.info(_lineno(), 'decode TXT:', data[ali_tbl])
         return req_handler_impl.set(self, worker, data, ali_tbl)
 
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:txt_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata, 'txt_record')
-
 class req_handler_record_mx(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'mx_record')
 
     def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:mx_record into database')
+        self.loger.info(_lineno(), 'adding name:', data['name'], ' table:', self.record_type, ' into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
@@ -815,16 +765,9 @@ class req_handler_record_mx(req_handler_impl):
         self.loger.info(_lineno(), 'select old:', result)
         return update_ret, True, result
 
-    def delete(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'deleting name:mx_record rid:', data['rid'], ' from database')
-        return req_handler_impl.delete(self, worker, data, ali_tbl)
-
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata, 'mx_record')
-
 class req_handler_record_domain_ns(req_hdl_abstract):
     def __init__(self, loger):
-        req_hdl_abstract.__init__(self, loger)
+        req_hdl_abstract.__init__(self, loger, 'domain_ns')
 
     def add(self, worker, data, ali_tbl):
         #{u'opt': u'add', u'data': u'{"name":"@.ee.com","main":"ee.com","rid":324,"domain_ns":"ns2.dnspro.net.","level":"0","ttl":"600","viewid":"0"}', u'type': u'record'}
@@ -843,7 +786,7 @@ class req_handler_record_domain_ns(req_hdl_abstract):
 
 class req_handler_domain(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'domain')
 
     def add(self, worker, data, ali_tbl):
         return req_hdl_abstract.add(self, worker, data, ali_tbl)
@@ -883,10 +826,7 @@ class req_handler_domain(req_handler_impl):
         self.loger.info(_lineno(), 'select old:', result)
         return True, True, result
 
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata)
-
-    def donotify(self, worker, msgobj, opt=None, data=None, odata=None, real_tbl=None):
+    def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         self.loger.debug(_lineno(), 'enter opt:', opt, ' data:', data, ' odata:', odata)
         if len(worker.proxy_addr.keys()) < 1:
             return False
@@ -916,7 +856,7 @@ class req_handler_domain(req_handler_impl):
 
 class req_handler_view(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'view')
 
     def add(self, worker, data, ali_tbl):
         data['vname'] = urllib.unquote(str(data['vname']))
@@ -946,9 +886,12 @@ class req_handler_view(req_handler_impl):
         del_ret = worker.dbcon.query(msg.g_sql_del_a_view % (data['vid'],))
         return del_ret, False, None
 
+    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
+        return req_hdl_abstract.notify(self, worker, msgobj, opt, data, odata)
+
 class req_handler_mask(req_handler_impl):
     def __init__(self, loger):
-        req_handler_impl.__init__(self, loger)
+        req_handler_impl.__init__(self, loger, 'mask')
 
     def add(self, worker, data, ali_tbl):
         #{“mask”:”123.150.107.0/24”,”vid”:2}
@@ -957,17 +900,17 @@ class req_handler_mask(req_handler_impl):
         add_ret = worker.dbcon.query(msg.g_sql_add_a_mask % (data['mask'], data['vid']), data['vid'])
         return add_ret, True, None
 
+    def set(self, worker, data, ali_tbl):
+        return req_hdl_abstract.set(self, worker, data, ali_tbl)
+
     def delete(self, worker, data, ali_tbl):
         #{“mask”:”123.150.107.0/24”,”vid”:2}
         data['vid'] = int(data['vid'])
-        self.loger.info(_lineno(), 'adding mask mask:', data['mask'], ' vid:', str(data['vid']));
+        self.loger.info(_lineno(), 'deleting mask mask:', data['mask'], ' vid:', str(data['vid']));
         del_ret = worker.dbcon.query(msg.g_sql_del_a_mask % (data['mask'], data['vid']))
         return del_ret, True, None
 
-    def notify(self, worker, msgobj, opt=None, data=None, odata=None):
-        return self.donotify(worker, msgobj, opt, data, odata)
-
-    def donotify(self, worker, msgobj, opt=None, data=None, odata=None, real_tbl=None):
+    def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
         self.loger.debug(_lineno(), 'opt:', opt, ' data:', data)
         if len(worker.proxy_addr.keys()) < 1:
             return False
@@ -982,8 +925,9 @@ class req_handler_mask(req_handler_impl):
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
         return False
 
-http_tbl_alise = ('A', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
+http_tbl_alise = ('A', 'PTR', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
 http_tbl_realname = {'A' : 'a_record',
+                     'PTR' : 'ptr_record',
                      'AAAA' : 'aaaa_record',
                      'CNAME' : 'cname_record',
                      'NS' : 'ns_record',

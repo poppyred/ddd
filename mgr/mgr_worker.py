@@ -32,6 +32,7 @@ class mgr_handler(queue_thread.Qthread):
 
         self.m_handlers['record'] = {}
         self.m_handlers['record']['A'] = req_handler_record_a(self.loger)
+        self.m_handlers['record']['PTR'] = req_handler_record_ptr(self.loger)
         self.m_handlers['record']['AAAA'] = req_handler_record_aaaa(self.loger)
         self.m_handlers['record']['CNAME'] = req_handler_record_cname(self.loger)
         self.m_handlers['record']['NS'] = req_handler_record_ns(self.loger)
