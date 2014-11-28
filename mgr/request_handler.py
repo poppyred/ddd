@@ -571,12 +571,12 @@ class req_handler_record_ptr(req_handler_impl):  #跟A的处理差不多
         req_handler_impl.__init__(self, loger, 'ptr_record')
 
     def add(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'adding ip:', data['ip'], ' table:', self.record_type, ' into database')
+        self.loger.info(_lineno(), 'adding ip:', data['name'], ' table:', self.record_type, ' into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
         add_ret = worker.dbcon.call_proc(msg.g_proc_add_ptr_record,
-                (data['ip'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
+                (data['name'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
         result = []
         ars = worker.dbcon.show()
         while ars and len(ars) > 0:
@@ -589,12 +589,12 @@ class req_handler_record_ptr(req_handler_impl):  #跟A的处理差不多
         return add_ret, True, result
 
     def set(self, worker, data, ali_tbl):
-        self.loger.info(_lineno(), 'updating ip:', data['ip'], ' table:', self.record_type, ' into database')
+        self.loger.info(_lineno(), 'updating ip:', data['name'], ' table:', self.record_type, ' into database')
         n_enable = 1
         if data.has_key('enable'):
             n_enable = int(data['enable'])
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_ptr_record,
-                (data['ip'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
+                (data['name'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
         result = []
         ars = worker.dbcon.show()
         while ars and len(ars) > 0:
