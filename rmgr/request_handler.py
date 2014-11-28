@@ -521,7 +521,54 @@ class req_handler_record_a(req_handler_impl):
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         return self.donotify(worker, msgobj, opt, data, odata, 'a_record')
 
+class req_handler_record_ptr(req_handler_impl):
 
+    def __init__(self):
+        req_handler_impl.__init__(self)
+
+    def add(self, worker, data, ali_tbl):
+        print >> sys.stderr,  ('adding name:' + str(data['name']) + ' table:ptr_record into database')
+        n_enable = 1
+        if data.has_key('enable'):
+            n_enable = int(data['enable'])
+        add_ret = worker.dbcon.call_proc(msg.g_proc_add_ptr_record,
+                (data['name'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
+        result = []
+        ars = worker.dbcon.show()
+        while ars and len(ars) > 0:
+            for i in range(len(ars)):
+                result.append(ars[i])
+            worker.dbcon.nextset()
+            ars = worker.dbcon.show()
+        worker.dbcon.fetch_proc_reset()
+        print >> sys.stderr, ('select old:' + result)
+        return add_ret, True, result
+
+    def set(self, worker, data, ali_tbl):
+        print >> sys.stderr,  ('updating name:' + str(data['name']) + ' table:ptr_record into database')
+        n_enable = 1
+        if data.has_key('enable'):
+            n_enable = int(data['enable'])
+        update_ret = worker.dbcon.call_proc(msg.g_proc_add_ptr_record,
+                (data['name'], data[ali_tbl], int(data['viewid']), int(data['ttl']), 0, n_enable, int(data['rid'])) )
+        result = []
+        ars = worker.dbcon.show()
+        while ars and len(ars) > 0:
+            for i in range(len(ars)):
+                result.append(ars[i])
+            worker.dbcon.nextset()
+            ars = worker.dbcon.show()
+        worker.dbcon.fetch_proc_reset()
+        selfprint >> sys.stderr, ('select old:' + result)
+        return update_ret, True, result
+
+    def delete(self, worker, data, ali_tbl):
+        print >> sys.stderr,  ('deleting name:ptr_record rid:' + str(data['rid']) + ' from database')
+        return req_handler_impl.delete(self, worker, data, ali_tbl)
+
+    def notify(self, worker, msgobj, opt = None, data = None, odata = None):
+        return self.donotify(worker, msgobj, opt, data, odata, 'ptr_record')
+		
 class req_handler_record_aaaa(req_handler_impl):
 
     def __init__(self):
@@ -661,7 +708,7 @@ class req_handler_record_ns(req_handler_impl):
         return True
 
     def bat_notify(self, worker, data):
-        if len(worker.proxy_addr.keys()) < 1:
+        if len(worker.proxy_addr.keys()) < 1 or not data.has_key('main'):
             return
         print >> sys.stderr, ('bat_data:' + repr(data))
         sub_data = []
@@ -877,6 +924,7 @@ class req_handler_view_mask(req_handler_impl):
 
 http_tbl_alise = ('A', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
 http_tbl_realname = {'A': 'a_record',
+		'PTR' : 'ptr_record',
         'AAAA': 'aaaa_record',
         'CNAME': 'cname_record',
         'NS': 'ns_record',

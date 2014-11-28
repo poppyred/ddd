@@ -25,6 +25,7 @@ class mgr_handler(object):
             raise Exception('[mgr_handler] Database configure error!!!')
         self.m_handlers['record'] = {}
         self.m_handlers['record']['A'] = req_handler_record_a()
+        self.m_handlers['record']['PTR'] = req_handler_record_ptr()
         self.m_handlers['record']['AAAA'] = req_handler_record_aaaa()
         self.m_handlers['record']['CNAME'] = req_handler_record_cname()
         self.m_handlers['record']['NS'] = req_handler_record_ns()
