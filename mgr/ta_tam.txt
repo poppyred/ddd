@@ -204,6 +204,92 @@ BEGIN
 DELIMITER ;
 
 
+
+
+/* Procedure structure for procedure `taptr` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `taptr` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `taptr`(
+	IN str_ip VARCHAR(255),
+	IN str_domain VARCHAR(255),
+	IN n_view INT,
+	IN n_ttl INT,
+	IN n_state INT,
+	IN n_enable INT,
+	IN n_rid INT)
+BEGIN
+	DECLARE n_zid INT default NULL;	
+	DECLARE arr_tbls VARCHAR(255);
+	DECLARE cut_tbl VARCHAR(255);
+	declare i int;
+	SELECT `id` INTO n_zid FROM zone WHERE domain=str_ip AND `view`=n_view LIMIT 1;
+	IF n_zid IS NULL THEN
+		INSERT INTO zone(client_id,domain,`view`,description) VALUES(1,str_ip,n_view,'');
+		SELECT `id` INTO n_zid FROM zone WHERE domain=str_ip AND `view`=n_view LIMIT 1;
+	END IF;
+	SET @oname = NULL;
+	SET @oview = NULL;
+	SET arr_tbls = 'a_record,aaaa_record,cname_record,mx_record,ns_record,txt_record,ptr_record';
+	SET i=1;  
+	while_label: WHILE i <= 7 DO 
+		SET cut_tbl=CONCAT(SUBSTRING_INDEX(SUBSTRING_INDEX(arr_tbls, ',' ,i),',',-1));
+		IF STRCMP(cut_tbl, 'ptr_record')!=0 THEN
+			SET @oname = NULL;
+			SET @oview = NULL;
+			SET @sqlcmd=CONCAT("SELECT ar.name,ze.view into @oname,@oview FROM ",cut_tbl,
+				" ar LEFT JOIN zone ze ON ar.zone=ze.id WHERE ar.enable=1 AND ar.rid=",n_rid);
+			PREPARE stmt FROM @sqlcmd;
+			EXECUTE stmt;
+			
+			IF @oname IS NOT NULL AND @oview IS NOT NULL THEN
+				SET @sqlcmd = CONCAT("delete from `", cut_tbl, "` WHERE rid=", n_rid);
+				PREPARE stmt FROM @sqlcmd;
+				EXECUTE stmt;
+				
+				SET @same_dn_cnt = 0;	
+				IF @oname IS NOT NULL AND n_zid IS NOT NULL THEN					
+					SET @sqlcmd = CONCAT("SELECT count(*) into @same_dn_cnt FROM ",cut_tbl,
+						" WHERE `name`='",@oname,"' AND `zone`=",n_zid," AND `enable`=1");
+					PREPARE stmt FROM @sqlcmd;
+					EXECUTE stmt;
+				END IF;
+				IF @same_dn_cnt > 0 THEN
+					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
+				ELSE
+					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
+				END IF;
+				SELECT @oname, @oview, cut_tbl, @same_dn_cnt;
+			END IF;
+			
+		END IF;
+		SET i = i + 1;  
+	END WHILE;
+	
+	-- update鐨勬椂鍊欐墠鐢ㄥ埌
+	-- SET @sqlcmd = CONCAT("UPDATE `ptr_record` SET `enable`=", n_enable, " WHERE rid=", n_rid);
+	-- PREPARE stmt FROM @sqlcmd;
+	-- EXECUTE stmt;
+	
+	SET @sqlcmd = CONCAT('INSERT INTO `ptr_record`',' (zone,`name`,`domain`,ttl,state,`enable`,`rid`) VALUES(',
+		n_zid,',\'',str_ip,'\',\'',str_domain,'\',',n_ttl,',',n_state,',',n_enable,',',n_rid,
+		') ON DUPLICATE KEY UPDATE zone=',n_zid,',`name`=\'',str_ip,'\',`domain`=\'',str_domain,
+		'\',`ttl`=',n_ttl,',state=',n_state,',`enable`=',n_enable);
+	PREPARE stmt FROM @sqlcmd;  
+	EXECUTE stmt;  
+	
+	DEALLOCATE PREPARE stmt; 
+	
+	CALL add_snd_req('dns', tbl_to_dnstype('ptr_record'), n_view, str_ip, 0, 1);
+	
+    END */$$
+DELIMITER ;
+
+
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
