@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+	<div id="sideMenu" class="side">
+		<div class="hd">
+			<h3>域名管理</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Domainmgr/">免费域名列表</a></li>
+				<li><a href="__APP__/Domainmgr/vip">VIP域名列表</a></li>
+			</ul>
+		</div>
+		<!--div class="hd">
+			<h3>其他功能</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a href="#"></a></li>
+				<li><a href="#"></a></li>
+			</ul>
+		</div-->
+	</div>
+	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });</script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">免费域名列表</h2>
+			</div>
+			<div class="bd">
+				<ul>
+					<div class="table-toolbar">
+						<div class="lf">共
+							{$page}
+						</div>
+						<div class="rf" style="margin-right:10px;"> 
+							<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" value="{$domain}" type="text" placeholder="请输入关键字词">
+							<button class="ui-btn-grey" onClick="seach(this)">搜索</button>
+						</div> 
+					</div>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+						<thead>
+						<tr id="tr_title">
+							<th class="chk">编号</th>
+							<th style="text-align:left;"><span class="el">域名</span></th>
+							<th><span class="el">TTL</span></th>
+							<th><span class="el">NS状态</span></th>
+							<th><span class="el">启用状态</span></th>
+							<th><span class="el">锁定状态</span></th>
+							<th><span class="el">添加时间</span></th>
+							<th>操作&nbsp;</th>
+						</tr>
+						</thead> 	
+						<tbody id="myData">
+							<volist name="zlist" id="s_vo">
+							<tr class="data"> 	 	
+								<td class="chk">{$i}</td>
+								<td class="val" style="text-align:left;">
+									<a title="" href="__APP__/Domainmgr/record?r={$s_vo.id}">{$s_vo.domain}</a>
+								</td>
+								<td class="rr">{$s_vo.default_ttl}</td>
+								<td class="rr" style="width:80px;"><if condition="$s_vo.is_author eq 0">未修改<else/>已修改</if></td> 
+								<td class="rr" style="width:80px;"><if condition="$s_vo.is_on eq 0">禁用<else/>启用</if></td>
+								<td class="rr" style="width:80px;"><if condition="$s_vo.is_lock eq 0">未锁定<else/>锁定</if></td>
+								<td class="rr" style="width:140px;">{$s_vo.add_time}</td>
+								<td class="iop">
+									<a title="查看其他信息" href="javascript:void(0);" onclick="readZone({$s_vo.id},this);">详情</a>
+									<a title="删除" href="javascript:void(0);" onclick="deleteDomain({$s_vo.id},this)">删除</a>
+                                    <if condition="$s_vo[is_on] == 0">
+										<a title="启用" href="javascript:void(0);" onclick="startOrStop({$s_vo.id},this)">启用</a>
+                                        <else/>
+										<a title="停用" href="javascript:void(0);" onclick="startOrStop({$s_vo.id},this)">停用</a>
+                                    </if>
+									<a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">管理</a>
+								</td>
+							</tr>
+							<tr style="background:#fff;display:none;"><td colspan="8" style="text-align:left"></td></tr>
+							</volist>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function seach(obj){
+		var val = $(obj).prev().val();
+		if(!val){
+			$(obj).prev().focus();
+			return false;
+		}
+		window.location.href = "__APP__/Domainmgr/index?domain=" + val ;
+	}
+	function deleteDomain(id,evt){
+		if(confirm('确认删除该域名吗？将删除该域名下的所有记录！')){
+			$.ajax({
+				url: '__APP__/Domainmgr/delDomain',
+				type: "post",
+				data: { 'id': id },
+				success: function (data) {
+					//$("#save_msg").html(data.info);
+					if(data.info == 'success'){
+						window.location.reload();//$($(evt).parent().parent()).remove();
+					}else{
+						alert(data.data);
+					}
+				},
+				error: function (data) {
+					alert(data.statusText);
+				}
+			});
+		}
+	}
+	function startOrStop(id,evt){
+		var status = $(evt).html();		
+		$.ajax({
+			url: '__APP__/Domainmgr/startOrStop',
+			type: "post",
+			data:{'id':id,'status':status},
+			success: function (data) {
+				if(data.info=='success'){
+					window.location.reload();
+				}else{
+					alert(data.data);
+				}
+			},
+			error:function(data){
+				alert(data.statusText);
+			}
+		});
+	}
+	function readZone(id,evt){
+		$.ajax({
+			url: '__APP__/Domainmgr/readZone',
+			type: "post",
+			data:{id:id},
+			success: function (data) {
+				var ison = "禁用",islock = "未锁定",is_edit = "未修改",level = "普通";
+				if(data.data.is_on==1){
+					ison = "启用" ;
+				}
+				if(data.data.is_lock==1){
+					islock = "锁定" ;
+				}
+				if(data.data.is_author==1){
+					is_edit = "已修改";
+				}
+				if(data.data.level>=8){
+					level = "VIP" ;
+				}
+				$($(evt).parent().parent().next().find("td").get(0)).empty();
+				$($(evt).parent().parent().next().find("td").get(0)).append("<div>"+
+								"<strong>域名套餐：</strong><span>"+level+"</span><br/>"+
+								"<strong>所属用户：</strong><span>"+data.data.user+"</span><br/>"+
+								"<strong>NS修改：</strong><span>"+is_edit+"</span><br/>"+
+								"<strong>启用状态：</strong><span>"+ison+"</span><br/>"+
+								"<strong>锁定状态：</strong><span>"+islock+"</span><br/>"+
+								"<strong>备注信息：</strong><span>"+data.data.desc+"</span><br/>"+
+								"<strong>添加时间：</strong>"+data.data.add_time+"</div>");
+				if($(evt).html() == "详情"){
+					$(evt).parent().parent().next().show();
+					$(evt).html("收起");
+					$(evt).parent().parent().addClass("bgcolor");
+				}else{
+					$(evt).parent().parent().next().hide();
+					$(evt).html("详情");
+					$(evt).parent().parent().removeClass("bgcolor");
+				}
+			},
+			error: function (data) {
+				alert(data.statusText);
+			}
+		});
+	}
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

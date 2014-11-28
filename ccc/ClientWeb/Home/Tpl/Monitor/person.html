@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 域名监控</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" >
+	var show_hide=0;
+    	$(function(){
+		//定时加载
+		setTimeout(function(){
+			$(".J_infoBox").slideToggle();
+		},1000);
+	});
+	//关闭
+	function closeDiv(){
+		$(".J_infoBox").slideToggle();
+	}
+	function checkAll(evt){
+		$('#myData :checkbox').each(function(){
+			this.checked = obj.checked;
+		});
+	}
+	function optSelect(){
+		if($("#opt_group").is(":visible")){
+			$("#opt_group").slideToggle();
+		}
+		$("#opt_sel").slideToggle();
+		stopPropagation();
+		return false;
+	}
+    </script>
+</head>
+<body class="page-dns" style="">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList"></a><span class="s"></span>
+				<strong class="current">自定义监控</strong>
+			</div>
+		</div> 
+		<div class="J_infoBox" style="display:none;">
+		    <div class="dns-tip-box fix J_dnsTipBox">
+			<div class="lf tips">
+			    <p class="dot">
+				域名监控新版上线！支持微信告警了，短信神马的都弱爆了！
+			    </p>
+			    <br />
+			    <p>&emsp;&nbsp;<button class="ui-btn-grey btn-check-cur-dns J_checkCurrentDns">立即开启微信告警</button></p>
+			</div>
+			<div class="lf helps">
+			    <p class="how"><a href="" target="_blank">如何设置微信告警？</a></p>
+			    <p class="when"><a href="" target="_blank">多长时间能收到告警信息？</a></p>
+			</div>
+			<a class="btn-close J_btnClose" href="javascript:void(0);" onClick="closeDiv();" >close</a>
+		    </div>
+		</div>
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<span class="dtype icon-vip"></span>
+				<strong id="cur_zone" class="dname">自定义监控</strong>
+				<span class="tab "><a style="margin-left:12px;" href="__APP__/Monitor/person">自定义监控</a></span>
+				<span class="tab nocur"><a href="__APP__/Monitor/">域名监控</a></span>
+			</p>
+		</div> 
+		<div class="table-box">
+			<div class="table-toolbar">
+				<div class="lf">
+					<select class="ui-select J_selDomainType">
+						<option value="all">全部监控</option>
+						<option value="ishichina">宕机未解决</option>
+						<option value="errordomain">故障已恢复</option>
+						<option value="noishichina">监控正常</option>
+					</select>
+					<button class="ui-btn-blue" style="" onClick="stopDns('all')">添加自定义监控</button>
+					<button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onclick="optSelect(this)">更多
+						<span class="caret"></span>
+					</button> 
+					<ul class="dropdown-menu" style="margin-left: 205px; display: none;" id="opt_sel">
+						<li><a id="disable-Mnt" href="javascript:" onclick="stopMnt()">停用</a></li>
+						<li><a id="enable-Mnt" href="javascript:" onclick="startMnt()">启用</a></li>
+						<li><a id="delete-Mnt" href="javascript:" onclick="deleteMnt()">删除</a></li>
+					</ul>
+				</div>
+				<div class="rf"> 
+					<!--a class="icon icon-export" href="optLog.html">解析记录日志</a-->
+					<!--a class="icon icon-log" href="javascript:void(0);" target="_blank">查看报警信息</a> 
+					<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" type="text" placeholder="请输入关键字词">
+					<button class="ui-btn-grey">搜索</button-->
+				</div> 
+			</div>
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<thead>
+				<tr id="tr_title">
+					<th class="chk"><input type="checkbox" onclick="checkAll();" class="J_chkForAll" title="全选/取消全选"></th>
+					<th class="sortable" style="text-align:left;" sort="type"><span class="el">监控地址</span></th>
+					<th class="sortable" sort="mx"><span class="el">监控状态</span></th>
+					<th class="sortable" sort="line"><span class="el">目标地址</span></th>
+					<th class="sortable" sort="rr"><span class="el">实时状态</span></th>
+					<th>操作&nbsp;</th>
+				</tr>
+				</thead> 	
+				<tbody id="myData">
+					<tr class="data"> 	 	
+						<td class="chk"><input type="checkbox" class="data_chk" value="111"></td>
+						<td class="val" style="text-align:left;">
+							<a title="DNSPro，享受域名保障服务" href="__APP__/Monitor/detail?d=mail.efly.cc">http://mail.efly.cc/</a>
+						</td>
+						<td class="iop">暂停监控</td>
+						<td class="iop">66.151.214.142</td> 
+						<td class="rr" style="text-align:left;padding-left:15px;width:240px;">05-05 09:42 服务器运行正常</td>
+						<td class="iop">
+							<a class="icon-manage" title="配置监控参数" href="javascript:void(0);" onClick="editTable(this);"></a>
+							<a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteDns('one',this)"></a>
+						</td>
+					</tr>
+					<tr class="data">
+						<td class="chk"><input type="checkbox" class="data_chk" value="222"></td> 	 	 
+						<td class="val" style="text-align:left;">
+							<a title="DNSPro，享受域名保障服务" href="__APP__/Monitor/detail?d=www.eflypro.com">http://www.eflypro.com/</a></td> 	
+						<td class="iop">监控中</td>
+						<td class="iop">154.21.41.25</td>
+						<td class="rr" style="text-align:left;padding-left:15px;width:240px;"><a class="ui-color-red" href="javascript:void(0);">05-05 09:42 服务器返回请求错误：404</a></td>
+						<td class="iop">
+							<a class="icon-manage" title="配置监控参数" href="javascript:void(0);"></a>
+							<a class="icon-del" title="删除" href="javascript:void(0);"></a>
+						</td> 	 
+					</tr>
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

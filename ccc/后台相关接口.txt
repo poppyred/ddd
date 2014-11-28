@@ -1,0 +1,5 @@
+域名接口：http://192.168.85.192:8080/dnspro_soap/services/record?wsdl （包括域名导入、域名ns记录查询）
+
+whois接口：http://192.168.85.192:8080/dnspro_soap/services/whois?wsdl	（包括whois信息查询）
+
+http://192.168.85.192:8080/dnspro_soap/services/mail?wsdl			邮件接口

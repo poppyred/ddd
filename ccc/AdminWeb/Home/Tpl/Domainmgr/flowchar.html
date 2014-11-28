@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+	<div id="sideMenu" class="side">
+		<div class="hd">
+			<h3>记录管理</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Domainmgr/">免费域名列表</a></li>
+				<li><a href="__APP__/Domainmgr/vip">套餐域名列表</a></li>
+			</ul>
+		</div>
+		<!--div class="hd">
+			<h3>其他功能</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a href="#"></a></li>
+				<li><a href="#"></a></li>
+			</ul>
+		</div-->
+	</div>
+	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });</script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		<input type="hidden" value="{$zone}" id="txt_zone"/>
+		<input type="hidden" value="{$is_new}" id="is_first"/>
+		<input type="hidden" value="{$time}" id="time"/>
+		<input type="hidden" value="{$num}" id="num"/>
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">解析统计</h2>
+				<a href="__APP__/Domainmgr/record?r={$r}">解析记录列表</a>
+			</div>
+			<div class="bd">
+				<ul>
+                    类型：
+                	<select class="ui-select" style="margin-left:10px;" id="type" onChange="addrecord()">
+                        <option value="main">按域名</option>
+                        <option value="child">按子域名</option>
+                    </select>
+                    时间：
+                    <select class="ui-select" style="margin-left:10px;" id="timezone">
+                        <option value="today">今天</option>
+                        <option value="month">本月</option>
+                        <option value="rweek">最近一周</option>
+                        <option value="rmonth">最近一月</option>
+                        <option value="rseason">最近一季</option>
+                        <option value="rhalf">最近半年</option>
+                        <option value="ryear">最近一年</option>
+                    </select>
+                    域名：
+                    <select class="ui-select" style="margin-left:10px;width:80px; display:none" id="record">
+                        <volist name="hostlist" id="item">
+                            <option selected value="{$item.host}">{$item.host}</option>
+                        </volist>
+                    </select>
+                    <select class="ui-select" style="margin-left:10px;width:200px;">
+                        <option selected value="all">{$zone}</option>
+                    </select>
+                    <button class="ui-btn-blue" style="margin-left:10px;" onclick="selectby()">查询</button>
+					<div id="chart" style="height:320px;margin-top:10px;"></div>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	$(function(){
+		//绑定下拉框
+			if('{$host}'!=""){
+				$("#record").show();
+				$("#record option").each(function(){
+					if($(this).val()=='{$host}'){
+						$(this).attr('selected','selected');
+					}					
+				});
+			}else{
+				$("#record option:eq(0)").attr('selected','selected');
+			}
+			$("#type option").each(function(){
+				if($(this).val()=='{$type}'){
+					$(this).attr('selected','selected');
+				}
+			});
+			$("#timezone option").each(function(){
+				if($(this).val()=='{$timezone}'){
+					$(this).attr('selected','selected');
+				}
+			});
+			
+			var time = $("#time").val(),
+				num = "["+$("#num").val()+"]",
+				
+				time_arr = new Array(),
+				time_arr = time.split(",");
+			
+			$('#chart').highcharts({
+				title: {
+				    text: '域名请求量统计图',
+				    x: -20 //center
+				},
+				subtitle: {
+				    text: '今天请求总量：{$sum}',//1245次（统计结果延迟1小时）',
+				    x: -16
+				},
+				xAxis: {					
+				    categories: time_arr
+				},
+				yAxis: {
+				    title: {
+					text: '请求次数'
+				    },
+				    min: 0,
+				    plotLines: [{
+					value: 0,
+					width: 1,
+					color: '#808080'
+				    }]
+				},
+				tooltip: {
+				    valueSuffix: '次',
+				    shared: true
+				},
+				legend: {
+				    enabled: true
+				},
+				series: [{
+					name: '访问量',
+				    data: eval('(' + num + ')')
+					//mainstr_arr
+				}]
+			});
+		
+	});
+	function addrecord(){
+		if($("#type").val()=="main"){
+			$("#record").hide();	
+		}else{
+			$("#record").show();	
+		}
+	}
+	function selectby(){
+		var type = $("#type").val(),timezone = $("#timezone").val(),d = $("#txt_zone").val(),host="";
+		if(type=="child"){
+			host=$("#record").val();
+		}
+		window.location.href = "__APP__/Domainmgr/flowchar?r={$r}&d=" + d + "&host=" + host + "&type=" + type + "&timezone=" + timezone;
+	}
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

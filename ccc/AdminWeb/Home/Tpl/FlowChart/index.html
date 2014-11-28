@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+<script type="text/javascript">
+var chart, last_query = "",result,max_num = 0, max_time = "";
+$(function(){
+	var IP = '{$ip}',VIEW = '{$view}';
+	$("#ip_list").val(IP);	
+	$("#view_list").val(VIEW);	
+	Highcharts.setOptions({                                                     
+		global: {                                                               
+			useUTC: false                                                       
+		}                                                                       
+	});
+	
+	$.ajax({	
+		url: "__APP__/FlowChart/index",
+		type:'post',
+		data:{'ip':IP,'view':VIEW},
+		async:false,
+		success: function (data) {
+			result = data.data;
+			if(data.info=='success'){
+				chart = new Highcharts.Chart({
+					chart: {
+						renderTo: 'container',
+						zoomType: 'x',
+						animation: Highcharts.svg, // don't animate in old IE
+						marginRight: 10,
+						events: {
+							load: function() {
+								setInterval(function() {
+									var url = "http://api.efly.cc/eflydns/dns_chart_req.php?time=" + last_query ;
+									switch(true){
+										case IP!="" && VIEW!="":
+											url += "&ip=" + IP + "&view=" + VIEW;
+										break;
+										case IP!="" && VIEW=="":
+											url += "&ip=" + IP ;
+										break;
+										case IP=="" && VIEW!="":
+											url += "&view=" + VIEW;
+										break;
+									}
+									url += url + "&callback=?";
+									$.ajax({	
+										url: url,
+										type: "GET",
+										dataType: 'jsonp',
+										success: function (result) {
+											if(result.descmap.length >= 1) {
+												for (var i = 0; i < result.descmap.length; i++) {
+													var x = Date.parse(result.descmap[i]["time"].replace(/-/g,"/")),
+													y = parseInt(result.descmap[i]["req"]),
+													ndr = parseInt(result.descmap[i]["ndr"]);
+													chart.series[0].addPoint([x, y], true, true);
+													chart.series[1].addPoint([x, ndr], true, true);													
+													if(parseInt(result.descmap[i]["req"]) > max_num){
+														max_num = parseInt(result.descmap[i]["req"]);
+														max_time = result.descmap[i]["time"];
+														$("#max_qps").html(max_num);$("#max_time").html(max_time);
+													}
+												}
+												last_query = result.descmap[result.descmap.length - 1]["time"];
+											}else{
+												//alert(data.error);
+											}										
+										},
+										cache: false,
+										error: function (result) {
+											//alert(result.statusText);
+										}
+									});
+								}, 4000);
+							}
+						}
+					},
+					title: {
+						text: '最近60分钟内并发量'
+					},
+					xAxis: {
+						type: 'datetime',
+						tickPixelInterval: 120
+					},
+					yAxis: {
+						title: {
+							text: '并发量QPS'
+						},
+						min: 0,
+						plotLines: [{
+							value: 0,
+							width: 1,
+							color: '#808080'
+						}]
+					},
+					tooltip: {
+						formatter: function() {
+							return '<b>'+ this.series.name +'</b><br/>'+
+							Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+							Highcharts.numberFormat(this.y, 0);
+						}
+					},
+					legend: {
+					enabled: false
+					},
+					plotOptions: {
+						area: {
+							fillColor: {
+								linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+								stops: [
+									[0, Highcharts.getOptions().colors[0]],
+									[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+								]
+							},
+							lineWidth: 1,
+							marker: {
+								enabled: false
+							},
+							shadow: false,
+							states: {
+								hover: {
+									lineWidth: 1
+								}
+							},
+							threshold: null
+						}
+					},
+					exporting: {
+						enabled: false
+					},
+					series: [{
+						type: 'area',
+						name: '当前并发（QPS）',
+						data: (function() {
+							var data = [], i;
+							if(result.descmap.length > 0){
+								for (i = 0; i < result.descmap.length; i++) {
+									var req = parseInt(result.descmap[i]["req"]);
+									data.push({
+										x: Date.parse(result.descmap[i]["time"].replace(/-/g,"/")),
+										y: req
+									});
+									if(req > max_num){
+										max_num = req;
+										max_time = result.descmap[i]["time"];
+									}
+								}
+								last_query = result.descmap[result.descmap.length-1]["time"];
+								$("#max_qps").html(max_num);$("#max_time").html(max_time);
+							}
+							return data;
+						})()
+					},{
+						type: 'area',
+						name: '非DNS请求',
+						data: (function() {
+							var data = [], i;
+							if(result.descmap.length > 0){
+								for (i = 0; i < result.descmap.length; i++) {
+									var ndr = parseInt(result.descmap[i]["ndr"]);
+									data.push({
+										x: Date.parse(result.descmap[i]["time"].replace(/-/g,"/")),
+										y: ndr
+									});
+								}
+							}else{
+								alert("错误提示：没有获取到并发监控数据，请检查程序是否正常运行！");
+							}
+							return data;
+						})()
+					}]
+				});
+			}else{
+				alert(data.data);
+			}
+		}
+	});
+});		
+function selectBy(){
+	var ip = $("#ip_list").val(),view = $("#view_list").val(),url = '__APP__/FlowChart/index';
+	switch(true){
+		case ip!="" && view!="":
+			url += "?ip=" + ip + "&view=" + view;
+		break;
+		case ip!="" && view=="":
+			url += "?ip=" + ip;
+		break;
+		case ip=="" && view!="":
+			url += "?view=" + view;
+		break;
+	}
+	window.location.href = url;
+}		
+</script>
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd">
+                <h3>请求总流量</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/FlowChart/index">实时流量</a></li>
+                    <li><a href="__APP__/FlowChart/history">历史流量</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu1" class="side">
+            <div class="hd">
+                <h3>未命中流量</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/FlowChart/error">实时流量</a></li>
+                    <li><a href="__APP__/FlowChart/error_history">历史流量</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+    		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">流量图信息</h2>
+			</div>
+            <div style="margin:5px 0px 0px 40px;">
+            	<label>选择设备：</label>
+                <select id="ip_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
+                	<option value="">全部</option>
+                    <volist name="ipList" id="item">
+	                	<option value="{$item}">{$item}</option>
+                    </volist>
+                </select>
+                <label>选择视图：</label>
+                <select id="view_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
+	                <option value="">全部</option>
+                    <volist name="viewList" id="item">
+	                	<option value="{$item.id}">{$item.name}</option>
+                    </volist>
+                </select>
+                <label style="margin-left:20px;">监控时间内最大并发：</label><span id="max_qps">-</span>    
+                <label style="margin-left:20px;">时间：</label><span id="max_time">-</span>
+			</div>
+			<div class="bd">
+				<div id="container" style="min-width:700px;height:400px"></div>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">	
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

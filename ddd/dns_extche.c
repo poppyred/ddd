@@ -171,7 +171,7 @@ static int extche_member_compare(const void *key1, uint32_t domain_len1,const vo
 	char * domain1 = (char*)key1;
 	char * domain2 = (char*)key2;
 	
-    he_debug("domain1:%s len:%d domian2:%s len:%d\n",domain1,domain_len1,domain2,domain_len2);
+    //he_debug("domain1:%s len:%d domian2:%s len:%d\n",domain1,domain_len1,domain2,domain_len2);
 	for(i=domain_len1-1,j=domain_len2-1;i>=0&&j>=0;i--,j--)
 	{
 		if(domain1[i] > domain2[j])

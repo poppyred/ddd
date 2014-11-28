@@ -948,7 +948,7 @@ void request_to_core(char *domain,int view, int type)
     }
 
 	txdata->dstip = addr.sin_addr.s_addr;
-    txdata->srcip = inet_aton("192.168.23.226",NULL);
+    //txdata->srcip = inet_aton("192.168.23.226",NULL);
 	txdata->dstport = htons(53);
 	txdata->srcport = htons(5353);
     

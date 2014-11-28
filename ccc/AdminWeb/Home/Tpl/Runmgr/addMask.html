@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd">
+                <h3>默认路线管理</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Runmgr/">默认路线列表</a></li>
+                    <li><a href="__APP__/Runmgr/addView">添加默认路线</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu1" class="side">
+            <div class="hd">
+                <h3>用户自定义路线</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/Runmgr/route">用户自定义路线列表</a></li>
+                    <li><a href="__APP__/Runmgr/addRoute">添加用户自定义路线</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu2" class="side">
+            <div class="hd">
+                <h3>NS服务地址</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/Runmgr/normalns">免费用户NS记录</a></li>
+                    <li><a href="__APP__/Runmgr/vipns">套餐用户NS记录</a></li>
+                    <li><a href="__APP__/Runmgr/addns">添加默认NS记录</a></li>
+                </ul>
+            </div>
+        </div>
+	</div>
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu2").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">添加掩码</h2>
+			</div>
+			<div class="bd">
+				<ul>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab" style="margin-left:20px;">	
+						<tbody id="myData">
+							<tr class="data">
+							    <td class="laber">路线名称</td>
+							    <td class="edit">
+                                <select id="txt_viewid">
+                                	<volist name="vlist" id="item">
+                                    	<option value="{$item.id}">{$item.name}</option>
+                                    </volist>
+                                </select>
+                                 *
+                                 </td>
+							    <td class="info">请选择路线名称</td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">路线掩码</td>
+							    <td class="edit">
+                                <textarea class="ui-ipt-txt" id="txt_mask" style="height: 111px; width: 239px;"></textarea>
+                                </td>
+							    <td class="info">说明：掩码之间用英文逗号隔开,例如：192.168.85.0/24,192.168.87.0/24</td>
+							</tr>                            
+							<tr>
+							    <td class="laber"></td> 	
+							    <td class="edit">
+								    <button id="submit_btn" onclick="save();">添加</button> <span id="save_msg" style="color:#3CADED"></span>
+							    </td>
+							    <td class="info"></td>  
+							</tr>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function save(){
+		var viewid = $("#txt_viewid").val();
+		var mask = $("#txt_mask").val();
+		if(!mask){
+			$("#save_msg").html("请输入路线掩码！");
+			$("#txt_mask").focus();
+			return false;
+		}
+		$.ajax({
+			url: '__APP__/Runmgr/addMask',
+			type: "post",
+			data:{'viewid':viewid,'mask':mask},
+			success: function (data) {
+				if(data.status==1){
+					window.location.href = "__APP__/Runmgr/mask?id=" + viewid;
+				}else{
+					$("#save_msg").html(data.info);
+				}				
+			},
+			error: function (data) {
+				alert(data.statusText);
+			}
+		});
+	}
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

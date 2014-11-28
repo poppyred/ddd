@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd">
+                <h3>默认路线管理</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Runmgr/">默认路线列表</a></li>
+                    <li><a href="__APP__/Runmgr/addView">添加默认路线</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu1" class="side">
+            <div class="hd">
+                <h3>用户自定义路线</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/Runmgr/route">用户自定义路线列表</a></li>
+                    <li><a href="__APP__/Runmgr/addRoute">添加用户自定义路线</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu2" class="side">
+            <div class="hd">
+                <h3>NS服务地址</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/Runmgr/normalns">免费用户NS记录</a></li>
+                    <li><a href="__APP__/Runmgr/vipns">套餐用户NS记录</a></li>
+                    <li><a href="__APP__/Runmgr/addns">添加默认NS记录</a></li>
+                </ul>
+            </div>
+        </div>
+	</div>
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu2").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">默认路线列表</h2>
+			</div>
+			<div class="bd">
+				<ul>
+					<div class="table-toolbar">
+						<div class="lf">共
+							{$page}
+						</div>
+						<div class="rf" style="margin-right:20px;"> 
+							<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" value="{$view}" type="text" placeholder="请输入关键字词">
+							<button class="ui-btn-grey" onClick="seach(this)">搜索</button>
+						</div> 
+					</div>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+						<thead>
+						<tr id="tr_title">
+							<th class="chk">编号</th>
+							<th style="text-align:left;"><span class="el">路线名称</span></th>
+							<th><span class="el">路线服务级别</span></th>
+							<th><span class="el">更新时间</span></th>
+							<th>操作&nbsp;</th>
+						</tr>
+						</thead> 	
+						<tbody id="myData">
+							<volist name="vlist" id="s_vo">
+							<tr class="data"> 	 	
+								<td class="chk">{$i}</td>
+								<td class="val" style="text-align:left;">
+									<a title="" href="__APP__/Runmgr/editView?id={$s_vo.id}">{$s_vo.name}</a>
+								</td>
+								<td class="iop">{$s_vo.level}</td>
+								<td class="iop">{$s_vo.up_time}</td> 
+								<td class="iop">
+									<a title="修改默认视图" href="__APP__/Runmgr/editView?id={$s_vo.id}">修改</a>
+									<a title="删除" href="javascript:void(0);" onclick="deleteView({$s_vo.id},this)">删除</a>
+									<a title="掩码管理" href="__APP__/Runmgr/mask?id={$s_vo.id}">掩码管理</a>
+								</td>
+							</tr>
+							</volist>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function seach(obj){
+		var val = $(obj).prev().val();
+		if(!val){
+			$(obj).prev().focus();
+			return false;
+		}
+		window.location.href = '__APP__/Runmgr/index?view=' + val ;
+	}
+	function deleteView(id,evt){
+		if(confirm('确认删除该视图吗？将删除该视图下的所有信息，包括视图掩码等！')){
+			$.ajax({
+				url: '__APP__/Runmgr/deleteView',
+				type: "post",
+				data: { id: id }, 
+				success: function (data) {
+					if(data.info == 'success'){
+						window.location.reload();
+					}else{
+						alert(data.data);
+					}
+				},
+				error: function (data) {
+					alert(data.statusText);
+				}
+			});
+		}
+	}
+	
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

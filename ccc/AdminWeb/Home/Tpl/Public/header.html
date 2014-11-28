@@ -1,0 +1,92 @@
+<div id="topBar">
+	<div class="siteWidth">
+		<!--span><a style="text-decoration:none;">收藏页面</a></span-->
+		<ul>
+			<li><em>您的域名出现访问超时，请留意！</em>DNSpro监控到您的域名出现故障，请检查</li>
+			<li><em>DNSPro退出个人用户免费套餐啦，欢迎免费试用！</em>试用对象：小型站点，企业网站，个人用户等</li>
+		</ul>
+	</div>
+</div><div class="clear"></div>
+<script type="text/javascript">
+	jQuery("#topBar").slide({ mainCell:"ul",autoPlay:true,effect:"topLoop" });
+	$(function(){		
+		$(".navBar ul li").hover(function(){
+			$(".navBar ul li").removeClass('on');
+			$(this).addClass('on');
+		},function(){
+			$(this).removeClass('on');			
+		});
+		$(".navBar ul li").mouseleave(function(){
+			showOrHide();
+		});
+		showOrHide();
+	});
+	function showOrHide(){
+		var url = window.location.href;
+		switch(true){
+			case url.indexOf('FlowChart')!=-1:
+			$(".navBar ul li:eq(0)").addClass('on');
+			break;
+			case url.indexOf('Clientmgr')!=-1:
+			$(".navBar ul li:eq(2)").addClass('on');
+			break;
+			case url.indexOf('Domainmgr')!=-1:
+			$(".navBar ul li:eq(4)").addClass('on');
+			break;
+			case url.indexOf('Runmgr')!=-1:
+			$(".navBar ul li:eq(6)").addClass('on');
+			break;
+			case url.indexOf('System/user')!=-1 || url.indexOf('System/addUser')!=-1 || url.indexOf('System/editUser')!=-1:
+			$(".navBar ul li:eq(8)").addClass('on');
+			break;
+			case url.indexOf('System')!=-1:
+			$(".navBar ul li:eq(10)").addClass('on');
+			break;
+		}	
+	}
+</script>
+
+<div id="header">
+	<div class="logoBar">
+		<h1>EflyDNS管理平台</h1>
+	</div>
+	<!-- navBar -->
+	<div class="navBar">
+		<ul class="nav clearfix">
+ 	       <li class="m">
+				<h3><a target="_self" href="__APP__/FlowChart/">流量监控</a></h3>
+			</li>
+			<li class="s">|</li>
+        	<if condition="$_SESSION['level'] == 1">
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/Clientmgr/">客户管理</a></h3>
+                </li>
+                <li class="s">|</li>
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/Domainmgr/">域名管理</a></h3>
+                </li>
+                <!--li class="s">|</li>
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/Taocang/">套餐管理</a></h3>
+                </li-->
+                <li class="s">|</li>
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/Runmgr/">线路管理</a></h3>
+                </li>
+                <li class="s">|</li>
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/System/user">账号权限</a></h3>
+                </li>
+            </if>
+			<li class="s">|</li>
+            <li class="m">
+                <h3><a target="_self" href="__APP__/System/">设备管理</a></h3>
+            </li>	
+			<div>
+				<span class='name'>{$_SESSION['admin']}</span>
+				<span class='notification'>|</span>
+				<a class='account' href="__APP__/Index/logout"><span>退出</span></a>
+			</div>
+		</ul>
+	</div>
+</div>

@@ -1,0 +1,140 @@
+﻿/* Css Reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,
+form,fieldset,input,textarea,p,blockquote,th,td,img { padding: 0; margin: 0; }
+fieldset,img { border: 0; }
+address,caption,cite,code,dfn,em,th,var,i { font-weight:normal; font-style:normal; }
+ol,ul,li { list-style: none; }
+div,dl,dt,dd,ol,ul,li { zoom:1; }
+caption,th { text-align: left; }
+h1,h2,h3,h4,h5,h6 { font-weight: normal; font-size:100%; }
+q:before,q:after { content:''; }
+abbr,acronym { border: 0; }
+
+/* Public */
+html{ width:100%; }
+body{ width:100%; color:#555;font:12px/20px "Microsoft YaHei", Arial, sans-serif, "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", STHeiti; -webkit-text-size-adjust: none;}
+a{color:#555;text-decoration:none; outline:none;}
+a:hover {color:#3CADED; text-decoration:underline; }
+.lf{ float:left !important; }
+.rf{ float:right !important; }
+.tc{ text-align:center; }
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+
+/* Protected */
+select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; border-top-color: #999; border-left-color: #999; background: #fff; }
+
+.ui-ipt-txt, .ui-textarea {height: 24px;padding: 0 5px;line-height: 24px;vertical-align: middle;color: #666;background-color: #fff;border: solid 1px #c7ccd2;border-right-color: #e0e4e9;border-bottom-color: #e0e4e9;outline: 0;}
+
+.siteWidth{ width:1200px; margin:0 auto;   }
+.column{ overflow:hidden;  }
+#topBar{ height:28px; line-height:30px; background:#fff; border-bottom:1px solid #f3f3f3; overflow:hidden;  }
+#topBar em{ color:#f00; }
+#topBar span{ float:right; color:#999;  }
+#topBar span a{ margin:0 5px; color:#666;  }
+
+/* 登陆页面 */
+.loginbox { width:400px;margin:0 auto;margin-top: 150px;background: #fff;
+	border: solid 1px #3CADED;padding: 15px 15px 0 15px;border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	box-shadow: 0 1px 3px rgba(131, 147, 167, 0.12);
+	-moz-box-shadow: 0 1px 3px rgba(131, 147, 167, 0.12);
+	-webkit-box-shadow: 0 1px 3px rgba(131,147,167,0.12);
+}
+.loginbox ul { margin-top: 30px;margin-bottom:10px; }
+.loginbox ul li { margin-left: 90px; line-height:30px;margin-bottom:18px; }
+
+/* 导航 */
+#header{ margin-bottom: 1px;  }
+.logoBar{ width:1200px; margin:0 auto; padding: 5px 0;  }
+.logoBar h1{ font: bold 26px/32px "Microsoft YaHei", Arial, sans-serif, "Helvetica Neue";color:#39A4DC;}
+.logoBar h2{ margin-left: 158px; margin-top: -30px; width:80px; font-size: 17px;color:#666; border-bottom: 1px solid #666;}
+
+/* css */
+.navBar{  position:relative; width:100%; margin:0 auto; position:relative; z-index:1;  background:#3CADED; color:#fff; height:40px; line-height:40px;   }
+.navBar ul { width:1200px; margin:0 auto;}
+.nav{ overflow:hidden; zoom:1; }
+.nav .m{ float:left;  padding:0 10px; display:inline;  }
+.nav h3{ float:left;  font-size:100%; font-weight:normal; font-size:14px;  }
+.nav .s{ float:left; width:3px; text-align:center; color:#75c7f2;   }
+.nav h3 a{ float:left;  display:block; padding:0 10px; color:#fff;   }
+.nav .on h3 a{ height:36px; line-height:36px; background:#fff; margin-top:4px;  color:#3CADED; text-decoration:none;  }
+
+.navBar ul div { float:right; padding:0px; font:normal 13px/20px "Microsoft YaHei"; }
+.navBar ul div  a{ margin:0px;}
+.navBar ul div .notification{ margin-left:6px;}
+.navBar ul div .name{font-size:13px;line-height:45px;display:inline-block;float:left;}
+.navBar ul div .account{ margin-left:4px; display:inline-block; line-height:47px;color:#fff; }
+
+.subNav{ color:#333;  height:36px; line-height:36px; background:#fff; border-bottom:1px solid #ccc; overflow:hidden; padding:0 10px;  }
+.subNav li{ overflow:hidden; zoom:1; }	
+.subNav iframe{ float:right;  }
+.subNav a{ margin:0 10px;  }
+
+/* content */
+.content{ padding:20px 0; overflow:hidden; width:1200px; margin:0 auto; }
+.mainContent{ width:1016px; float:left; margin-left:10px; height:100%;}
+.main{ width:1200px; margin:0 auto; height:100%;}
+.side{ width:168px; float:left; }
+
+.table-toolbar { height: 30px;line-height: 30px;padding: 10px 0;border-bottom: solid 1px #eaeaea;vertical-align: baseline; }
+.table-toolbar button { color:#333;border:solid 1px #d0d0d0;background:#f1f1f1;padding: 0 10px;height:26px;line-height:25px;vertical-align: middle;margin:0px 4px 0px 4px;display: inline-block;overflow:hidden;cursor:pointer; }
+.table-toolbar button:hover { border: solid 1px #3CADED; }
+.table-toolbar .lf span, .table-toolbar .lf a {margin-left:12px;}
+
+/* 左菜单 */
+#sideMenu,#sideMenu1,#sideMenu2 { padding:0 1px; overflow:hidden; margin-bottom:10px; border: 1px solid #f3f3f3; font: normal 14px/20px "Microsoft YaHei";color:#666;}
+#sideMenu .hd,#sideMenu1 .hd,#sideMenu2 .hd { height:34px; line-height:34px; margin:1px 0;  padding:0 16px; background:url(../img/icons.png) #F8F8F8 148px -37px no-repeat; cursor:pointer;}
+#sideMenu .hd h3,#sideMenu1 .hd h3,#sideMenu2 .hd h3 { font-weight:bold; font-size:13px; }
+#sideMenu .on,#sideMenu1 .on,#sideMenu2 .on { background:url(../img/icons.png) #3CADED 148px -77px no-repeat; }
+#sideMenu .on h3,#sideMenu1 .on h3,#sideMenu2 .on h3{ color:#fff; }
+#sideMenu .bd,#sideMenu1 .bd,#sideMenu2 .bd { padding:10px 0 10px 15px; overflow:hidden; display:none; }
+#sideMenu .bd li,#sideMenu1 .bd li,#sideMenu2 .bd li { height:28px; line-height:28px; overflow:hidden; }
+#sideMenu .bd li span,#sideMenu1 .bd li span,#sideMenu2 .bd li span { color:#999; margin-right:5px; }
+
+
+
+/* Tab切换 */
+.slideTxtBox { float:left;  width:100%; height:100%; overflow:hidden;  padding:0 0 0 10px; background:#fff;  text-align:left;  }
+.slideTxtBox .hd { height:34px; line-height:34px; padding:0 0; border-bottom:2px solid #3CADED; font-size:14px; }
+.slideTxtBox .hd a{float:left;margin-left:20px;border:2px solid #3CADED; border-bottom:none; padding:0px 10px; cursor:pointer;}
+.slideTxtBox .hd ul { overflow:hidden; zoom:1; }
+.slideTxtBox .hd ul { float:right; }
+.slideTxtBox .hd ul li{ float:left; }
+.slideTxtBox .hd ul li a{ display:block; padding:0 15px;  }
+.slideTxtBox .hd ul li a:hover{ text-decoration:none;  }
+.slideTxtBox .hd ul li.on a{ background:#3CADED; color:#fff; font-weight:bold;  }
+.slideTxtBox .bd{ padding: 10px 0;  }
+.slideTxtBox .bd li{ height:34px; line-height:34px;   }
+.slideTxtBox .bd li .date{ float:right; color:#999;  }
+.slideTxtBox h1{ padding-left:20px; font-size: 18px;color: #646464; display: block; }
+
+/* table */
+.ui-table{color:#555}
+.ui-table th{height:48px;border-top-color:#eaeaea;font-weight:bold;}
+.ui-table td{height:40px;border-top:solid 1px #f3f3f3;background:#fff;line-height:20px;}
+.ui-table td.laber {width: 100px;padding-left: 10px;color: #666;text-align: left;font-weight: bold;}
+.ui-table td.edit {text-align: left;padding-left: 10px;color: #999;width: 226px;}
+.ui-table td.info {color: #999;text-align: center;}
+.ui-table td > div {width: 994px;margin: 0 0 4px 0;padding: 3px 1px 1px 10px;border: 1px solid #eee;}
+.ui-table tbody tr.even td{background-color:#fbfdfe}
+.ui-table tbody tr.bgcolor td,.ui-table tbody tr:hover td{background:#f3f3f3}
+.ui-table tbody tr.row-opened td,.ui-table tbody tr.row-opened:hover td{background-color:#eef5ff;border-top:solid 1px #ddd}
+.ui-table tbody tr.without-help td{background-color:#fff}
+.ui-table .sortable{-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none}
+.ui-table .sortable .el{background:url(../img/order_icon.gif) right 9px no-repeat;padding-right:12px;display:inline-block;line-height:30px;cursor:pointer}
+.ui-table .sortable .asc{background-position:right 9px}
+.ui-table .sortable .desc{background-position:right -50px}
+.ui-table .sortable .asc_on{background-position:right -171px}
+.ui-table .sortable .desc_on{background-position:right -110px}
+
+.memu_bar { margin:10px; height:34px;*height:54px;line-height:34px; }
+.memu_bar a, .memu_bar span { margin-left:10px; }
+.memu_bar li { float:left; }
+.memu_bar li a { width:30px;padding:3px 3px;text-align:center;background:#fff;border:1px solid #3CADED;color:#333; margin:0 5px; margin-bottom:20px; }
+.memu_bar li a:hover { color:#fff;border:1px solid #3CADED;background:#3CADED;text-decoration:none; }
+.memu_bar button:hover { border: dashed 1px #3CADED; }
+.memu_bar button, .memu_bar input[type="submit"] {color: #fff;font-weight: bold;font-size: 13px;border: 1px solid #fff;background: #3CADED;padding: 0px 15px;height: 34px;line-height: 24px;margin: 0px 4px 0px 4px;overflow: hidden;cursor: pointer;}
+
+.footer a {color: #666;}
+.footer {text-align: center;line-height: 25px;background: url(../img/foot.gif) 0 bottom repeat-x #eee;border-top: solid 1px #dbdee1;padding: 25px 0;}

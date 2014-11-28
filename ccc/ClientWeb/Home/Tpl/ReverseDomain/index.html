@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 反向解析</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" >
+		$(function(){
+			$("#type_sel").val($("#type").val());		
+			$('html').bind('click',function(e){
+				if($("#opt_sel").is(":visible")){
+					$("#opt_sel").slideToggle();
+				}
+			});
+			
+			$(".table-toolbar .ui-btn-blue").click(function(){
+				$(".J_extendAddBox").slideToggle();
+			});
+			$(".J_extendAddBox .J_btnCloseExtendBox").click(function(){
+				$(".J_extendAddBox").slideToggle();
+			});
+			
+		});
+		var stopPropagation = function(e) {
+			if(e && e.stopPropagation){         //W3C取消冒泡事件         
+				e.stopPropagation();     
+			}else{         //IE取消冒泡事件         
+				window.event.cancelBubble = true;     
+			} 
+		};
+		function optSelect(e){
+			if($("#opt_group").is(":visible")){
+				$("#opt_group").slideToggle();
+			}
+			$("#opt_sel").slideToggle();
+			stopPropagation(e);
+		}
+		function deleteReverse(id,obj){
+			if(confirm('确定删除该域名反解析？')){
+				$.ajax({
+					url:'__APP__/ReverseDomain/deleteReverse',
+					type:'post',
+					data:{'id':id},
+					success:function(data){
+						if(data.data){
+							window.location.reload();
+						}else{
+							layer.msg('温馨提示：'+data.data,2,3);		
+						}
+					},
+					error:function(data){
+						layer.msg('温馨提示：'+data.status,2,3);
+					}
+				});
+			}
+		}
+		function addReverse(){
+				
+		}
+    </script>
+</head>
+<body class="page-dns" style="">
+	<input value="{$type}" id="type" type="hidden" />
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList"></a><span class="s"></span>
+				<strong class="current">域名反解析</strong>
+			</div>
+		</div>
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<!--span class="dtype icon-vip"></span>
+				<strong id="cur_zone" class="dname">域名监控</strong>
+				<span class="tab nocur"><a href="__APP__/Monitor/person">自定义监控</a></span>
+				<span class="tab "><a href="__APP__/Monitor/">域名监控</a></span-->
+			</p>            
+		</div>   
+        <div class="bd ui-bubble J_extendAddBox" style="width: 940px;margin: 0 auto;display:none;"> 	
+                <b class="ui-bubble-arr box-outer-arr">◆<b class="ui-bubble-arr-in">◆</b></b> 	
+                <a class="ui-bubble-close J_closeExtendBox" href="javascript:void(0);">close</a> 	
+                <div class="cont"> 		
+                    <div class="single J_boxSingle">
+                        <div class="ui-field-row">
+                            <input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="请输入ip地址" style="width:200px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_ip">
+                             <span style="color: rgb(245, 29, 0);margin-left:20px;" > 例如，11.11.11.11</span>
+                        </div> 			
+                        <div class="ui-field-row">
+                            <button class="ui-btn-red btn-add J_btnSubmitAddSingle" onclick="addReverse()">添 加</button>
+                            <button class="ui-btn-grey btn-cancle J_btnCloseExtendBox" style="margin-left:20px;">取 消</button>
+                        </div>
+                    </div> 		                    
+                </div> 
+            </div>      
+		<div class="table-box">
+        	
+			<div class="table-toolbar">
+				<div class="lf">
+					<button class="ui-btn-blue" style="" >添加域名反解析</button>
+					<button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onclick="optSelect(this)">更多
+						<span class="caret"></span>
+					</button> 
+					<ul class="dropdown-menu" style="margin-left: 112px; display: none;" id="opt_sel">
+						<li><a id="disable-Mnt" href="javascript:" onclick="stopMnt()">停用</a></li>
+						<li><a id="enable-Mnt" href="javascript:" onclick="startMnt()">启用</a></li>
+						<li><a id="delete-Mnt" href="javascript:" onclick="deleteMnt()">删除</a></li>
+					</ul>
+				</div>
+			</div>
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<thead>
+				<tr id="tr_title">
+					<th class="chk"><input type="checkbox" onclick="checkAll();" class="J_chkForAll" title="全选/取消全选"></th>
+					<th class="sortable" sort="type"><span class="el">IP地址</span></th>
+					<th class="sortable" sort="rr"><span class="el">解析状态</span></th>
+					<th>操作&nbsp;</th>
+				</tr>
+				</thead> 	
+				<tbody id="myData">
+                	<if condition="count($rlist) == 0">
+                    	<tr class="con-empty J_listEmpty" id="null_zone">
+                            <td colspan="6">
+                                <span class="ui-sorry">暂无域名反解析~</span>
+                            </td>
+                        </tr>
+                    <else/>
+                        <volist name="rlist" id="item">
+                            <tr class="data">
+                                <td class="chk"><input type="checkbox" class="data_chk" value="{$item.id}"></td>
+                                <td class="val">{$item.ip}</td>                                
+                                <if condition="$item.status == 0">
+	                                <td class="rr">启用</td>
+                                <else/>
+	                                <td class="rr">停用</td>
+                                </if>
+                                <td class="iop">
+                                    <a class="icon-manage" title="配置监控参数" href="javascript:void(0);" onClick="editTable(this);"></a>
+                                    <a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteReverse({$item.id},this)"></a>
+                                </td>
+                            </tr>
+                        </volist>
+                    </if>
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

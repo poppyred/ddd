@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 域名监控</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" >
+	var show_hide=0;
+    	$(function(){
+			$("#type_sel").val($("#type").val());
+		//添加
+		/*
+		$(".J_closeExtendBox").click(function(){
+			$(".J_extendAddBox").slideToggle("slow");
+		});
+		$(".J_btnCloseExtendBox").click(function(){
+			$(".J_extendAddBox").slideToggle("slow");
+		});
+		*/
+		$('html').bind('click',function(e){
+			if($("#opt_sel").is(":visible")){
+				$("#opt_sel").slideToggle();
+			}
+		});
+	});
+	var stopPropagation = function(e) {
+		if(e && e.stopPropagation){         //W3C取消冒泡事件         
+			e.stopPropagation();     
+		}else{         //IE取消冒泡事件         
+			window.event.cancelBubble = true;     
+		} 
+	};
+	/*function addMonitor(){
+		$(".J_extendAddBox").slideToggle("slow");
+	}*/
+	//关闭
+	function closeDiv(){
+		$(".J_infoBox").slideToggle();
+	}
+	function checkAll(evt){
+		$('#myData :checkbox').each(function(){
+			$(this).attr('checked',!$(this).attr('checked'));
+		});
+	}
+	function optSelect(e){
+		if($("#opt_group").is(":visible")){
+			$("#opt_group").slideToggle();
+		}
+		$("#opt_sel").slideToggle();
+		stopPropagation(e);
+	}
+	function deleteMnt(){
+		if($("#myData :checked").length==0){
+			return false;
+		}
+		var id = "";
+		$("#myData :checked").each(function(i){
+			if(i!=$("#myData :checked").length-1){
+				id += $(this).val() + ",";
+			}else{
+				id += $(this).val() ;
+			}
+		});
+		var del = $.layer({
+			area: ['auto','auto'],
+			dialog: {
+				msg: '确定删除选中监控信息？',
+				btns: 2,                    
+				type: 4,
+				btn: ['确定','取消'],
+				yes: function(){
+					layer.close(del);
+					$.ajax({
+						url:'__APP__/Monitor/deleteMonitor',
+						type:'post',
+						data:{'id':id,'type':'all'},
+						async:false,
+						success:function(data){							
+							bindMyData(data);
+						},
+						error:function(data){
+							layer.msg('温馨提示：'+data.status,2,3);
+						}
+					});				
+					
+				}, no: function(){
+					layer.close(del);
+				}
+			}
+		});
+	}
+	function bindMyData(data){
+		var str = "";
+		if(data.info=='success'){
+			if(!data.data){
+				$("#myData").html('<tr class="con-empty J_listEmpty" id="null_zone"><td colspan="6"><span class="ui-sorry">暂无域名监控~</span></td></tr>');
+			}else{
+				for(var i=0;i<data.data.length;i++){
+					str += '<tr class="data"><td class="chk"><input type="checkbox" class="data_chk" value="' + data.data[i].id + '"></td><td class="val" ><a title="EflyDns，享受域名保障服务" href="__APP__/Monitor/detail?d=' + data.data[i].domain + '">' + data.data[i].domain + '</a></td>';
+					if(data.data[i].is_on==0){
+						str += '<td class="iop">监控中</td>';
+					}else{
+						str += '<td class="iop">暂停监控</td>';
+					}
+					str += '<td class="rr">'+ data.data[i].status +'</td><td class="iop"><a class="icon-manage" title="配置监控参数" href="javascript:void(0);" onClick="editTable(this);"></a> <a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteMonitor(' + data.data[i].id + ')"></a></td></tr>';
+				}
+				$("#myData").html(str);
+			}
+		}else{
+			layer.msg('温馨提示：'+data.data,2,3);	
+		}	
+	}
+	function editTable(obj){
+		layer.msg('功能建设中...',2,2);
+	}
+	//单条删除
+	function deleteMonitor(id){
+		var del = $.layer({
+			area: ['auto','auto'],
+			dialog: {
+				msg: '确定删除监控信息？',
+				btns: 2,                    
+				type: 4,
+				btn: ['确定','取消'],
+				yes: function(){
+					layer.close(del);
+					$.ajax({
+						url:'__APP__/Monitor/deleteMonitor',
+						type:'post',
+						data:{'id':id,'type':'one'},
+						async:false,
+						success:function(data){
+							bindMyData(data);
+						},
+						error:function(data){
+							layer.msg('温馨提示：'+data.status,2,3);
+						}
+					});				
+				}, no: function(){
+					layer.close(del);
+				}
+			}
+		});
+	}
+	function stopMnt(){
+		if($("#myData :checked").length==0){
+			return false;
+		}
+		var id = "";
+		$("#myData :checked").each(function(i){
+			if(i!=$("#myData :checked").length-1){
+				id += $(this).val() + ",";
+			}else{
+				id += $(this).val() ;
+			}
+		});
+		var stopmnt = $.layer({
+			area: ['auto','auto'],
+			dialog: {
+				msg: '确定暂停选中监控信息？',
+				btns: 2,                    
+				type: 4,
+				btn: ['确定','取消'],
+				yes: function(){
+					layer.close(stopmnt);
+					$.ajax({
+						url:'__APP__/Monitor/stopMonitor',
+						type:'post',
+						data:{'id':id},
+						async:false,
+						success:function(data){							
+							bindMyData(data);
+						},
+						error:function(data){
+							layer.msg('温馨提示：'+data.status,2,3);
+						}
+					});				
+					
+				}, no: function(){
+					layer.close(stopmnt);
+				}
+			}
+		});
+	}
+	function startMnt(){
+		if($("#myData :checked").length==0){
+			return false;
+		}
+		var id = "";
+		$("#myData :checked").each(function(i){
+			if(i!=$("#myData :checked").length-1){
+				id += $(this).val() + ",";
+			}else{
+				id += $(this).val() ;
+			}
+		});		
+		$.ajax({
+			url:'__APP__/Monitor/startMonitor',
+			type:'post',
+			data:{'id':id},
+			async:false,
+			success:function(data){							
+				bindMyData(data);
+			},
+			error:function(data){
+				layer.msg('温馨提示：'+data.status,2,3);
+			}
+		});		
+	}
+	function selectBy(val){
+		//alert(val);
+		window.location.href = "__APP__/Monitor/index?type=" + val;
+	}
+    </script>
+</head>
+<body class="page-dns" style="">
+	<input value="{$type}" id="type" type="hidden" />
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList"></a><span class="s"></span>
+				<strong class="current">域名监控</strong>
+			</div>
+		</div>
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<!--span class="dtype icon-vip"></span>
+				<strong id="cur_zone" class="dname">域名监控</strong>
+				<span class="tab nocur"><a href="__APP__/Monitor/person">自定义监控</a></span>
+				<span class="tab "><a href="__APP__/Monitor/">域名监控</a></span-->
+			</p>
+		</div> 
+		<div class="table-box">
+			<div class="table-toolbar">
+				<div class="lf">
+					<select class="ui-select J_selDomainType" id="type_sel" onChange="selectBy(this.value)">
+						<option value="all">全部监控</option>
+						<option value="success">正常访问</option>
+						<option value="error">宕机未解决</option>
+					</select>
+					<button class="ui-btn-blue" style="" onClick="window.location.href='__APP__/Monitor/add'">添加域名监控</button>
+					<button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onclick="optSelect(this)">更多
+						<span class="caret"></span>
+					</button> 
+					<ul class="dropdown-menu" style="margin-left: 193px; display: none;" id="opt_sel">
+						<li><a id="disable-Mnt" href="javascript:" onclick="stopMnt()">停用</a></li>
+						<li><a id="enable-Mnt" href="javascript:" onclick="startMnt()">启用</a></li>
+						<li><a id="delete-Mnt" href="javascript:" onclick="deleteMnt()">删除</a></li>
+					</ul>
+				</div>
+				<div class="rf"> 
+					<!--a class="icon icon-export" href="optLog.html">解析记录日志</a-->
+					<!--a class="icon icon-log" href="javascript:void(0);" target="_blank">查看报警信息</a> 
+					<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" type="text" placeholder="请输入关键字词">
+					<button class="ui-btn-grey">搜索</button--> 	
+				</div> 
+			</div>
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<thead>
+				<tr id="tr_title">
+					<th class="chk"><input type="checkbox" onclick="checkAll();" class="J_chkForAll" title="全选/取消全选"></th>
+					<th class="sortable" sort="type"><span class="el">监控地址</span></th>
+					<th class="sortable" sort="mx"><span class="el">监控状态</span></th>
+					<th class="sortable" sort="rr"><span class="el">实时状态</span></th>
+					<th>操作&nbsp;</th>
+				</tr>
+				</thead> 	
+				<tbody id="myData">
+                	<if condition="count($mlist) == 0">
+                    	<tr class="con-empty J_listEmpty" id="null_zone">
+                            <td colspan="6">
+                                <span class="ui-sorry">暂无域名监控~</span>
+                            </td>
+                        </tr>
+                    <else/>
+                        <volist name="mlist" id="item">
+                            <tr class="data">
+                                <td class="chk"><input type="checkbox" class="data_chk" value="{$item.id}"></td>
+                                <td class="val">
+                                    <a title="EflyDns，享受域名保障服务" href="__APP__/Monitor/detail?d={$item.domain}">{$item.domain}</a>
+                                </td>
+                                <if condition="$item.is_on == 0">
+                                    <td class="iop">监控中</td>
+                                	<else/>
+                                    <td class="iop">暂停监控</td>
+                                </if>
+                                <td class="rr">{$item.status}</td>
+                                <td class="iop">
+                                    <a class="icon-manage" title="配置监控参数" href="javascript:void(0);" onClick="editTable(this);"></a>
+                                    <a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteMonitor({$item.id})"></a>
+                                </td>
+                            </tr>
+                        </volist>
+                    </if>
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

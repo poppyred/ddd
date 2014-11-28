@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 解析统计</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" >
+		$(function(){
+			//绑定下拉框
+			if('{$host}'!=""){
+				$("#record").show();
+				$("#record option").each(function(){
+					if($(this).val()=='{$host}'){
+						$(this).attr('selected','selected');
+					}					
+				});
+			}else{
+				$("#record option:eq(0)").attr('selected','selected');
+			}
+			$("#type option").each(function(){
+				if($(this).val()=='{$type}'){
+					$(this).attr('selected','selected');
+				}
+			});
+			$("#timezone option").each(function(){
+				if($(this).val()=='{$timezone}'){
+					$(this).attr('selected','selected');
+				}
+			});
+			
+			var time = $("#time").val(),
+				num = "["+$("#num").val()+"]",
+				
+				time_arr = new Array(),
+				time_arr = time.split(",");
+			
+			$('#chart').highcharts({
+				title: {
+				    text: '域名请求量统计图',
+				    x: -20 //center
+				},
+				subtitle: {
+				    text: '今天请求总量：{$sum}',//1245次（统计结果延迟1小时）',
+				    x: -16
+				},
+				xAxis: {					
+				    categories: time_arr
+				},
+				yAxis: {
+				    title: {
+					text: '请求次数'
+				    },
+				    min: 0,
+				    plotLines: [{
+					value: 0,
+					width: 1,
+					color: '#808080'
+				    }]
+				},
+				tooltip: {
+				    valueSuffix: '次',
+				    shared: true
+				},
+				legend: {
+				    enabled: true
+				},
+				series: [{
+					name: '访问量',
+				    data: eval('(' + num + ')')
+					//mainstr_arr
+				}]
+			});
+		});
+		
+		function selectby(){
+			var type = $("#type").val(),timezone = $("#timezone").val(),d = $("#txt_zone").val(),host="";
+			if(type=="child"){
+				host=$("#record").val();
+			}
+			window.location.href = "__APP__/Domain/domainRpt?d=" + d + "&host=" + host + "&type=" + type + "&timezone=" + timezone;
+		}
+		function addrecord(){
+			if($("#type").val()=="main"){
+				$("#record").hide();	
+			}else{
+				$("#record").show();	
+			}
+		}
+    </script>
+</head>
+<body class="page-dns">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<input type="hidden" value="{$zone}" id="txt_zone"/>
+		<input type="hidden" value="{$is_new}" id="is_first"/>
+		<input type="hidden" value="{$time}" id="time"/>
+		<input type="hidden" value="{$num}" id="num"/>
+        
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList" ></a><span class="s"></span>
+				<a href="__APP__/Domain/domainList">域名列表</a><span class="s"></span>
+				<strong class="current">{$zone} 的解析统计</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<!--if condition="$is_on eq 0">
+                	<span class="dtype icon-pause"></span>
+					<else /-->
+                    <if condition="$level neq 0">
+                        <span class="dtype icon-vip"></span>
+                        <else /><span class="dtype icon-novip"></span>
+                    </if>
+                <!--<a href="__APP__/Domain/domainRoute?d={$zone}">自定义路线</a>-->
+				<strong id="cur_zone" class="dname">{$zone}</strong>
+				<span class="tab nocur"><a href="javascript:void(0);">自定义路线</a></span>
+				<span class="tab "><a href="__APP__/Domain/domainRpt?d={$zone}">解析统计</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainSet?d={$zone}">域名设置</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/detail?d={$zone}">记录管理</a></span>
+			</p>
+		</div> 
+		
+		<div class="J_infoBox" style="display:none;">
+		    <div class="dns-tip-box fix J_dnsTipBox">
+			<div class="lf tips">
+			    <p>
+				<b class="ui-color-red">
+				    域名解析记录生效的时间分为以下三种情况：
+				    <a class="ui-help" href="javascript:void(0);" title="先设置解析记录，后修改DNS，可使您的域名解析平滑过渡，访问无断点。"></a>
+				</b>
+			    <p class="dot">
+			      新增解析记录，我们是实时生效的。
+			    </p>
+			    <p class="dot">
+			      修改域名记录，DNSPro解析权威服务器上是实时生效的，最终生效时间取决于各地运营商的缓存DNS刷新时间；一般可认为修改记录后生效时间为您域名记录之前设置的TTL时间，所以还请耐心等待。
+			    </p>
+			    <p class="dot">
+			      新修改域名DNS指向DNSPro解析的DNS后，我们的DNS服务器的生效时间是实时的，但因各地ISP服务商刷新域名DNS的时间不一致，所以导致解析在全球生效一般需要0--72小时，所以还请您耐心的等待。
+			    </p>
+			    
+			</div>
+			<div class="lf helps">
+			    <p class="how"><a href="" target="_blank">如何修改DNS？</a></p>
+			    <p class="when"><a href="" target="_blank">设置解析后多长时间生效？</a></p>
+			    <p class="qa"><a href="" target="_blank">解析常见问题？</a></p>
+			</div>
+			<a class="btn-close J_btnClose" href="javascript:void(0);" onClick="closeDiv();" >close</a>
+		    </div>
+		</div>
+		
+		<div class="table-box" style="margin-bottom:100px;">
+			<table cellpadding="0" cellspacing="0" width="100%" >
+				<thead>
+					<tr id="tr_title">
+						<th style="text-align:right;width:88px;white-space:nowrap;">查询类型</th> 
+						<th style="text-align:left;">
+						<select class="ui-select" style="margin-left:10px;" id="type" onChange="addrecord()">
+							<option value="main">按域名</option>
+							<option value="child">按子域名</option>
+						</select>
+						</th>
+						<th style="text-align:right;width:88px;white-space:nowrap;">查询时间</th> 
+						<th style="text-align:left;">
+						<select class="ui-select" style="margin-left:10px;" id="timezone">
+							<option value="today">今天</option>
+							<option value="month">本月</option>
+							<option value="rweek">最近一周</option>
+							<option value="rmonth">最近一月</option>
+							<option value="rseason">最近一季</option>
+							<option value="rhalf">最近半年</option>
+							<option value="ryear">最近一年</option>
+						</select>
+						</th>
+						<th style="text-align:right;width:88px;white-space:nowrap;">查询域名</th> 
+						<th style="text-align:right;" >
+						<select class="ui-select" style="margin-left:10px;width:80px; display:none" id="record">
+                        	<volist name="hostlist" id="item">
+								<option selected value="{$item.host}">{$item.host}</option>
+                            </volist>
+						</select>
+						</th>
+                        <th style="text-align:right;">
+						<select class="ui-select" style="margin-left:10px;width:200px;">
+							<option selected value="all">{$zone}</option>
+						</select>
+						</th>
+						<th style="width:220px;text-align:left;">
+							<button class="ui-btn-blue" style="margin-left:10px;" onclick="selectby()">查询</button>
+						</th>
+					</tr>
+				</thead> 	
+				<tbody id="myData">
+					<tr class="">
+					    <td colspan="8">
+						<div id="chart" style="height:320px;margin-top:10px;"></div>
+					    </td>
+					</tr>
+					<!--tr class="">
+					    <td colspan="7">
+						<div id="container" style="height:320px;margin-top:10px;"></div>
+					    </td>
+					</tr-->
+				</tbody> 
+			</table>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

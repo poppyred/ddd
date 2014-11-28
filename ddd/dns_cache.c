@@ -562,7 +562,7 @@ int dns_cache_delete(char *domain,int domain_len,unsigned int view_id,unsigned s
     h_hash_st * cache_table = table_select(type);
     if (!cache_table)
     {
-        hyb_debug("Set wrong type cache!\n");
+        hyb_debug("Set wrong type cache,The wrong type = %d\n", type);
         return -1;
     }
 
@@ -628,7 +628,7 @@ int dns_cache_get(char* answer, char* domain, int domain_len, int view_id,
     h_hash_st * cache_table = table_select(type);
     if (!cache_table)
     {
-        hyb_debug("Set wrong type cache!\n");
+        hyb_debug("Get wrong type cache,The wrong type = %d\n", type);
         return -1;
     }
     

@@ -219,6 +219,7 @@ int make_ptr_answer(char*packet,int len,char*domain,int domainlen)
 			templen = templen+answer[i].size+1;
 		}
 		dns_answer->a_rdata[templen] = 0;
+        dns_answer->a_rdlen = htons(templen+1);
 		return len+12+templen+1;
 	}
 	else

@@ -1,0 +1,82 @@
+<div class="tc-page-head"> 	
+	<div class="inner"> 		
+		<h1 class="logo">
+			<a href="http://www.eflydns.com/"><img class="main lf" src="__ROOT__/Public/img/DNSPro_w.png" alt="DNSPro"></a>
+		</h1>
+		<div class="info">
+			<p class="user">您好，{$_SESSION['user']}
+				<span class="s">|</span>
+				<a href="javascript:void(0);" style="margin-left:-10px;padding: 5px 15px 5px 15px; background:url(__ROOT__/Public/img/down_arrow.png) no-repeat; background-position:40px 8px;" id="userinfo">账户</a>
+                <!--span class="s">|</span>
+				<a href="__APP__/Index/login/">退出</a><!--span class="s">|</span>	
+				<a href="javascript:void(0);">购物车[0件]</a-->
+			</p>
+			<p class="nav">
+				<span class="b active"></span><a href="__APP__/Domain/domainList/">域名解析</a>
+				<span class="b"></span><a href="__APP__/ReverseDomain/index?id={$_SESSION['id']}">域名反解析</a>
+				<span class="b"></span><a href="__APP__/Monitor/index">域名监控</a>
+				<span class="b"></span><a href="http://www.eflydns.com/index/Help/help/" target="_blank">帮助中心</a>
+			</p>
+		</div>        
+        <div class="userset" id="userset">
+            <ul>
+                <li style=" border-top:none;">
+                	<a href="__APP__/Index/user/"><i style="background:url(__ROOT__/Public/img/set.png) no-repeat;"></i>账户设置</a>
+                </li>
+                <!--li>
+                	<a href="javascript:void(0);"><i style="background:url(__ROOT__/Public/img/service.png) no-repeat;"></i>我的服务</a>
+                </li>
+                <li>
+                	<a href="javascript:void(0);"><i style="background:url(__ROOT__/Public/img/user.png) no-repeat;"></i>切换账户</a>
+                </li-->
+                <li>
+                	<a href="__APP__/Index/login/"><i style="background:url(__ROOT__/Public/img/out.png) no-repeat;"></i>退出</a>
+                </li>
+            </ul>
+        </div>
+	</div>
+</div> 
+<script type="text/javascript">	
+		
+	$(function(e){
+		var url = window.location.href;
+		$('.nav span').removeClass('active');
+		switch(true){
+			case url.indexOf('ReverseDomain')!=-1:
+			$('.nav span:eq(1)').addClass('active');
+			break;
+			case url.indexOf('Domain')!=-1:
+			$('.nav span:eq(0)').addClass('active');
+			break 
+			case url.indexOf('Monitor')!=-1:
+			$('.nav span:eq(2)').addClass('active');
+			break;
+		}
+		$(".info .user a").hover(function(){
+			$(this).css({'background':'#fff url(__ROOT__/Public/img/down_arrow1.jpg) no-repeat','color':'#666','background-position':'40px 8px'});
+			$("#userset").show();
+			
+		},function(){
+			//$(this).css({'background':'#1c8fdf url(__ROOT__/Public/img/down_arrow.png) no-repeat','color':'#fff','background-position':'40px 8px'});
+		});
+		
+		$('html').bind('click',function(e){
+			if($("#userset").is(":visible")){
+				$("#userset").slideToggle();
+				$(".info .user a").css({'background':'#1c8fdf url(__ROOT__/Public/img/down_arrow.png) no-repeat','color':'#fff','background-position':'40px 8px'});	
+			}
+		});
+		
+		$("#userset ul").mouseleave(function(){
+			$(".info .user a").css({'background':'#1c8fdf url(__ROOT__/Public/img/down_arrow.png) no-repeat','color':'#fff','background-position':'40px 8px'});	
+			$("#userset").hide();
+		});
+	});
+	var stopPropagation = function(e) {
+		if(e && e.stopPropagation){         //W3C取消冒泡事件         
+			e.stopPropagation();     
+		}else{         //IE取消冒泡事件         
+			window.event.cancelBubble = true;     
+		} 
+	};
+</script>

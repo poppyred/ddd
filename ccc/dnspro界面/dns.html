@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>阿里云解析-解析记录</title>
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" href="css/dns.css">
+    <link rel="stylesheet" href="css/artDialog.css">
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/jquery.artDialog.js"></script>
+    <script type="text/javascript" >
+		var show_hide=0;
+    	$(function(){
+			//定时加载
+			//setTimeout(function(){
+			//	$(".J_infoBox").slideToggle();
+			//},3000);
+			//加载提示信息
+			$('.msg_info').children().html(info_val);
+			//加载备注
+			$('.msg_info').after(tr_desc);			
+		});
+		//保存操作
+		function savaOpt(obj){
+			var tr = $(obj).parent().parent(),trnext=$(tr).next(),
+				type = tr.find("#type").val(),			//记录类型
+				rr = tr.find("#rr").val(),				//主机记录
+				route = tr.find("#route").val(),		//解析线路
+				val = tr.find("#val").val(),			//记录值
+				mx = '',								//MX优先级
+				ttl = tr.find("#time :selected").text();//TTL
+				//如果不是mx
+				if(tr.find(".mx").html()=='--'){
+					mx = '--';
+				}else{
+					mx = tr.find("#mx :selected").val();
+				}
+				
+			//保存验证
+			if(rr=='' || typeof(rr)=='undefined'){
+				tr.find("#rr").val('@');
+			}
+			if(val=='' || typeof(val)=='undefined'){
+				tr.find("#val").focus();
+				//提示
+				$(obj).parent().parent().next().show();
+				return;
+			}
+			if(type=='A'){
+				if(!CheckIp(val)){
+					tr.find("#val").focus();				
+					return;
+				}	
+			}
+					
+			tr.attr("class","data");
+			//清空
+			tr.empty();
+			tr.html(trcontent(type,rr,route,val,mx,ttl));
+			//提示
+			if($(tr).attr('id')=='add_row'){
+				messageBox('解析记录添加成功。');
+				$(tr).next().after(tr_desc);	
+			}
+			$(tr).attr('id','');
+			trnext.hide();
+			
+		}
+		//取消操作
+		function CancelOpt(obj,type,rr,route,val,mx,ttl){
+			var tr = $(obj).parent().parent(),trnext=$(tr).next();
+			tr.attr("class","data");
+			//清空
+			tr.empty();
+			tr.html(trcontent(type,rr,route,val,mx,ttl));
+			//提示
+			trnext.hide();
+		}
+		//不可编辑tr内容
+		function trcontent(type,rr,route,val,mx,ttl){
+			var str = '<td class="chk"><input type="checkbox" class="J_chkForMe" value=""></td><td class="type" onclick="editTable(this)">'+ type +'</td><td class="rr" onclick="editTable(this)">'+ rr +'</td><td class="route" onclick="editTable(this)">'+ route +'</td><td class="val" onclick="editTable(this)">'+ val +'</td><td class="mx" onclick="editTable(this)">'+ mx +'</td><td class="ttl" onclick="editTable(this)">'+ ttl +'</td><td class="iop"><a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a>&nbsp;<a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteDns(\'one\',this)"></a>&nbsp;<a class="icon-add" title="编辑备注" href="javascript:void(0);" onClick="editDesc(this);"></a></td>'	;
+			return str;
+		}
+		//编辑
+		function editTable(obj){
+			var tr = "";
+			//编辑按钮
+			if($(obj).html()==""){
+				tr = $(obj).parent().parent();
+			}else{
+				tr = $(obj).parent();
+			}
+			
+			var trnext=$(tr).next(),				
+				type = tr.find(".type").html(),			//记录类型
+				rr = tr.find(".rr").html(),				//主机记录
+				route = tr.find(".route").html(),		//解析线路
+				val = tr.find(".val").html(),			//记录值
+				mx = tr.find(".mx").html(),				//MX优先级
+				ttl = tr.find(".ttl").html(),			//TTL	
+				str='<select class="ui-select" style="width:50px;" id="mx" onFocus="showInfo(\'mx\',this)">'
+				spancls = "";
+				tr.attr("class","row-opened");
+				if(type=='MX'){
+					for(var i=0;i<10;i++){
+						if(i+1==mx){
+							str += "<option value='"+ (i+1) +"' selected>"+ (i+1) +"</option>";
+						}else{
+							str += "<option value='"+ (i+1) +"'>"+ (i+1) +"</option>";
+						}
+					}
+					str +'</select>';
+				}else{
+					str = mx;
+				}
+				//清空
+				tr.empty();
+				//可编辑状态
+				if(show_hide==1){
+					spancls = "ui-help J_btnToggleHelp";
+				}else{
+					spancls = "ui-help J_btnToggleHelp ui-help-opened";
+				}
+				tr.html('<td class="chk"></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option></select></td><td class="rr"><input value="'+ rr +'" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><span class="ui-color-grey suffix" title=".thisistest.com">.thisistest.com</span></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)"><option value="默认">默认</option><option value="联通">联通</option><option value="电信">电信</option><option value="移动">移动</option><option value="教育网">教育网</option><option value="海外">海外</option></select></td><td class="val"><input value="'+ val +'" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">'+ str +'</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="600" >10分钟</option><option value="1800">30分钟</option><option value="3600">1小时</option><option value="43200">12小时</option><option value="86400">24小时</option></select></td><td class="iop"><button class="ui-btn-yellow btn-update J_btnUpdateDnsRow" onclick="savaOpt(this)">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelOpt(this,\''+ type +'\',\''+ rr +'\',\''+ route +'\',\''+ val +'\',\''+ mx +'\',\''+ ttl +'\')">取消</button><span id="icon_open_close" class="'+spancls+'" onclick="slideInfo(this)"></span></td>');
+				//绑定下拉框值
+				tr.find("#type").val(type);
+				tr.find("#route").val(route);				
+				tr.find("#time option").each(function(){
+					if($(this).text()==ttl){
+						$(this).attr('selected','selected');
+					}
+				});
+				//提示
+				if(show_hide==0){
+					$(tr).next().find('.help-tips-box div').hide();
+					$(tr).next().find('.expand-box-arr').css('left','107px');
+					$(tr).next().find('.J_helpRecordType').show();
+					trnext.show();
+				}
+		}
+		//切换消息
+		function slideInfo(obj){
+			if($(obj).attr('class')=='ui-help J_btnToggleHelp ui-help-opened'){
+				$(obj).attr('class','ui-help J_btnToggleHelp');
+				$(obj).parent().parent().next().hide();				
+			}else {
+				$(obj).attr('class','ui-help J_btnToggleHelp ui-help-opened');
+				$(obj).parent().parent().next().show();
+			}
+			show_hide=0;
+		}
+		//关闭
+		function closeDiv(){
+			$(".J_infoBox").slideToggle();
+		}
+		//消息提示
+		function showInfo(cla,tr){
+			var val = $(tr).parent().parent().find('#type').val(),
+				id = $(tr).parent().parent().next().attr('id');
+			//隐藏div
+			$('#'+id+' .help-tips-box div').hide();
+			
+			switch (cla){
+				case 'icon-manage':	
+					$('#'+id).find('.expand-box-arr').css('left','107px');
+					$('#'+id).find('.J_helpRecordType').show();
+					break;
+				case 'type':	
+					$('#'+id).find('.expand-box-arr').css('left','107px');
+					$('#'+id).find('.J_helpRecordType').show();
+					break;
+				case 'rr':
+					$('#'+id).find('.expand-box-arr').css('left','242px');
+					switch(val){
+						case 'A':case 'MX':case 'AAAA':
+							$('#'+id).find('.J_helpRR_A_MX_AAAA').show();
+							break;
+						case 'CNAME':
+							$('#'+id).find('.J_helpRR_CNAME').show();
+							break;
+						case 'NS':
+							$('#'+id).find('.J_helpRR_NS').show();
+							break;
+						case 'TXT':
+							$('#'+id).find('.J_helpRR_TXT').show();
+							break;
+						case 'SRV':
+							$('#'+id).find('.J_helpRR_SRV').show();
+							break;
+						case 'REDIRECT_URL':
+							$('#'+id).find('.J_helpRR_URL1').show();
+							break;
+						case 'FORWARD_URL':
+							$('#'+id).find('.J_helpRR_URL0').show();
+							break;
+					}
+					break;
+				case 'route':
+					$('#'+id).find('.expand-box-arr').css('left','454px');
+					$('#'+id).find('.J_helpRoute').show();
+					break;
+				case 'val':
+					$('#'+id).find('.expand-box-arr').css('left','556.5px');
+					switch(val){
+						case 'A':
+							$('#'+id).find('.J_helpValue_A').show();
+							break;
+						case 'CNAME':
+							$('#'+id).find('.J_helpValue_CNAME').show();
+							break;
+						case 'MX':
+							$('#'+id).find('.J_helpValue_MX').show();
+							break;
+						case 'NS':
+							$('#'+id).find('.J_helpValue_NS').show();
+							break;
+						case 'TXT':
+							$('#'+id).find('.J_helpValue_TXT').show();
+							break;
+						case 'AAAA':
+							$('#'+id).find('.J_helpValue_AAAA').show();
+							break;
+						case 'SRV':
+							$('#'+id).find('.J_helpValue_SRV').show();
+							break;
+						case 'REDIRECT_URL':
+							$('#'+id).find('.J_helpValue_URL1').show();
+							break;
+						case 'FORWARD_URL':
+							$('#'+id).find('.J_helpValue_URL0').show();
+							break;
+					}
+					break;
+				case 'mx':
+					$('#'+id).find('.expand-box-arr').css('left','658px');
+					$('#'+id).find('.J_helpMX').show();
+					break;
+				case 'ttl':
+					$('#'+id).find('.expand-box-arr').css('left','737px');
+					$('#'+id).find('.J_helpTTL').show();
+					break;
+			}
+		}
+		//不在提示
+		function notshowInfo(obj){
+			var span = $(obj).parent().parent().parent().parent().prev().find('#icon_open_close');
+			$(span).attr('class','ui-help J_btnToggleHelp');
+			//隐藏信息
+			$(obj).parent().parent().parent().parent().hide();
+			show_hide = 1;
+		}
+		//添加
+		function addDNS(obj){
+			if(!$("#add_row").html()){
+				$("#tr_title").after(tr_add);
+				$("#add_row").after('<tr class="msg_info" id="tx_0"><td colspan="8" class="expand-outer"></td></tr>');
+				$("#add_row").next().children().html(info_val);			
+				var tr = $("#tr_title").next();
+				$(tr).next().find('.help-tips-box div').hide();
+				$(tr).next().find('.J_helpRecordType').show();
+			}else{
+				messageBox('您有正在编辑的解析尚未保存。');
+			}
+		}
+		//取消添加
+		function CancelAdd(){
+			$('#add_row').next().empty();
+			$('#add_row').empty();
+		}
+		//绑定mx下拉框
+		function bindingMX(obj){
+			var val = $(obj).val(),str='',
+				td = $(obj).parent().parent().find('.mx');
+			$(td).empty();
+			if(val=='MX'){
+				for(var i=0;i<10;i++){
+					str += "<option value='"+ (i+1) +"'>"+ (i+1) +"</option>";
+				}
+				$(td).append('<select class="ui-select" style="width:50px;" id="mx" onFocus="showInfo(\'mx\',this)">'+ str +'</select>');
+			}else{
+				$(td).append('--');
+			}
+		}
+		//编辑备注
+		function editDesc(obj){
+			var tr = $(obj).parent().parent();
+			$(tr).attr('class','row-opened');	
+			$(tr).next().next().show();	
+		}
+		//保存备注
+		function cancelEditDesc(obj){
+			var tr = $(obj).parent().parent().parent().parent().parent().parent();
+			if($(tr).prev().prev().attr('class')=='row-opened'){
+				$(tr).prev().prev().attr('class','data');
+			}else{
+				$(tr).prev().prev().attr('class','row-opened');
+			}
+			$(tr).hide();
+		}
+		//取消保存备注
+		function saveEditDesc(obj){
+			var tr = $(obj).parent().parent().parent().parent().parent().parent();
+			if($(tr).prev().prev().attr('class')=='row-opened'){
+				$(tr).prev().prev().attr('class','data');
+			}else{
+				$(tr).prev().prev().attr('class','row-opened');
+			}
+			$(tr).hide();
+		}
+		//操作提示消息
+		function messageBox(str){
+			$("#message").children().html(str);
+			$("#message").slideDown();				
+			setTimeout(function(){
+				$("#message").slideUp();
+			},3000);
+		}
+		//删除
+		function deleteDns(type,obj){
+			//批量
+			var chk = $('#mytab .data_chk:checked');
+			if(type=='all'){
+				if($(chk).length>0){
+					for(var i=0;i<chk.length;i++){
+						alert(chk[i].value);
+					}
+				}else{
+					art.dialog({
+						title:false,
+						icon:'warning',
+						height:100,
+						content:'请先选择要删除的解析记录！',
+						cancelVal: '知道了',
+						cancel:true
+					}).lock();
+				}
+			}else{
+				art.dialog({
+					title:false,
+					height:80,
+					icon:'question',
+					content:'确认删除该解析记录？',
+					ok:function(){
+						var tr = $(obj).parent().parent();
+						alert($(tr).html());
+						//备注信息
+						$(tr).next().next().empty();
+						//提示信息
+						$(tr).next().empty();
+						//解析信息
+						$(tr).empty();
+//						alert($(obj).parent().parent().next().html());
+					},
+					cancelVal: '取消',
+					cancel:true
+				}).lock();
+			}
+		}
+    </script>
+</head>
+<body class="page-dns" style="">
+	<div class="J_pageWrapper">
+		<div class="tc-page-head"> 	
+			<div class="inner"> 		
+				<h1 class="logo">
+					<a href="javascript:void(0);"><img class="main lf" src="./img/T1qIPjFwlcXXcL6NDm-222-54.png" alt="阿里云解析"></a>
+				</h1> 		
+				<div class="info"> 			
+					<p class="user">您好，
+						<a href="javascript:void(0);" target="_blank">522408598</a><span class="s">|</span>
+						<a href="javascript:void(0);">退出</a><span class="s">|</span>	
+						<a href="javascript:void(0);">进入万网首页</a><span class="s">|</span>
+						<a href="javascript:void(0);" target="_blank">万网域名管理</a><span class="s">|</span>
+						<a href="javascript:void(0);" target="_blank">会员中心</a><span class="s">|</span>
+						<a href="javascript:void(0);" target="_blank">帮助</a> 
+					</p>
+					<p class="nav">
+						<a href="domainList.html">域名列表</a><span class="s"></span>
+						<a href="javascript:void(0);" target="_blank">常见问题</a><span class="s"></span>
+						<a href="javascript:void(0);" target="_blank">意见反馈</a>
+					</p> 		
+				</div> 	
+			</div> 
+		</div> 
+		<div class="head-info">
+			<div class="head-path"> 	
+				<a class="home" href="javascript:void(0);" ></a><span class="s"></span>
+				<a href="domainList.html">域名列表</a><span class="s"></span>
+				<strong class="current">keyanwei.com.cn的解析记录</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title"><span class="dtype icon-hichina"></span><strong class="dname">keyanwei.com.cn</strong></p>
+		</div> 
+		<div class="J_infoBox" style="display:none;">
+        <div class="dns-tip-box fix J_dnsTipBox">
+            <div class="lf tips">
+                <p>
+                    <b class="ui-color-red">
+                        请您先设置解析记录，然后再到域名注册的地方把DNS修改为如下阿里DNS，以使解析生效：
+                        <a class="ui-help" href="javascript:void(0);" title="先设置解析记录，后修改DNS，可使您的域名解析平滑过渡，访问无断点。"></a>
+                    </b><br>
+                    &emsp;&nbsp;
+                    <b class="font-arial">ns1.alidns.com<br>&emsp;&nbsp;ns2.alidns.com</b>
+                </p>
+                <p>&emsp;&nbsp;<button class="ui-btn-grey btn-check-cur-dns J_checkCurrentDns">检测当前DNS</button>
+                </p>
+                <p class="dot">
+                    阿里DNS不能和其他DNS同时使用，若与其他DNS同时使用会导致解析混乱。
+                </p>
+                <p class="dot">
+                    修改 DNS 服务器需要最长 72 小时的全球生效时间，请耐心等待。
+                </p>
+            </div>
+            <div class="lf helps">
+                <p class="how"><a href="javascript:void(0);" target="_blank">如何修改DNS？</a></p>
+                <p class="when"><a href="javascript:void(0);" target="_blank">设置解析后多长时间生效？</a></p>
+                <p class="qa"><a href="javascript:void(0);" target="_blank">解析常见问题？</a></p>
+            </div>
+            <a class="btn-close J_btnClose" href="javascript:void(0);" onClick="closeDiv();" >close</a>
+        </div>
+    </div>
+		<div class="table-box">
+			<div class="table-toolbar">
+				<div class="lf">
+					<button class="ui-btn-blue" onClick="addDNS('icon-manage')">新增解析</button>
+					<button class="ui-btn-grey" style="" onClick="deleteDns('all')">删除</button>
+				</div>
+				<div class="rf"> 
+					<a class="icon icon-log" href="optLog.html">解析记录日志</a>
+					<a class="icon icon-export" href="javascript:void(0);" target="_blank">导出解析记录</a> 
+					<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" type="text" placeholder="请输入关键字词">
+                    <button class="ui-btn-grey">搜索</button> 	
+				</div> 
+			</div>
+			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+				<!--thead-->
+                <tr id="tr_title">
+					<th class="chk"><input type="checkbox" class="J_chkForAll" title="全选/取消全选"></th> 		
+					<th class="sortable" sort="type"><span class="el">记录类型</span></th> 		
+					<th class="sortable" sort="rr"><span class="el">主机记录（RR）</span></th> 		
+					<th class="sortable" sort="line"><span class="el">解析线路</span></th> 		
+					<th><span>记录值</span></th> 		
+					<th class="sortable" sort="mx"><span class="el">MX优先级</span></th> 		
+					<th><span>TTL</span></th> 		
+					<th>操作&nbsp;<a href="take_effect.html" target="_blank">[何时生效？]</a></th> 	
+				</tr>
+                <!--/thead--> 	
+				<!--tbody-->   
+					<tr class="data"> 	 	
+						<td class="chk"><input type="checkbox" class="data_chk" value="111"></td> 	 	 	
+						<td class="type" onclick="editTable(this)">MX</td> 	
+						<td class="rr" onclick="editTable(this)">@</td> 	 	
+						<td class="route" onclick="editTable(this)">默认</td> 	
+						<td class="val" onclick="editTable(this)">mx.ym.163.com</td> 	
+						<td class="mx" onclick="editTable(this)">2</td> 	 	
+						<td class="ttl" onclick="editTable(this)">10分钟</td> 	 	 	
+						<td class="iop">
+							<a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a>
+							<a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteDns('one',this)"></a>
+							<a class="icon-add" title="编辑备注" href="javascript:void(0);" onClick="editDesc(this);"></a>
+						</td> 	 
+					</tr>
+                    <tr style="display:none" class="msg_info" id="tx_1">	 	
+						<td colspan="8" class="expand-outer"></td>
+					</tr>
+					<tr class="data">
+						<td class="chk"><input type="checkbox" class="data_chk" value="222"></td> 	 	 
+						<td class="type" onclick="editTable(this)">A</td> 	
+						<td class="rr" onclick="editTable(this)">www.keyanwei.com.cn</td> 	 	
+						<td class="route" onclick="editTable(this)">联通</td> 	
+						<td class="val" onclick="editTable(this)">221.4.158.59</td> 	
+						<td class="mx" onclick="editTable(this)">--</td>
+						<td class="ttl" onclick="editTable(this)">12小时</td> 	 	 	
+						<td class="iop">
+							<a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a>
+							<a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteDns('one',this)"></a>
+							<a class="icon-add" title="编辑备注" href="javascript:void(0);" onClick="editDesc(this);"></a>
+						</td> 	 
+					</tr>
+                    <tr style="display:none" class="msg_info" id="tx_2"> 	 	
+						<td colspan="8" class="expand-outer"></td> 	 
+					</tr>
+				<!--/tbody--> 
+			</table>
+		</div> 
+		<div class="tc-page-foot">     
+			<div class="foot_c1">	      
+				<a href="http://www.efly.cc/" target="_blank" class="link_gray">睿江科技</a><span class="s">|</span>	      
+				<a href="http://www.eflypro.com/" target="_blank" class="link_gray">EFLYPRO</a><span class="s">|</span>	    	
+				<a href="http://www.eflypro.com/index.php/Aboutus/" target="_blank" class="link_gray">关于我们</a><span class="s">|</span>	      
+				<a href="javascript:void(0);" target="_blank" class="link_gray">DNSPro解析服务协议</a>	      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ui-color-grey">Copyright© 2014 DNSPro 版权所有</span>	  
+			</div>
+		</div>
+	</div>
+    <!-- 消息提示 -->
+    <div class="ui-pop-box small-con-box" id="message" style=" display:none; width: auto; height: auto; left: 635.5px; top: 212px;"><div class="con small-con" ></div></div>
+</body>
+</html>

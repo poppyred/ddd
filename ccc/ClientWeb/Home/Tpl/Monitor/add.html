@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 域名监控</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" >
+		$(function(){
+			
+		});
+		function showAdd(obj){
+//			alert($(".domain-title span:eq(0)").attr('class'));
+			$(".domain-title span").attr('class','tab');
+			switch($(obj).html()){
+				case 'URL监控':
+				$(".domain-title span:eq(1)").attr('class','tab nocur');
+				$(".domain").hide();
+				$(".url").show();
+				break;
+				case '域名监控':
+				$(".domain-title span:eq(0)").attr('class','tab nocur');
+				$(".url").hide();
+				$(".domain").show();
+				break;
+			}
+		}
+		function updateSel(val){
+			var str = "" ;
+			$.ajax({
+				url:'__APP__/Monitor/bindsel',
+				type:'post',
+				async:false,
+				data:{'val':val},
+				success:function(data){
+					if(data.info=='success'){
+						for(var key in data.data){
+							str += '<option title="'+data.data[key].type+'">' + data.data[key].val + '</option>'		
+						}
+						$("#sub_domain").html(str);
+					}else{
+						layer.msg('温馨提示：获取子域名信息错误，请联系管理员。',2,3);		
+					}
+				},
+				error:function(data){
+					layer.msg('温馨提示：'+data.status,2,3);
+				}
+			});
+		}
+		function addMonitor(type){
+			if(type=='ip'){
+				if($("#sub_domain").val()==null){
+					return false;	
+				}
+				$.ajax({
+					url:'__APP__/Monitor/addMonitor',
+					type:'post',
+					async:false,
+					data:{'domain':$("#domain").val(),'recordType':$("#sub_domain :selected").attr('title'),'val':$("#sub_domain").val(),'type':type},
+					success:function(data){
+						if(data.info=='success'){
+							window.location.href = "__APP__/Monitor/index";	
+						}else{
+							layer.msg('温馨提示：'+data.info,2,3);
+						}
+					},
+					error:function(data){
+						layer.msg('温馨提示：添加域名监控错误，请联系管理员。',2,3);		
+					}
+				});
+			}else{
+				if($("#url").val()=="" || typeof($("#url").val())=='undefined'){
+					$("#url").focus();
+					return false;	
+				}
+				var reg = /^(https?|http):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/;
+				if(!reg.test($("#url").val())){
+					$("#url").focus();
+					layer.msg('温馨提示：url格式不正确。<p/>(例如：http://www.eflydns.com)');
+					return false;	
+				}
+				$.ajax({
+					url:'__APP__/Monitor/addMonitor',
+					type:'post',
+					async:false,
+					data:{'domain':$("#url").val(),'type':type},
+					success:function(data){
+						if(data.info=='success'){
+							window.location.href = "__APP__/Monitor/index";	
+						}else{
+							layer.msg('温馨提示：'+data.info,2,3);			
+						}
+					},
+					error:function(data){
+						layer.msg('温馨提示：添加URL监控错误，请联系管理员。',2,3);		
+					}
+				});
+			}
+		}
+    </script>
+    <style type="text/css">
+		.table-box{ border:none;box-shadow:none;-o-box-shadow:none;-webkit-box-shadow:none;-moz-box-shadow:none;}
+		.table-box .url{ display:none;}
+    	.table-box table{color:#555;font-size:14px;margin-left:0px;}
+		.table-box table tr{ height:50px;}
+    	.table-box table select{background:#fff;padding:6px 10px;border:1px solid #ccc;color:#555;-webkit-border-radius: 4px;-o-border-radius: 4px;border-radius: 4px;-moz-border-radius: 4px; width:280px; margin-left:50px; font-size:16px;}
+		.table-box table select:focus{border-color: rgba(82, 168, 236, 0.8);-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);-moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);outline: 0;}
+		.table-box table input[type="text"]{padding:8px 10px;width:280px;color:#555;border:1px solid #ccc;-webkit-border-radius: 4px;-o-border-radius: 4px;border-radius: 4px;-moz-border-radius: 4px; margin-left:20px;}
+		.table-box table input[type="text"]:focus{border-color: rgba(82, 168, 236, 0.8);-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);-moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);outline: 0;}
+		.table-box a{font-size:12px;}
+		.table-box input[type="button"]{ background:#1c8fdf;color:#fff; padding:8px 20px; border:none; cursor:pointer;margin-left:20px;-webkit-border-radius: 4px;-o-border-radius: 4px;border-radius: 4px;-moz-border-radius: 4px;}	
+    </style>
+</head>
+<body class="page-dns" style="">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<div class="head-info">
+        	<p class="domain-title">
+				<span class="tab nocur"><a href="javascript:void(0);" onClick="showAdd(this)">URL监控</a></span>
+				<span class="tab "><a href="javascript:void(0);" onClick="showAdd(this)">域名监控</a></span>
+			</p>
+			<div class="head-path" style="padding:14.5px 0px;">
+				<a class="home" href="__APP__/Domain/domainList"></a><span class="s"></span>
+				<strong class="current">添加监控</strong>
+			</div>
+		</div>
+        <div class="table-box">
+        	<div class="domain">
+                <table>
+                    <tr>
+                        <td>请选择域名：</td>
+                        <td>
+                            <select onChange="updateSel(this.value)" id="domain">
+                            	<volist name="zlist" id="item">
+                                	<option>{$item.domain}</option>
+                                </volist>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>请选择子域名：</td>
+                        <td>
+                            <select id="sub_domain">
+                            	<volist name="dlist" id="item">
+                                	<option title="{$item.type}">{$item.val}</option>
+                                </volist>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="right">
+                            <a href="__APP__/Monitor/index">算了，以后再说</a>
+                            <input type="button" value="添加监控" onClick="addMonitor('ip')"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="url">
+            	<table>
+                	<tr>
+                    	<td>请填写需要监控的URL：</td>
+                        <td><input type="text" id="url" placeholder="例如 https://www.eflydns.com/"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="right">
+                            <a href="__APP__/Monitor/index">算了，以后再说</a>
+                            <input type="button" value="添加监控" onClick="addMonitor('url')"/>
+                        </td>
+                    </tr>
+               	</table>
+           	</div>
+		</div>
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

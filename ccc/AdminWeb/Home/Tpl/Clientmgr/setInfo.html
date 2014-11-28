@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+	<div id="sideMenu" class="side">
+		<div class="hd">
+			<h3>客户管理</h3>
+		</div>
+		<div class="bd">
+			<ul>
+            	<if condition="$user[type] eq 0 ">
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Clientmgr/">个人客户管理</a></li>
+                    <li><a href="__APP__/Clientmgr/vip">企业客户管理</a></li>
+                <else/>
+                    <li><a href="__APP__/Clientmgr/">个人客户管理</a></li>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Clientmgr/vip">企业客户管理</a></li>
+                
+                </if>
+			</ul>
+		</div>
+		<!--div class="hd">
+			<h3>其他功能</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a href="#"></a></li>
+				<li><a href="#"></a></li>
+			</ul>
+		</div-->
+	</div>
+	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });</script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">客户信息</h2>
+			</div>
+			<div class="bd">
+				<ul>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab" style="margin-left:20px;">	
+						<tbody id="myData">
+							<tr class="data">
+							    <td class="laber">用户密码</td>
+							    <td class="edit"> ****** </td>
+							    <td class="info"><a href="javascript:void(0);" onClick="updatePwd({$user.id},this)">修改密码</a></td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">联系人</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="link_man" value="{$user.link_man}" placeholder="联系人"> *</td>
+							    <td class="info">请输入联系人姓名</td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">手机号码</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="link_phone" value="{$user.link_phone}" placeholder="手机号码"></td>
+							    <td class="info">请输入手机号码</td>
+							</tr>
+                            <tr class="data">
+							    <td class="laber">微信号</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="link_weixin" value="{$user.link_weixin}" placeholder="微信号"></td>
+							    <td class="info">请输入微信号</td>
+							</tr>
+                            <if condition="$user[type] eq 1 ">                            	
+                            <tr class="data">
+							    <td class="laber">公司名称</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="org_name" value="{$user.org_name}" placeholder="公司名称"></td>
+							    <td class="info">请输入公司名称</td>
+							</tr>
+                            <tr class="data">
+							    <td class="laber">组织机构代码</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="org_num" value="{$user.org_num}" placeholder="组织机构代码"></td>
+							    <td class="info">请输入组织机构代码</td>
+							</tr>
+                           	</if>
+                            <tr class="data">
+							    <td class="laber">账户状态</td>
+							    <td class="edit">
+                                	<if condition="$user.status == 0">
+                                	<input type="radio" name="status" class="status" value="0" checked /> 启用
+                                	<input type="radio" name="status" class="status" value="1" /> 禁用
+                                    <else/>
+                                	<input type="radio" name="status" class="status" value="0" /> 启用
+                                	<input type="radio" name="status" class="status" value="1" checked /> 禁用                                    
+                                    </if>
+                                </td>
+							    <td class="info">请输入组织机构代码</td>
+							</tr>
+							<tr>
+							    <td class="laber"></td> 	
+							    <td class="edit">
+								    <button id="submit_btn" onclick="save({$user.id},{$user.type});">保存</button> <span id="save_msg" style="color:#3CADED"></span>
+							    </td>
+							    <td class="info"></td>  
+							</tr>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function updatePwd(id,obj){
+		$(obj).parent().prev().html('<input id="pwd" type="password" class="ui-ipt-txt" placeholder="用户密码"/>');
+		$(obj).parent().html('<a href="javascript:void(0);" onClick="savePwd(' + id + ',this)">确定</a>');		
+	}
+	function savePwd(id,obj){
+		var pwd = $("#pwd").val().trim();
+		if(!pwd){
+			$("#pwd").focus();
+			return false;
+		}
+		$.ajax({
+			url:'__APP__/Clientmgr/savePwd',
+			type:'post',
+			data:{'id':id,'pwd':pwd},
+			success:function(data){
+				if(data.info=='success'){
+					$(obj).parent().prev().html(' ****** ');		
+					$(obj).parent().html('<a href="javascript:void(0);" onClick="updatePwd(' + id + ',this)">修改密码</a>');	
+					alert('修改密码成功');
+				}else{
+					$("#save_msg").html(data.data);
+				}
+			},
+			error:function(data){
+				alert(data.statusText);
+			}
+		});
+	}
+	function save(id,type){
+		var link_man = $("#link_man").val().trim(),
+			link_phone = $("#link_phone").val().trim(),
+			link_weixin = $("#link_weixin").val().trim(),
+			status = $(":radio:checked").val();
+		if(type==1){
+			var	org_name = $("#org_name").val().trim(),
+				org_num = $("#org_num").val().trim();			
+		}
+		if(!checkName(link_man)){
+			$("#save_msg").html('联系人姓名格式不正确');
+			return false;
+		}	
+		if(!checkPhone(link_phone)){
+			$("#save_msg").html('手机号码格式不正确');
+			return false;
+		}
+		$.ajax({
+			url:'__APP__/Clientmgr/setInfo',
+			type:'post',
+			data:{'link_man':link_man,'link_phone':link_phone,'link_weixin':link_weixin,'org_name':org_name,'org_num':org_num, 'status':status,'id':id},
+			success:function(data){
+				if(data.info=='success'){
+					alert(data.data);
+					window.location.href = "__APP__/Clientmgr/setInfo?id=" + id ;
+				}else{
+					$("#save_msg").html(data.data);
+				}
+			},
+			error:function(data){
+				alert(data.statusText);
+			}
+		});
+	}
+	
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>
