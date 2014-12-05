@@ -15,12 +15,13 @@ g_init_resp_expect = -1
 g_a_tbl = 1
 g_ns_tbl = 2
 g_cname_tbl = 5
+g_ptr_tbl = 12
 g_mx_tbl = 15
 g_txt_tbl = 16
 g_aaaa_tbl = 28
 g_any_tbl = 255
 
-g_list_tbl = ('a_record', 'aaaa_record', 'cname_record', 'mx_record', 'ns_record', 'txt_record')
+g_list_tbl = ('a_record', 'aaaa_record', 'cname_record', 'mx_record', 'ns_record', 'txt_record', 'ptr_record')
 #g_dict_tbl_type = {'a_record':g_a_tbl,
 #             'aaaa_record':g_ns_tbl,
 #             'cname_record':g_cname_tbl,
@@ -39,7 +40,7 @@ g_dict_type = {'a_record':g_a_tbl, #'A':1, #指定计算机IP地址
         'MR':9, #指定邮件重命名域名
         'NULL':10, #指定空的资源记录
         'WKS':11, #描述已知服务
-        'PTR':12, #如果查询是IP地址,则指定计算机名;否则指定指向其它信息的指针
+        'ptr_record':g_ptr_tbl, #如果查询是IP地址,则指定计算机名;否则指定指向其它信息的指针
         'HINFO':13, #指定计算机CPU以及操作系统类型
         'MINFO':14, #指定邮箱或邮件列表信息
         'mx_record':g_mx_tbl, #'MX':15, #指定邮件交换器
