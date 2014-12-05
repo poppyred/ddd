@@ -568,7 +568,7 @@ class req_handler_record_ptr(req_handler_impl):
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         return self.donotify(worker, msgobj, opt, data, odata, 'ptr_record')
-		
+
 class req_handler_record_aaaa(req_handler_impl):
 
     def __init__(self):

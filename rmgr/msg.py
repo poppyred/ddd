@@ -12,11 +12,12 @@ g_init_resp_expect = -1
 g_a_tbl = 1
 g_ns_tbl = 2
 g_cname_tbl = 5
+g_ptr_tbl = 12
 g_mx_tbl = 15
 g_txt_tbl = 16
 g_aaaa_tbl = 28
 g_any_tbl = 255
-g_list_tbl = ('a_record', 'aaaa_record', 'cname_record', 'mx_record', 'ns_record', 'txt_record')
+g_list_tbl = ('a_record', 'aaaa_record', 'cname_record', 'mx_record', 'ns_record', 'txt_record', 'ptr_record')
 g_dict_type = {'a_record': g_a_tbl,
  'ns_record': g_ns_tbl,
  'MD': 3,
@@ -28,7 +29,7 @@ g_dict_type = {'a_record': g_a_tbl,
  'MR': 9,
  'NULL': 10,
  'WKS': 11,
- 'PTR': 12,
+ 'ptr_record': g_ptr_tbl,
  'HINFO': 13,
  'MINFO': 14,
  'mx_record': g_mx_tbl,
