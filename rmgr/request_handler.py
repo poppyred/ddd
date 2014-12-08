@@ -541,7 +541,7 @@ class req_handler_record_ptr(req_handler_impl):
             worker.dbcon.nextset()
             ars = worker.dbcon.show()
         worker.dbcon.fetch_proc_reset()
-        print >> sys.stderr, ('select old:' + result)
+        print >> sys.stderr, ('select old:' + str(result))
         return add_ret, True, result
 
     def set(self, worker, data, ali_tbl):
@@ -559,7 +559,7 @@ class req_handler_record_ptr(req_handler_impl):
             worker.dbcon.nextset()
             ars = worker.dbcon.show()
         worker.dbcon.fetch_proc_reset()
-        selfprint >> sys.stderr, ('select old:' + result)
+        print >> sys.stderr, ('select old:' + str(result))
         return update_ret, True, result
 
     def delete(self, worker, data, ali_tbl):
@@ -922,7 +922,7 @@ class req_handler_view_mask(req_handler_impl):
         return req_hdl_abstract.notify(self, worker, msgobj, opt, data, odata, '', flush, direct)
 
 
-http_tbl_alise = ('A', 'AAAA', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
+http_tbl_alise = ('A', 'AAAA', 'PTR', 'CNAME', 'NS', 'TXT', 'MX', 'domain_ns')
 http_tbl_realname = {'A': 'a_record',
 		'PTR' : 'ptr_record',
         'AAAA': 'aaaa_record',
