@@ -149,6 +149,47 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 	return count;
 }
 
+static int ip_to_q_name(char*ip,int len,char*qname)
+{
+    assert(ip);
+    assert(qname);
+
+    //hyb_debug("origin:%s\n",ip);
+    int ptr_cnt = 0;
+    int count = 0;
+    int i = 0;
+	char *delims = ".";
+	char *myStrBuf=NULL;
+    char *ips[20];
+	char *p =NULL;
+	while(p = strtok_r(ip,delims,&myStrBuf))
+	{
+        ip = NULL;
+
+        ips[count] = p;
+        count ++;
+        
+	}
+
+    for(i = count-1;i>=0;i--)
+    {
+               
+        int size = strlen(ips[i]);
+        //hyb_debug("ip:%s size:%d\n",p,size);
+        memcpy(qname+ptr_cnt,ips[i],size);
+        
+        ptr_cnt += size;
+        memcpy(qname+ptr_cnt,delims,1);
+        ptr_cnt += 1;    
+    }
+    //memcpy_s(qname,ip,len);
+    strcat_n(qname,256,"in-addr.arpa");
+    //hyb_debug("New ipptr is :%s\n",qname);
+
+    return strlen(qname);
+
+}
+
 
 int dns_pack_head(char*result,char*domain,int domain_len)
 {
@@ -173,7 +214,7 @@ int dns_pack_head(char*result,char*domain,int domain_len)
 
     //hyb_debug("fuck:%s\n",result);
 	
-	char qname[512];
+	char qname[512] = {0};
 	int len = domain_to_q_name(domain, domain_len, qname);
 	if(len<=0)
 	{
@@ -217,15 +258,34 @@ int dns_pack_query(char*result,char*domain,int domain_len, int view, int type)
 
     //hyb_debug("fuck:%s\n",result);
 	
-	char qname[512];
-	int len = domain_to_q_name(domain, domain_len, qname);
-	if(len<=0)
-	{
-		return 0;
-	}
+	char qname[512] = {0};
+    char inaddr[512] = {0};
+    int qlen = 0;
+    if (type == 0X000C)
+    {
+        qlen = ip_to_q_name(domain, domain_len, inaddr);
+	    if(qlen<=0)
+	    {
+		    return 0;
+	    }
 
-	memcpy_s(result+12,qname,len);
-	int total_len = 12+len;
+        qlen = domain_to_q_name(inaddr, strlen(inaddr), qname);
+	    if(qlen<=0)
+	    {
+		    return 0;
+	    }
+    }
+    else
+    {
+	    qlen = domain_to_q_name(domain, domain_len, qname);
+	    if(qlen<=0)
+	    {
+		    return 0;
+	    }
+    }
+
+	memcpy_s(result+12,qname,qlen);
+	int total_len = 12+qlen;
 
 	dns_query->q_type = htons(type);
 	dns_query->q_class = htons(0x0001);

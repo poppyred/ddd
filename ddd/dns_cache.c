@@ -27,6 +27,8 @@ h_hash_st *g_ns_table = NULL;
 h_hash_st *g_mx_table = NULL;
 h_hash_st *g_cname_table = NULL;
 h_hash_st *g_any_table = NULL;
+h_hash_st *g_ptr_table = NULL;
+
 
 
 volatile int g_list_statu = 0;
@@ -143,6 +145,13 @@ int dns_cache_init()
         return -1;
     }
 
+    g_ptr_table = h_hash_create(cache_member_destroy,NULL,MAX_HASH_SPCES);
+    if (!g_ptr_table)
+    {
+        hyb_debug("[dns cache init sucess!]\n");
+        return -1;
+    }
+
     g_any_table = h_hash_create(cache_member_destroy,NULL,MAX_HASH_SPCES);
     if (!g_any_table)
     {
@@ -157,6 +166,7 @@ int dns_cache_init()
     g_cache_table[4] = g_mx_table;
     g_cache_table[5] = g_cname_table;
     g_cache_table[6] = g_any_table;
+    g_cache_table[7] = g_ptr_table;
     
     return 0;
 }
@@ -208,6 +218,12 @@ void dns_cache_destroy()
     {
         h_hash_destroy(g_cname_table);
         g_cname_table = NULL;
+    }
+
+    if (g_ptr_table)
+    {
+        h_hash_destroy(g_ptr_table);
+        g_ptr_table = NULL;
     }
 
     if (g_any_table)
@@ -407,6 +423,10 @@ static h_hash_st* table_select(unsigned short type)
         
     case 0x0005:
         select_table = g_cname_table;
+        break;
+                
+    case 0x000C:
+        select_table = g_ptr_table;
         break;
         
     case 0x000F:
@@ -807,6 +827,7 @@ int dns_cache_info()
     int ns_cnt = h_hash_count(g_ns_table);
     int cname_cnt = h_hash_count(g_cname_table);
     int txt_cnt = h_hash_count(g_txt_table);
+    int ptr_cnt = h_hash_count(g_ptr_table);
     
     hyb_debug("[The A Cache-Table num:%d]\n",a_cnt);
     hyb_debug("[The AAAA Cache-Table num:%d]\n",aaaa_cnt);
@@ -814,9 +835,10 @@ int dns_cache_info()
     hyb_debug("[The NS Cache-Table num:%d]\n",ns_cnt);
     hyb_debug("[The CNAME Cache-Table num:%d]\n",cname_cnt);
     hyb_debug("[The TXT Cache-Table num:%d]\n",txt_cnt);
+    hyb_debug("[The PTR Cache-Table num:%d]\n",ptr_cnt);
 
 
-    if (!a_cnt && !aaaa_cnt && !mx_cnt && !ns_cnt && !cname_cnt && !txt_cnt)
+    if (!a_cnt && !aaaa_cnt && !mx_cnt && !ns_cnt && !cname_cnt && !txt_cnt && !ptr_cnt)
     {
         return -1;
     }

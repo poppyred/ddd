@@ -131,7 +131,11 @@
 			type: "post",
 			data:{'user':user, 'pwd':pwd, 'desc':desc,'level':level},
 			success: function (data) {
-				$("#save_msg").html(data.info);
+				if(data.status==1){
+					window.location.href = "__APP__/System/user";
+				}else{
+					$("#save_msg").html(data.info);
+				}
 			},
 			error: function (data) {
 				alert(data.statusText);

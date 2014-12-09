@@ -344,6 +344,14 @@ class MonitorAction extends BaseAction {
 			}
 			$data = file_get_contents(C('NS_CHECH_URL').'/script/eflydns_monitor_domain.php?opt=status&val=['. substr($str,0,-1) .']');
 			$result = json_decode($data,true);
+			/*
+			$args["host"] = "121.201.12.61";//主机
+			$args["url"] = C('NS_CHECH_URL').'/script/eflydns_monitor_domain.php';//?opt=status&val=['. substr($str,0,-1) .']';
+			$args["method"] = "GET";//请求方式
+			$args["data"] = array("opt"=>"status","val"=>substr($str,0,-1));//参数
+			$this->asyn_request($args);
+			*/
+			
 			if($result['ret']==0){
 				$mlist[$key]['status'] = "<label style='color:green'>正常</label>";
 			}else{
@@ -370,4 +378,5 @@ class MonitorAction extends BaseAction {
 			$this->ajaxReturn('','error',0);
 		}
 	}
+	
 }

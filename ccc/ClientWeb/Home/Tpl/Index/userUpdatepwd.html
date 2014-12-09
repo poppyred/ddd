@@ -67,18 +67,20 @@
 				<strong id="cur_zone" class="dname"></strong>
 				<!--span class="tab nocur"><a href="__APP__/Index/alarm">告警通知</a></span-->
 				<!--span class="tab nocur"><a href="__APP__/Index/safe">账号安全</a></span-->
-				<span class="tab "><a href="__APP__/Index/user">用户信息</a></span>
+				<!--span class="tab "><a href="__APP__/Index/user">用户信息</a></span-->
 			</p>
 		</div>
 		<div class="table-box" style="margin-top:7px;">
         	<input id="fm-regist-id-email" value="{$mail}" type="hidden" />
-			<table cellpadding="0" cellspacing="0" width="100%" id="mytab" style="font-size:14px;">
+			<table cellpadding="0" cellspacing="0" width="100%" id="mytab" style="font-size:14px;width: 500px;margin: 0 auto;">
 				<thead>
 					<tr id="tr_title">
 						<th style="text-align:left;font-size:13px;color:#404040;height:30px;" colspan="2">
-                        	<div id="regist-error" class="form-error notice notice-error" style="display:none;width:440px;margin-left:100px">
-                                <span class="icon-notice icon-error"></span>
-                                <span class="notice-descript" id="error_msg"></span>
+                        	<div style="height:30px;">
+                                <div id="regist-error" class="form-error notice notice-error" style="display:none;width:440px;margin-left:100px">
+                                    <span class="icon-notice icon-error"></span>
+                                    <span class="notice-descript" id="error_msg"></span>
+                                </div>
                             </div>
                         </th>
 						<th style="height:30px;">						
@@ -87,17 +89,17 @@
 				</thead> 	
 				<tbody id="myData">
 					<tr class="data" style="height:55px;">
-					    <td class="laber" style="text-align:center;width:150px;">原始密码</td>
+					    <td class="laber" >原始密码</td>
 					    <td class="edit">
-                        	<input type="password" id="fm-regist-password-ys" style="width:285px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkYsPwd()"/>
+                        	<input type="password" id="fm-regist-password-ys" style="width:212px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkYsPwd()"/>
                         </td>
 					    <td class="info" width="50px"></td>
 					</tr>
                     <tr class="data" style="height:55px;">
-					    <td class="laber" style="text-align:center;width:150px;">登录密码</td>
+					    <td class="laber" >登录密码</td>
 					    <td class="edit">
                         	<div class="fm-field-wrap">
-                                    <input type="password" id="fm-regist-password" style="width:285px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkPwd()"/>
+                                    <input type="password" id="fm-regist-password" style="width:212px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkPwd()"/>
                                        <div id="fm-regist-password-pstrength" class="pstrength-container">
                                            <div id="fm-regist-password-pstrength-bar" class="pstrength-bar clr">
                                            <div class="pstrength-bar-weak" id="bar_ruo">弱</div>
@@ -109,18 +111,19 @@
 					    <td class="info"></td>
 					</tr>
                     <tr class="data" style="height:55px;">
-					    <td class="laber" style="text-align:center;width:150px;">确认密码</td>
+					    <td class="laber" >确认密码</td>
 					    <td class="edit">
-                        	<input type="password" id="fm-regist-repassword" style="width:285px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkRePwd()"/>
+                        	<input type="password" id="fm-regist-repassword" style="width:212px;" name="_fm-a-_0-p" tabindex="3" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" onBlur="checkRePwd()"/>
                         </td>
 					    <td class="info"></td>
 					</tr>
-                    <tr style="height:55px;" align="right">                    	
-                        <td colspan="2">
-                        	<input type="button" id="fm-regist-submit" onClick="updatepwd()" value="保存" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
-                            <input type="button" id="fm-regist-submit" onClick="history.go(-1)" value="返回" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
+                    <tr style="height:55px;" align="left">                    	
+                        <td></td>
+                        <td>
+                        	<input type="button" id="fm-regist-submit" style="padding:0px 22px;margin-left:90px;" onClick="updatepwd()" value="保存" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
+                            <input type="button" id="fm-regist-submit" style="padding:0px 22px;" onClick="history.go(-1)" value="返回" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
                         </td>
-					    <td ></td>
+                        <td></td>
 					</tr>
 				</tbody> 
 			</table>

@@ -14,63 +14,82 @@
 	<script type="text/javascript" src="__ROOT__/Public/js/jquery.mailAutoComplete-3.1.js"></script>
 	<title>EflyDNS - 修改密码</title>
 	<script type="text/javascript">
-		//如果是内部页，父级页面刷新,登录
+	//如果是内部页，父级页面刷新,登录
 		
-		$(function(){
-			var msg = $("#error-msg").html();
-			if(msg){
-				  $("#regist-error").show();
-			}
-		});
-		function keyEmail(){
-			$("#username").mailAutoComplete({
-				boxClass: "out_box", //外部box样式     
-				listClass: "list_box", //默认的列表样式     
-				focusClass: "focus_box", //列表选样式中     
-				markCalss: "mark_box", //高亮样式     
-				autoClass: true,     
-				textHint: true, //提示文字自动隐藏 
-			}); 	
+	$(function(){
+		var msg = $("#error-msg").html();
+		if(msg){
+			  $("#regist-error").show();
 		}
-	</script>
-	<script type="text/javascript">
+		$("#fm-regist-id-email").mailAutoComplete({
+			boxClass: "out_box", //外部box样式     
+			listClass: "list_box", //默认的列表样式     
+			focusClass: "focus_box", //列表选样式中     
+			markCalss: "mark_box", //高亮样式     
+			autoClass: true,     
+			textHint: true, //提示文字自动隐藏 
+		}); 	
+	});
 	function forgetPWD(){
-		if(checkEmail2() && checkCode()){
 			var mail = $("#fm-regist-id-email").val(),
+				pwd = $("#fm-regist-password").val();
+				repwd = $("#fm-regist-repassword").val();
 				code = $("#J-checkcode").val();
-				$.ajax({
-					url:'__APP__/Index/forget',
-					type:'post',
-					data:{'mail':mail,'code':code},
-					success:function(data){
-						if(data.info=='error'){
-							showInfo(data.data);	
-						}else{
-							//showInfo(data.data);
-							//setTimeout(function(){
-								window.location.href='__APP__/Index/updatepwd?mail='+mail;
-							//},2000);
-						}
-					},
-					error:function(data){
-						showInfo(data.statusText);		
+				
+			if(!mail){
+				$("#fm-regist-id-email").focus();
+				$("#msg_email").show();
+				return false;
+			}
+			if(!checkemail(mail)){
+				$("#fm-regist-id-email").focus();
+				showInfo('请输入正确的邮箱格式，例如：zhangsan@163.com');
+				return false;
+			}
+			if(!code){
+				$("#J-checkcode").focus();
+				$("#msg_checkcode").show();
+				return false;
+			}
+			if(!pwd){
+				$("#fm-regist-password").focus();
+				$("#fm-regist-password").next().show();
+				return false;
+			}
+			if(pwd.length<6){
+				$("#fm-regist-password").focus();
+				showInfo('密码不能小于六位字符');
+				return false;
+			}
+			if(!repwd){
+				$("#fm-regist-repassword").focus();
+				$("#fm-regist-repassword").next().show();
+				return false;
+			}
+			if(pwd!=repwd || pwd.length!=repwd.length){
+				$("#fm-regist-repassword").focus();
+				showInfo('两次密码输入不一致');
+				return false;
+			}
+			
+			$.ajax({
+				url:'__APP__/Index/forget',
+				type:'post',
+				data:{'mail':mail,'code':code,'pwd':pwd},
+				success:function(data){
+					if(data.info=='error'){
+						showInfo(data.data);	
+					}else{
+						showInfo(data.data);
+						setTimeout(function(){
+							window.location.href='__APP__/Domain/domainList';
+						},2000);
 					}
-				});
-		}else{
-			showInfo('请完整填写表单！');
-		}
-	}
-	function checkEmail2(){
-		var val = $("#fm-regist-id-email").val();
-		if(typeof(val)=="undefined" || val==""){
-			return false;
-		}
-		if(!checkemail(val)){
-			showInfo('请输入正确的邮箱格式，例如：zhangsan@163.com');
-			return false;
-		}
-		
-		return true;
+				},
+				error:function(data){
+					showInfo(data.statusText);		
+				}
+			});
 	}
 	var timerc=60;
 	function countdown(){
@@ -89,14 +108,13 @@
 	function changeVerify(){		
 		var mail = $("#fm-regist-id-email").val();
 		if(!mail){
-			$("#username").focus();
-			$("#msg-username").show();
+			$("#fm-regist-id-email").focus();
+			$("#msg_email").show();
 			return false;
 		}
 		if(!isEmail(mail)){
-			$("#username").focus();
-			$("#msg-username").html("<span class='noempty'>*</span>输入正确的邮箱地址");
-			$("#msg-username").show();
+			$("#fm-regist-id-email").focus();
+			showInfo('请输入正确的邮箱格式，例如：zhangsan@163.com');
 			return false;
 		}
 		$.ajax({
@@ -115,6 +133,12 @@
 			}
 		});
 	}
+	function hide(){
+		$("#msg_email").hide();
+		$("#msg_checkcode").hide();
+		$("#fm-regist-password").next().hide();
+		$("#fm-regist-repassword").next().hide();
+	}
 	</script>
 </head>
 <body class="regist">
@@ -128,28 +152,29 @@
 	</div>
 	
 	<div id="content-container">
-    <div id="content" class="grid780 clr">
-	
+    <div id="content" class="grid780 clr">	
         <div id="regist-module" class="clr" >
-            <div id="regist-wrap" style="border:none;">
+            <div id="regist-wrap" >
                  <form id="regist" name="regist" method="post">
-                    <div id="regist-error" class="form-error notice notice-error" style="display:none">
-                        <span class="icon-notice icon-error"></span>
-                        <span id="error_msg" class="notice-descript">{$error}</span>
-                    </div>
+                     <div style="height:30px;">             
+                        <div id="regist-error" class="form-error notice notice-error" style="display:none">
+                            <span class="icon-notice icon-error"></span>
+                            <span id="error_msg" class="notice-descript">{$error}</span>
+                        </div>
+                      </div>
                     <table id="regist-form" class="form">
                         <tbody><tr>
                             <td class="fm-label">
                                 <div class="fm-label-wrap fm-relative">
                                     <span class="icon icon-regist-email"></span>
                                     <label for="username">
-                                        账号:</label>
+                                        电子邮箱:</label>
                                 </div>
                             </td>
-                            <td class="fm-field" width="300">
+                            <td class="fm-field" width="360">
                                 <div class="fm-field-wrap" style="z-index:2;">
-                                    <input type="text" id="fm-regist-id-email" name="username" onclick="onBlue();" onFocus="keyEmail()" tabindex="1" placeholder="输入电子邮箱" class="fm-text fm-validator" value="{$mail}">
-                                    <div id="msg-username" class="fm-validator-result"><span class="noempty">*</span>输入邮箱地址</div>
+                                    <input type="text" id="fm-regist-id-email" name="username" onFocus="hide()" tabindex="1" placeholder="输入电子邮箱" class="fm-text fm-validator" value="{$mail}">
+                                    <span class="noempty" id="msg_email">输入邮箱地址</span>
                                 </div>
                             </td>
                         </tr>
@@ -160,32 +185,60 @@
                             </td>
                             <td class="fm-field">
                                 <div class="fm-field-wrap">
-                                    <input id="J-checkcode" name="checkcode" onclick="onBlue();" class="fm-text fm-checkcode fm-validator" tabindex="2" type="text" maxlength="6" autocomplete="off" value="" name="_fm-a-_0-im" style="width:80px!important;">
-                                    <a href="javascript:void(0);" id="time_a" style="display:block;height:30px;line-height:30px;width:180px; margin-left:30px; text-align:center;" onclick="changeVerify(this);" class="J-changeCheckcode">获取验证码</a><span id="timedesc" style="height:30px;line-height:30px;width:180px;margin-left:20px;"></span>
-                                    <div id="msg-code" class="fm-validator-result"><span class="noempty">*</span>输入验证码</div>
+                                    <input id="J-checkcode" name="checkcode"  onFocus="hide()" class="fm-text fm-checkcode fm-validator" tabindex="2" type="text" maxlength="6" autocomplete="off" value="" name="_fm-a-_0-im" style="width:80px!important;">
+                                    <a href="javascript:void(0);" id="time_a" style="height:30px;line-height:30px; margin-left:30px; text-align:center;" onclick="changeVerify(this);" class="J-changeCheckcode">获取验证码</a>
+                                    
+                                    <span id="timedesc" style="height:30px;line-height:30px;width:180px;margin-left:20px;"></span>
+                                    <span class="noempty" id="msg_checkcode">输入验证码</span>
                                 </div>
                         </td></tr>
+                        <tr>
+                            <td class="fm-label">
+                                <label for="fm-regist-password">
+                                    <span class="noempty">*</span>
+                                    登录密码:</label>
+                            </td>
+                            <td class="fm-field">
+                                <div class="fm-field-wrap">
+                                    <input type="password" id="fm-regist-password" name="_fm-a-_0-p" tabindex="3" placeholder="输入登录密码" class="fm-text fm-password fm-validator" autocomplete="off" onkeyup="checkPwdBar(this.value)" oonFocus="hide()"/>
+                                    <span class="noempty">输入登录密码</span>  
+                                       <div id="fm-regist-password-pstrength" class="pstrength-container"><div id="fm-regist-password-pstrength-bar" class="pstrength-bar clr"><div class="pstrength-bar-weak" id="bar_ruo">弱</div><div class="pstrength-bar-middle" id="bar_zhong">中</div><div class="pstrength-bar-strong" id="bar_qiang">强</div></div></div><div class="fm-validator-result"></div></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fm-label">
+                                <label for="fm-regist-repassword">
+                                    <span class="noempty">*</span>
+                                    确认密码:</label>
+                            </td>
+                            <td class="fm-field">
+                                <div class="fm-field-wrap">
+                                    <input type="password" id="fm-regist-repassword" name="_fm-a-_0-r" tabindex="4" placeholder="确认登录密码" class="fm-text fm-password fm-validator" autocomplete="off" onFocus="hide()"/>
+                                    <span class="noempty">确认登录密码</span>
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <td></td>
                             <td class="fm-field">
                                 <div class="fm-field-wrap">
-                                    <input type="button" id="fm-regist-submit" onClick="forgetPWD()" value="下一步" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
+                                    <input type="button" id="fm-regist-submit" onClick="forgetPWD()" value="修改" name="event_submit_do_join" tabindex="4" class="fm-button fm-submit">
                                 </div>
                             </td>
                         </tr>
                     </tbody></table>
                 </form>
             </div>
-            <!--div id="regist-extra">
+            <div id="regist-extra">
                     <h3>免费注册</h3>
                     <p>&nbsp;</p>
                     <a href="__APP__/Index/register">注册个人账号</a>
                     <p>&nbsp;</p>
-                    <p>如果您是企业用户，请</p>
-                    <a href="__APP__/Index/cregister">注册企业账号</a>
+                    <p>如果您是企业用户</p>
+                    请&nbsp;<a href="__APP__/Index/cregister">注册企业账号</a>
                     <p>&nbsp;</p>
-                    <a href="#">了解更多>></a>
-              </div-->
+                    <a href="http://www.eflydns.com/index/index.php/Help/manual?51" target="_blank">了解更多>></a>
+              </div>
           </div>
     </div>
     </div>

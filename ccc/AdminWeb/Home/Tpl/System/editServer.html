@@ -189,8 +189,11 @@
 			type: "post",
 			data:{'id':id, 'ip':ip, 'sid':sid, 'desc':desc, 'type':type, 'subtype':subtype, 'status':status},
 			success: function (data) {
-				$("#save_msg").html(data.info);
-				window.location.href = "__APP__/System";
+				if(data.status==1){
+					window.location.href = "__APP__/System";
+				}else{
+					$("#save_msg").html(data.info);
+				}
 			},
 			error: function (data) {
 				alert(data.statusText);

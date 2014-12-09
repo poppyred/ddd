@@ -76,7 +76,7 @@
 				cancel(c,evt);
 			},
 			error: function (data) {
-				alert(data.statusText);
+				layer.msg(data.statusText,2,5);
 			}
 		});	
 	}
@@ -101,7 +101,7 @@
 				cancel(p,evt);
 			},
 			error: function (data) {
-				alert(data.statusText);
+				layer.msg(data.statusText,2,5);
 			}
 		});	
 	}
@@ -120,7 +120,7 @@
 				cancel(m,evt);
 			},
 			error: function (data) {
-				alert(data.statusText);
+				layer.msg(data.statusText,2,5);
 			}
 		});	
 	}
@@ -138,7 +138,7 @@
 				cancel_weixin(w,evt);
 			},
 			error: function (data) {
-				alert(data.statusText);
+				layer.msg(data.statusText,2,5);
 			}
 		});	
 	}
@@ -166,6 +166,25 @@
 		}
  		$($(tr).find("td").get(1)).html(str);
 	}
+	function updateReverse(obj){
+		var val = $(obj).attr('rel');
+		$.ajax({
+			url: '__APP__/Index/updateReverse',
+			type: "post",
+			data:{'val':val},
+			async:false,
+			success: function (data) {
+				if(data.info=='success'){					
+					window.location.href = "__APP__/Index/user";
+				}else{
+					layer.msg(data.data,2,5);
+				}
+			},
+			error: function (data) {
+				layer.msg(data.statusText,2,5);
+			}
+		});	
+	}
 	</script>
 </head>
 <body class="page-dns">
@@ -185,7 +204,7 @@
 				<strong id="cur_zone" class="dname"></strong>
 				<!--span class="tab nocur"><a href="__APP__/Index/alarm">告警通知</a></span-->
 				<!--span class="tab nocur"><a href="__APP__/Index/safe">账号安全</a></span-->
-				<span class="tab "><a href="__APP__/Index/user">用户信息</a></span>
+				<!--span class="tab "><a href="__APP__/Index/user">用户信息</a></span-->
 			</p>
 		</div>
 		<div class="table-box">
@@ -242,6 +261,15 @@
 					    <else/><td class="edit" style="width:520px;">{$user.link_weixin}</td>
 					    <td class="info"><a href="javascript:void(0);" rel="weixin" onClick="updateInfo(this)">修改</a></td>
 					    </if>
+					</tr>
+					<tr class="data" style="height:55px;" id="row_man">
+					    <td class="laber" style="text-align:center;width:150px;">反向解析</td>
+					    <td class="edit" style="width:520px;"></td>
+                        <if condition="$_SESSION['is_reverse'] ==0 ">
+					    <td class="info"><a href="javascript:void(0);" rel="1" onClick="updateReverse(this)">开启</a></td>
+                        <else/>                        
+					    <td class="info"><a href="javascript:void(0);" rel="0" onClick="updateReverse(this)">关闭</a></td>
+                        </if>
 					</tr>
 					<tr class="data" style="height:25px;"></tr>
 				</tbody> 

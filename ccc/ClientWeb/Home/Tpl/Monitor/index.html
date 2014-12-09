@@ -86,7 +86,7 @@
 							bindMyData(data);
 						},
 						error:function(data){
-							layer.msg('温馨提示：'+data.status,2,3);
+							layer.msg('温馨提示：'+data.status,2,5);
 						}
 					});				
 					
@@ -114,7 +114,7 @@
 				$("#myData").html(str);
 			}
 		}else{
-			layer.msg('温馨提示：'+data.data,2,3);	
+			layer.msg('温馨提示：'+data.data,2,5);	
 		}	
 	}
 	function editTable(obj){
@@ -140,7 +140,7 @@
 							bindMyData(data);
 						},
 						error:function(data){
-							layer.msg('温馨提示：'+data.status,2,3);
+							layer.msg('温馨提示：'+data.status,2,5);
 						}
 					});				
 				}, no: function(){
@@ -179,7 +179,7 @@
 							bindMyData(data);
 						},
 						error:function(data){
-							layer.msg('温馨提示：'+data.status,2,3);
+							layer.msg('温馨提示：'+data.status,2,5);
 						}
 					});				
 					
@@ -210,7 +210,7 @@
 				bindMyData(data);
 			},
 			error:function(data){
-				layer.msg('温馨提示：'+data.status,2,3);
+				layer.msg('温馨提示：'+data.status,2,5);
 			}
 		});		
 	}

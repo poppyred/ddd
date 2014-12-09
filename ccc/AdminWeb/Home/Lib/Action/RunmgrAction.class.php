@@ -137,11 +137,17 @@ class RunmgrAction extends BaseAction {
 			$this->display();
 		}else{
 			if(isset($_POST['id']) && isset($_POST['name']) && isset($_POST['level'])){//&& isset($_POST['mask'])
-				$data['name'] = $_POST['name'];
-				$data['level'] = $_POST['level'];
-				$data['desc'] = $_POST['desc'];
 				$view = M('view',Null,'DB_NEWS'); 
 				$view_mask = M('view_mask',Null,'DB_NEWS'); 
+			
+				$entity = $view->where("name='".$_POST['name']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn('error','输入的路线名称重复',0);
+				}
+			
+				$data['name'] = $_POST['name'];
+				$data['level'] = $_POST['level'];
+				$data['desc'] = $_POST['desc'];				
 				$is_ok = $view->where('id='.$_POST['id'])->save($data);
 				
 				if($is_ok===false){
@@ -247,12 +253,17 @@ class RunmgrAction extends BaseAction {
 		}else{
 			if(isset($_POST['name']) && isset($_POST['level']) && isset($_POST['mask'])){
 				
+				$list = M('view',Null,'DB_NEWS');
+				$view_mask = M('view_mask',Null,'DB_NEWS'); 
 				
+				$entity = $list->where("name='".$_POST['name']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn('error','输入的路线名称重复',0);
+				}
 				$data["name"] = trim($_POST['name']);
 				$data["level"] = trim($_POST['level']);
 				$data["desc"] = trim($_POST['desc']);
 				$data["up_time"] = date('Y-m-d H:i:s');
-				$list = M('view',Null,'DB_NEWS');
 				$is_ok = $list->data($data)->add();
 				
 				$val = array("vid"=>(int)$is_ok,"vname"=>rawurldecode($data["name"]),"comment"=>rawurldecode($data["desc"]),"ttl"=>"300");
@@ -266,7 +277,7 @@ class RunmgrAction extends BaseAction {
 				
 				//添加成功
 				if($is_ok){
-					$view_mask = M('view_mask',Null,'DB_NEWS'); 
+					
 					$str = trim($_POST['mask']);
 					$arr = explode(',', $str);
 					for($i=0;$i<count($arr);$i++){
@@ -343,10 +354,14 @@ class RunmgrAction extends BaseAction {
 			$this->assign('zlist',$list);
 			$this->display();
 		}else{
-			if(isset($_POST['name']) && isset($_POST['zone']) && isset($_POST['mask']) && isset($_POST['id'])){
+			if(isset($_POST['name']) && isset($_POST['zone']) && isset($_POST['mask']) && isset($_POST['id'])){				
+				$route = M('route',Null,'DB_NEWS'); 
+				$entity = $route->where("name='".$_POST['name']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn('error','输入的路线名称重复',0);
+				}
 				$data['name'] = $_POST['name'];
 				$data["zone_id"] = $_POST['zone'];
-				$route = M('route',Null,'DB_NEWS'); 
 				$is_ok = $route->where('id='.$_POST['id'])->save($data);
 				//删除view_mask
 				$route_mask = M('route_mask',Null,'DB_NEWS'); 
@@ -388,20 +403,20 @@ class RunmgrAction extends BaseAction {
 			$this->display();
 		}else{
 			if(isset($_POST['name']) && isset($_POST['zone']) && isset($_POST['mask'])){
-				//$zone = M('zone',Null,'DB_NEWS'); 
-				//$cnd["domain"] = trim($_POST['zone']);
-				//$ret = $zone->where($cnd)->find();
-				//if(empty($ret)){
-				//	$this->ajaxReturn(0,'添加失败，没有找到对应的域名！',0);
-				//}else{
+					$list = M('route',Null,'DB_NEWS'); 
+					$view_mask = M('route_mask',Null,'DB_NEWS'); 
+					
+					$entity = $list->where("name='".$_POST['name']."'")->find();
+					if(!empty($entity)){
+						$this->ajaxReturn('error','输入的路线名称重复',0);
+					}
+					
 					$data["name"] = trim($_POST['name']);
 					$data["zone_id"] = $_POST['zone'];
 					$data["up_time"] = date('y-m-d h:i:s');
-					$list = M('route',Null,'DB_NEWS'); 
 					$is_ok = $list->data($data)->add();
 					//添加成功
 					if($is_ok){
-						$view_mask = M('route_mask',Null,'DB_NEWS'); 
 						$str = trim($_POST['mask']);
 						$arr = explode(',', $str);
 						for($i=0;$i<count($arr);$i++){
@@ -459,6 +474,11 @@ class RunmgrAction extends BaseAction {
 		}else{
 			if(isset($_POST['val']) && isset($_POST['level']) && isset($_POST['ttl']) && isset($_POST['view'])){
 				$nameserver = M('nameserver',Null,'DB_NEWS'); 
+				$entity = $nameserver->where("val='".$_POST['val']."'");
+				if(!empty($entity)){					
+					$this->ajaxReturn(0,'输入的记录值重复',0);
+				}
+				
 				$data['level'] = $_POST['level'];
 				$data['val'] = $_POST['val'];
 				$data['view'] = $_POST['view'];
@@ -498,11 +518,15 @@ class RunmgrAction extends BaseAction {
 			}
 		}else{
 			if(isset($_POST['val']) && isset($_POST['level']) && isset($_POST['ttl']) && isset($_POST['view']) && isset($_POST['id'])){
+				$name = M('nameserver',Null,'DB_NEWS'); 
+				$entity = $name->where("val='".$_POST['val']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn('error','输入的记录值重复',0);
+				}
 				$data['level'] = $_POST['level'];
 				$data['val'] = $_POST['val'];
 				$data['view'] = $_POST['view'];
-				$data['ttl'] = $_POST['ttl'];
-				$name = M('nameserver',Null,'DB_NEWS'); 
+				$data['ttl'] = $_POST['ttl'];				
 				$ret = $name->where('id='.$_POST['id'])->save($data);
 				if($ret === false){
 					$this->ajaxReturn(0,'修改默认NS记录失败',0);

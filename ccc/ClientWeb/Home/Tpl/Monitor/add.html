@@ -45,11 +45,11 @@
 						}
 						$("#sub_domain").html(str);
 					}else{
-						layer.msg('温馨提示：获取子域名信息错误，请联系管理员。',2,3);		
+						layer.msg('温馨提示：获取子域名信息错误，请联系管理员。',2,5);		
 					}
 				},
 				error:function(data){
-					layer.msg('温馨提示：'+data.status,2,3);
+					layer.msg('温馨提示：'+data.status,2,5);
 				}
 			});
 		}
@@ -67,11 +67,11 @@
 						if(data.info=='success'){
 							window.location.href = "__APP__/Monitor/index";	
 						}else{
-							layer.msg('温馨提示：'+data.info,2,3);
+							layer.msg('温馨提示：'+data.info,2,5);
 						}
 					},
 					error:function(data){
-						layer.msg('温馨提示：添加域名监控错误，请联系管理员。',2,3);		
+						layer.msg('温馨提示：添加域名监控错误，请联系管理员。',2,5);		
 					}
 				});
 			}else{
@@ -94,11 +94,11 @@
 						if(data.info=='success'){
 							window.location.href = "__APP__/Monitor/index";	
 						}else{
-							layer.msg('温馨提示：'+data.info,2,3);			
+							layer.msg('温馨提示：'+data.info,2,5);			
 						}
 					},
 					error:function(data){
-						layer.msg('温馨提示：添加URL监控错误，请联系管理员。',2,3);		
+						layer.msg('温馨提示：添加URL监控错误，请联系管理员。',2,5);		
 					}
 				});
 			}

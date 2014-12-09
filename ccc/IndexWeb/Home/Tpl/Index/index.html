@@ -85,17 +85,13 @@
 
    <div id="myCarousel" class="carousel slide">
             <div class="carousel-inner">
-              <div class="item active">
+              <!-- <div class="item active">
                 <a href="#">
-                    <!--
-                  <img src="__ROOT__/Public/images/qiniuBanner.jpg" alt=""/>
-                  <a href="#" class="qiniu_btn" target="_blank"></a>
-                    -->
                     <img src="__ROOT__/Public/images/b2.jpg" alt=""/>
                 </a>
-              </div>
+              </div> -->
 
-              <div class="item">
+              <div class="item active">
                 <a href="#">
                   <img data-src="__ROOT__/Public/images/b1.jpg" alt="" class="ue-recrew"/>
                   <a href="http://www.eflydns.com/client/Index/register" class="banner-sign-up"></a>
@@ -453,7 +449,8 @@
 
     //change header bg "ClassName#Color"
     //this.colorArr = ['#0d1216','#062C5B','#bdc2c6','#fff'];
-    this.colorArr = ['#062C5B','#0d1216'];
+    //this.colorArr = ['#062C5B','#0d1216'];
+    this.colorArr = ['#0d1216'];//2014.12.08:调整bg颜色
     //add background color animation
     if(this.colorArr){
       var arr = this.colorArr;
@@ -479,7 +476,7 @@
   Carousel.prototype = {
 
     cycle: function () {
-      this.interval = setInterval($.proxy(this.next, this), 7000)
+      //this.interval = setInterval($.proxy(this.next, this), 7000);//2014.12.08:不轮播
       return this
     }
 
@@ -547,6 +544,8 @@
         , children = $active.parent().children()
         , nextPos = children.index($next) < 0 ? 0: children.index($next)
         , that = this;
+
+        console.log('silde');
 
         //change header bg
         if(this.colorArr) this.changebg(nextPos, this.colorArr);
@@ -663,7 +662,7 @@
 
                   a.carousel();
 
-                  b.show();
+                  //b.show();//2014.12.08:隐藏dot
 
                   a.find('.item').each(function(){
                      b.find('ul').append('<li ><a data-id="' + b.find('li').length + '" class="" href="#"></a></li>');
@@ -679,7 +678,7 @@
                   b.find('li a').on('click',function(e){
                         e.preventDefault();
                         a.trigger('to',$(e.target).data('id'));
-                  })
+                  });
 
                })
                   // if there was an error loading the image, react accordingly

@@ -153,7 +153,15 @@
 			type: "post",
 			data:{'val':val, 'view':view, 'ttl':ttl,'level':level},
 			success: function (data) {
-				$("#save_msg").html(data.info);
+				if(data.status==1){
+					if(level==1){
+						window.location.href = "__APP__/Runmgr/vipns";
+					}else{
+						window.location.href = "__APP__/Runmgr/normalns";
+					}
+				}else{
+					$("#save_msg").html(data.info);
+				}
 			},
 			error: function (data) {
 				alert(data.statusText);

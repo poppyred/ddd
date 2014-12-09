@@ -29,6 +29,7 @@
 		$("#msg-username").hide();
 		$("#msg-code").hide();
 		$("#msg-pwd").hide();
+		$("#regist-error").hide();		
 	}
 	
 	function isEmail(str){

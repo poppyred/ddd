@@ -212,16 +212,21 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
 		return;
 	}
 
-    /*反向解析处理*/
-    if(q_type == 0x000c)
-	{
-        dns_deal_ptr_answer(src,rxdata,txdata,recvlen,domain,domainlen,client);
-        return;
-    }
-		
     /*view_id= 1 为默认视图*/
     if(likely(view_id > 0 && view_id < MAX_VIEM_NUM)) //在用户ip视图中找到
     {
+        /*反向解析处理*/
+        if(q_type == 0x000c)
+	    {
+            int ret = dns_cache_answer_check(src, txdata, domain, domainlen, 1, 
+                q_type,client,qurey_id,rxdata->dip,rxdata->smac);
+            if (ret)
+            {
+                dns_deal_ptr_answer(src,rxdata,txdata,recvlen,domain,domainlen,client);
+            }
+            return;
+        }
+
         /*检查是否已缓存*/
         int ret = dns_cache_answer_check(src, txdata, domain, domainlen, view_id, 
                 q_type,client,qurey_id,rxdata->dip,rxdata->smac);
@@ -1000,7 +1005,7 @@ static void timer_callback1(void *user_data)
 {
 	global_now++;
 	g_tm = localtime(&global_now);
-    
+
     /*
     struct sockaddr_in addr;
     int sockfd = socket(AF_INET,SOCK_DGRAM,0);
@@ -1080,7 +1085,7 @@ static void timer_callback4(void *user_data)
 static void timer_callback5(void *user_data)
 {
     dns_lcllog_reqcnt();
-    
+
 	if (g_mday == 0)
 	{
 		g_mday = g_tm->tm_mday;
@@ -1900,6 +1905,14 @@ int main(int argc, char **argv)
 
     /*初始化配置*/
     init_to_mgr();
+
+      
+    //send_pkt_debug("*.etong.com.dns21.org",1);
+    //send_pkt_debug("*.dns21.org",1);
+    
+   // send_pkt_debug("*.etong.com.dns21.org",2);
+    //send_pkt_debug("*.dns21.org",2);
+    
 
 	/*事件等待*/
 	efly_event_loop();

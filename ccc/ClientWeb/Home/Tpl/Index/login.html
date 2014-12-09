@@ -21,22 +21,18 @@
 			if(msg){
 				  $("#regist-error").show();
 			}
-		});
-		function keyEmail(){
 			$("#username").mailAutoComplete({
-				boxClass: "out_box", //外部box样式     
+				boxClass: "out_box", //外部box样式    
 				listClass: "list_box", //默认的列表样式     
 				focusClass: "focus_box", //列表选样式中     
 				markCalss: "mark_box", //高亮样式     
 				autoClass: true,     
-				textHint: true, //提示文字自动隐藏 
+				textHint: true //提示文字自动隐藏 
 			}); 	
+		});
+		function changeVerify(){
+			$('#verifyImg').attr('src','__APP__/Index/verify?t='+ new Date());
 		}
-	</script>
-	<script type="text/javascript">
-	function changeVerify(){
-		$('#verifyImg').attr('src','__APP__/Index/verify?t='+ new Date());
-	}
 	</script>
 </head>
 <body class="regist">
@@ -44,33 +40,33 @@
 		<div id="header" class="clr">
 			<h1 id="logo">
 				<a href="http://www.eflydns.com" title="EflyDNS" ><img class="main lf" src="__ROOT__/Public/img/DNSPro_w.png" alt="EflyDNS"></a>
-				<span class="header-title" style="display:block;">用户登录</span>
+				<span class="header-title">用户登录</span>
 			</h1>
 		</div>
 	</div>
 	
 	<div id="content-container">
     <div id="content" class="grid780 clr">
-	
         <div id="regist-module" class="clr" style="">
-            <div id="regist-wrap">
+            <div id="regist-wrap">            	
                  <form id="regist" name="regist" onsubmit="return validate_form(this);" method="post">
-                    <div id="regist-error" class="form-error notice notice-error" style="display:none">
-                        <span class="icon-notice icon-error"></span>
-                        <span id="error-msg" class="notice-descript">{$error}</span>
+                 	<div style="height:30px;">                             	
+                        <div id="regist-error" class="form-error notice notice-error" style="display:none">
+                            <span class="icon-notice icon-error"></span>
+                            <span id="error-msg" class="notice-descript">{$error}</span>
+                        </div>
                     </div>
                     <table id="regist-form" class="form">
                         <tbody><tr>
                             <td class="fm-label">
                                 <div class="fm-label-wrap fm-relative">
                                     <span class="icon icon-regist-email"></span>
-                                    <label for="username">
-                                        电子邮箱:</label>
+                                    <label for="username">电子邮箱:</label>
                                 </div>
                             </td>
-                            <td class="fm-field" width="300">
+                            <td class="fm-field" width="360">
                                 <div class="fm-field-wrap" style="z-index:2;">
-                                    <input type="text" id="username" name="username" onclick="onBlue();" onFocus="keyEmail()" style="width:160px;" tabindex="1" placeholder="输入电子邮箱" class="fm-text fm-validator" value="{$mail}"><div id="msg-username" class="fm-validator-result"><span class="noempty">*</span>输入邮箱地址</div>
+                                   <input type="text" id="username" name="username" onFocus="onBlue()" tabindex="1" placeholder="输入电子邮箱" class="fm-text fm-validator" value="{$mail}">                                   <span class="noempty" id="msg-username">输入邮箱地址</span>
                                 </div>
                             </td>
                         </tr>
@@ -81,8 +77,8 @@
                             </td>
                             <td class="fm-field">
                                 <div class="fm-field-wrap">
-                                    <input type="password" onclick="onBlue();" id="password" name="password" value="" style="width:160px;" tabindex="2" class="fm-text fm-password fm-validator" autocomplete="off">
-                                    <div id="msg-pwd" class="fm-validator-result"><span class="noempty">*</span>输入登录密码</div></div>
+                                    <input type="password" onFocus="onBlue();" id="password" name="password" value="" tabindex="2" placeholder="输入登录密码" class="fm-text fm-password fm-validator" autocomplete="off">
+                                    <span class="noempty" id="msg-pwd">输入登录密码</span></div>
                             </td>
                         </tr>
                         <tr>
@@ -92,14 +88,14 @@
                             </td>
                             <td class="fm-field">
                                 <div class="fm-field-wrap">
-                                    <input id="checkcode" name="checkcode" onclick="onBlue();" class="fm-text fm-checkcode fm-validator" tabindex="3" type="text" maxlength="4" autocomplete="off" value="" name="_fm-a-_0-im">
+                                    <input id="checkcode" name="checkcode" onFocus="onBlue();" class="fm-text fm-checkcode fm-validator" tabindex="3" type="text" maxlength="4"  name="_fm-a-_0-im">
                                     <img id="verifyImg" src="__APP__/Index/verify" style="margin-left:10px;" align="absMiddle" onclick="changeVerify();" alt="点击图片刷新验证码" title="点击刷新图片验证码">
                                     <a href="javascript:void(0);" onclick="changeVerify();" class="J-changeCheckcode">看不清，换一张</a>
-                                    <div id="msg-code" class="fm-validator-result"><span class="noempty">*</span>输入验证码</div>
+                                    <span class="noempty" id="msg-code">输入验证码</span>
                                 </div>
                         </td></tr>
                         <tr><td align="right"></td><td>
-                        <a href="__APP__/Index/forget" target="_blank">忘记密码？</a>
+                        <a href="__APP__/Index/forget" >忘记密码？</a>
                         </td></tr>
                         <tr>
                             <td></td>
@@ -120,7 +116,7 @@
                     <p>如果您是企业用户</p>
                     请&nbsp;<a href="__APP__/Index/cregister">注册企业账号</a>
                     <p>&nbsp;</p>
-                    <a href="http://www.eflydns.com/index/index.php/Help/manual?51">了解更多>></a>
+                    <a href="http://www.eflydns.com/index/index.php/Help/manual?51" target="_blank">了解更多>></a>
               </div>
           </div>
     </div>

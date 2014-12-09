@@ -83,7 +83,14 @@
 							</tr>
 							<tr class="data">
 							    <td class="laber">路线级别</td>
-							    <td class="edit"><input class="ui-ipt-txt" type="text" id="txt_level" value="{$view.level}" placeholder="路线级别"> *</td>
+							    <td class="edit">
+                                <select id="txt_level" style="width:120px;">
+                                	<option value="0">免费用户</option>
+                                	<option value="1">创业版</option>
+                                	<option value="2">企业版</option>
+                                	<option value="3">旗舰版</option>
+                                </select>
+                                 *</td>
 							    <td class="info">说明：＂路线级别＂决定了用户需要说明套餐才能使用该路线</td>
 							</tr>
 							<!--tr class="data">
@@ -121,6 +128,9 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	$(function(){
+		$("#txt_level").val('{$view.level}');
+	});
 	function updateViewMask(id,obj){
 		var val = $(obj).parent().find('span').html();
 		$(obj).parent().html('<input value="'+val+'" class="ui-ipt-txt" id="txt_network" />&nbsp;<a href="javascript:void(0);" onClick="saveViewMask(' + id + ',this);">确定</a>');

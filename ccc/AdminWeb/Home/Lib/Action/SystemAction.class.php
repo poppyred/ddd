@@ -39,13 +39,17 @@ class SystemAction extends BaseAction {
 			$this->display();
 		}else{
 			if(isset($_POST['sid']) && isset($_POST['ip'])){
+				$list = M("server_list");
+				$entity = $list->where("sid='".$_POST['sid']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn(0,'输入的服务器编码重复',0);	
+				}
 				$data["sid"] = trim($_POST['sid']);
 				$data["ip"] = trim($_POST['ip']);
 				$data["desc"] = trim($_POST['desc']);
 				$data["type"] = trim($_POST['type']);
 				$data["status"] = trim($_POST['status']);
 				$data["subtype"] = trim($_POST['subtype']);
-				$list = M("server_list");
 				$is_ok = $list->where('id='.$_POST['id'])->save($data);
 				//添加成功
 				if($is_ok === false){
@@ -79,13 +83,19 @@ class SystemAction extends BaseAction {
 			$this->display();
 		}else{
 			if(isset($_POST['sid']) && isset($_POST['ip'])){
+				$list = M("server_list");
+				$entity = $list->where("sid='".$_POST['sid']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn(0,'输入的服务器编码重复',0);	
+				}
+				
 				$data["sid"] = trim($_POST['sid']);
 				$data["ip"] = trim($_POST['ip']);
 				$data["desc"] = trim($_POST['desc']);
 				$data["type"] = trim($_POST['type']);
 				$data["status"] = trim($_POST['status']);
 				$data["subtype"] = trim($_POST['subtype']);
-				$list = M("server_list");
+				
 				$is_ok = $list->add($data);
 				//添加成功
 				if($is_ok){
@@ -101,12 +111,17 @@ class SystemAction extends BaseAction {
 		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
 			$this->display();
 		}else{
-			if(isset($_POST['user']) && isset($_POST['pwd'])){
+			if(isset($_POST['user']) && isset($_POST['pwd'])){				
+				$list = M("admin");
+				$entity = $list->where("user='".$_POST['user']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn(0,'输入的用户名已存在',0);
+				}
+				
 				$data["user"] = trim($_POST['user']);
 				$data["pwd"] = trim($_POST['pwd']);
 				$data["level"] = trim($_POST['level']);
 				$data["desc"] = trim($_POST['desc']);
-				$list = M("admin");
 				$is_ok = $list->add($data);
 				//添加成功
 				if($is_ok){
@@ -128,11 +143,15 @@ class SystemAction extends BaseAction {
 			}
 		}else{
 			if(isset($_POST['user']) && isset($_POST['pwd'])){
+				$list = M("admin");
+				$entity = $list->where("user='".$_POST['user']."'")->find();
+				if(!empty($entity)){
+					$this->ajaxReturn(0,'输入的用户名已存在',0);
+				}
 				$data["user"] = trim($_POST['user']);
 				$data["pwd"] = trim($_POST['pwd']);
 				$data["level"] = trim($_POST['level']);
 				$data["desc"] = trim($_POST['desc']);
-				$list = M("admin");
 				$is_ok = $list->where('id='.$_POST['id'])->save($data);
 				//添加成功
 				if($is_ok===false){					

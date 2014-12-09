@@ -13,7 +13,9 @@
 			</p>
 			<p class="nav">
 				<span class="b active"></span><a href="__APP__/Domain/domainList/">域名解析</a>
-				<span class="b"></span><a href="__APP__/ReverseDomain/index?id={$_SESSION['id']}">域名反解析</a>
+                <if condition="$_SESSION[is_reverse] == 1">
+					<span class="b"></span><a href="__APP__/ReverseDomain/index">反向解析</a>
+                </if>
 				<span class="b"></span><a href="__APP__/Monitor/index">域名监控</a>
 				<span class="b"></span><a href="http://www.eflydns.com/index/Help/help/" target="_blank">帮助中心</a>
 			</p>
@@ -41,17 +43,20 @@
 	$(function(e){
 		var url = window.location.href;
 		$('.nav span').removeClass('active');
-		switch(true){
-			case url.indexOf('ReverseDomain')!=-1:
+		if(url.indexOf('ReverseDomain')!=-1){
 			$('.nav span:eq(1)').addClass('active');
-			break;
-			case url.indexOf('Domain')!=-1:
-			$('.nav span:eq(0)').addClass('active');
-			break 
-			case url.indexOf('Monitor')!=-1:
-			$('.nav span:eq(2)').addClass('active');
-			break;
 		}
+		else if(url.indexOf('Domain')!=-1){
+			$('.nav span:eq(0)').addClass('active');
+		}
+		else if(url.indexOf('Monitor')!=-1){
+			if("{$_SESSION['is_reverse']}"==1){
+				$('.nav span:eq(2)').addClass('active');
+			}else{
+				$('.nav span:eq(1)').addClass('active');
+			}	
+		}
+		
 		$(".info .user a").hover(function(){
 			$(this).css({'background':'#fff url(__ROOT__/Public/img/down_arrow1.jpg) no-repeat','color':'#666','background-position':'40px 8px'});
 			$("#userset").show();

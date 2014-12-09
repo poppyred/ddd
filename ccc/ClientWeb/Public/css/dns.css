@@ -62,7 +62,7 @@
 .table-box td.domain .icon-stop{background:url(../img/Pause.png) 0 center no-repeat}
 .table-box td.msg{padding-left:10px;/*width:390px;*/}
 .table-box td.msg a{color:#999}
-.table-box td.remark{/*width:280px;*/padding-left:10px;color:#999}
+.table-box td.remark{width:173px;padding-left:10px;color:#999}
 .table-box td.remark a{color:#0658a5}
 .table-box td.iop a{display:inline-block;width:15px;height:15px;background:url(../img/icon2_06.png) -1000px 0 no-repeat;margin:0 4px}
 .table-box td.iop a.icon-star{background-position:0 0}

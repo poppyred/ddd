@@ -21,9 +21,11 @@
 			});
 			
 			$(".table-toolbar .ui-btn-blue").click(function(){
+				$(".J_iptDomainSingle").val('');
 				$(".J_extendAddBox").slideToggle();
 			});
 			$(".J_extendAddBox .J_btnCloseExtendBox").click(function(){
+				$(".J_iptDomainSingle").val('');
 				$(".J_extendAddBox").slideToggle();
 			});
 			
@@ -43,26 +45,216 @@
 			stopPropagation(e);
 		}
 		function deleteReverse(id,obj){
-			if(confirm('确定删除该域名反解析？')){
-				$.ajax({
-					url:'__APP__/ReverseDomain/deleteReverse',
-					type:'post',
-					data:{'id':id},
-					success:function(data){
-						if(data.data){
-							window.location.reload();
-						}else{
-							layer.msg('温馨提示：'+data.data,2,3);		
-						}
-					},
-					error:function(data){
-						layer.msg('温馨提示：'+data.status,2,3);
-					}
-				});
-			}
+			var del = $.layer({
+				area: ['auto','auto'],	
+				dialog: {	
+					msg: '确定删除该域名反解析？',	
+					btns: 2,                   	
+					type: 4,	
+					btn: ['确定','取消'],	
+					yes: function(){	
+						layer.close(del);	
+						$.ajax({
+							url:'__APP__/ReverseDomain/deleteReverse',	
+							type:'post',	
+							data:{'id':id},	
+							async:false,	
+							success:function(data){								
+								bindMyData(data);
+							},	
+							error:function(data){	
+								layer.msg('温馨提示：'+data.status,2,5);	
+							}	
+						});
+					}, no: function(){	
+						layer.close(del);
+					}	
+				}	
+			});			
 		}
 		function addReverse(){
-				
+			var ip = $("#txt_ip").val().trim(),domain = $("#txt_domain").val().trim();
+			if(!ip){
+				$("#txt_ip").focus();
+				return false;
+			}
+			/*if(!CheckIp(ip)){
+				$("#txt_ip").focus();
+				layer.msg('温馨提示：输入的ip格式不正确。',2,5)
+				return false;
+			}*/
+			if(!domain){
+				$("#txt_domain").focus();
+				return false;
+			}
+			$.ajax({
+				url:'__APP__/ReverseDomain/addReverse',
+				type:'post',
+				data:{'ip':ip,'domain':domain},
+				success:function(data){
+					bindMyData(data);
+					$(".J_extendAddBox").slideToggle();
+				},
+				error:function(data){
+					layer.msg('温馨提示：'+data.status,2,5);
+				}
+			});
+		}
+		function checkAll(evt){	
+			$('#myData :checkbox').each(function(){	
+				$(this).attr('checked',!$(this).attr('checked'));	
+			});	
+		}
+		function returnID(){
+			var id = "";
+			$("#myData :checked").each(function(i){
+				if(i!=$("#myData :checked").length-1){
+					id += $(this).val() + ',';
+				}else{
+					id += $(this).val() ;
+				}
+			});
+			return id;	
+		}
+		function deleteRd(){
+			if($("#myData :checked").length==0){
+				return false;
+			}
+			var del = $.layer({
+				area: ['auto','auto'],	
+				dialog: {	
+					msg: '确定删除选中域名反解析？',	
+					btns: 2,                   	
+					type: 4,	
+					btn: ['确定','取消'],	
+					yes: function(){	
+						layer.close(del);	
+						$.ajax({
+							url:'__APP__/ReverseDomain/deleteReverse',	
+							type:'post',	
+							data:{'id':returnID()},	
+							async:false,	
+							success:function(data){	
+								bindMyData(data);
+							},	
+							error:function(data){	
+								layer.msg('温馨提示：'+data.status,2,5);	
+							}	
+						});
+					}, no: function(){	
+						layer.close(del);
+					}	
+				}	
+			});
+		}
+		function bindMyData(data){
+			var str = "";
+			if(data.info=='success'){
+				if(!data.data){
+					$("#myData").html('<tr class="con-empty J_listEmpty" id="null_zone"><td colspan="5"><span class="ui-sorry">暂无域名反解析~</span></td></tr>');
+				}else{
+					for(var i=0;i<data.data.length;i++){
+						str += '<tr class="data"><td class="chk"><input type="checkbox" class="data_chk" value="' + data.data[i].id + '"></td><td class="val">' + data.data[i].ip + '</td><td class="val">' + data.data[i].domain + '</td>';
+						if(data.data[i].status==0){
+							str += '<td class="rr" style="color:green">启用</td>';
+						}else{
+							str += '<td class="rr" style="color:red">停用</td>';
+						}
+						str += '<td class="iop"><a class="icon-manage" title="修改" href="javascript:void(0);" onClick="editTable(' + data.data[i].id + ',this);"></a> <a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteReverse(' + data.data[i].id + ',this)"></a></td></tr>';
+					}
+					$("#myData").html(str);
+				}
+			}else{
+				layer.msg('温馨提示：'+data.data,2,5);	
+			}
+		}
+		function editTable(id,obj){
+			var ip = $(obj).parent().parent().find('td:eq(1)').html(),domain = $(obj).parent().parent().find('td:eq(2)').html();;
+			$(obj).parent().parent().find('td:eq(1)').html('<input class="ui-ipt-txt" id="ip" type="text" value="' + ip + '" />');			
+			$(obj).parent().parent().find('td:eq(2)').html('<input class="ui-ipt-txt" id="domain" type="text" value="' + domain + '" />');
+			$(obj).parent().html('<a href="javascript:void(0);" onClick="save(' + id + ')">确定</a><a style="margin-left:20px;" href="javascript:void(0);" onClick="cancel(\'' + ip + '\',\'' + domain + '\',' + id + ',this)">取消</a>');
+			$("#ip").focus();
+		}
+		function save(id){
+			var ip = $("#ip").val(), domain = $("#domain").val();
+			if(!ip){
+				$("#ip").focus();
+				return false;
+			}
+			/*if(!CheckIp(ip)){
+				$("#txt_ip").focus();
+				layer.msg('温馨提示：输入的ip格式不正确。',2,5)
+				return false;
+			}*/
+			if(!domain){
+				$("#domain").focus();
+				return false;
+			}
+			$.ajax({
+				url:'__APP__/ReverseDomain/updateReverse',	
+				type:'post',	
+				data:{'id':id,'ip':ip,'domain':domain},	
+				async:false,	
+				success:function(data){	
+					bindMyData(data);
+				},	
+				error:function(data){	
+					layer.msg('温馨提示：'+data.status,2,5);	
+				}	
+			});
+		}
+		function cancel(ip,domain,id,obj){				
+			$(obj).parent().parent().find('td:eq(1)').html(ip);
+			$(obj).parent().parent().find('td:eq(2)').html(domain);
+			$(obj).parent().html('<a class="icon-manage" title="修改" href="javascript:void(0);" onClick="editTable(' + id + ',this);"></a> <a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteReverse(' + id + ',this)"></a>');
+		}
+		function stopRd(){
+			if($("#myData :checked").length==0){
+				return false;
+			}
+			var del = $.layer({
+				area: ['auto','auto'],	
+				dialog: {	
+					msg: '确定停用选中域名反解析？',	
+					btns: 2,                   	
+					type: 4,	
+					btn: ['确定','取消'],	
+					yes: function(){	
+						layer.close(del);	
+						$.ajax({
+							url:'__APP__/ReverseDomain/startStopReverse',	
+							type:'post',	
+							data:{'id':returnID(),'status':1},	
+							async:false,	
+							success:function(data){	
+								bindMyData(data);
+							},	
+							error:function(data){	
+								layer.msg('温馨提示：'+data.status,2,5);	
+							}	
+						});
+					}, no: function(){	
+						layer.close(del);
+					}	
+				}	
+			});
+		}
+		function startRd(){
+			if($("#myData :checked").length==0){
+				return false;
+			}	
+			$.ajax({
+				url:'__APP__/ReverseDomain/startStopReverse',	
+				type:'post',	
+				data:{'id':returnID(),'status':0},	
+				async:false,	
+				success:function(data){	
+					bindMyData(data);
+				},	
+				error:function(data){	
+					layer.msg('温馨提示：'+data.status,2,5);	
+				}	
+			});
 		}
     </script>
 </head>
@@ -74,7 +266,7 @@
 		<div class="head-info">
 			<div class="head-path">
 				<a class="home" href="__APP__/Domain/domainList"></a><span class="s"></span>
-				<strong class="current">域名反解析</strong>
+				<strong class="current">反向解析</strong>
 			</div>
 		</div>
 		<div class="J_singleTop">
@@ -91,9 +283,11 @@
                 <div class="cont"> 		
                     <div class="single J_boxSingle">
                         <div class="ui-field-row">
-                            <input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="请输入ip地址" style="width:200px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_ip">
-                             <span style="color: rgb(245, 29, 0);margin-left:20px;" > 例如，11.11.11.11</span>
-                        </div> 			
+                           	<span style="color:#666">IP地址</span>
+                           	<input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="请输入ip地址" style="width:180px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_ip">
+                            <span style="color:#666;margin-left:20px">域名</span>
+                            <input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="ip地址对应的域名" style="width:200px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_domain">
+                        </div>
                         <div class="ui-field-row">
                             <button class="ui-btn-red btn-add J_btnSubmitAddSingle" onclick="addReverse()">添 加</button>
                             <button class="ui-btn-grey btn-cancle J_btnCloseExtendBox" style="margin-left:20px;">取 消</button>
@@ -101,18 +295,17 @@
                     </div> 		                    
                 </div> 
             </div>      
-		<div class="table-box">
-        	
+		<div class="table-box">        	
 			<div class="table-toolbar">
 				<div class="lf">
-					<button class="ui-btn-blue" style="" >添加域名反解析</button>
+					<button class="ui-btn-blue" style="" >添加反向解析</button>
 					<button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onclick="optSelect(this)">更多
 						<span class="caret"></span>
 					</button> 
-					<ul class="dropdown-menu" style="margin-left: 112px; display: none;" id="opt_sel">
-						<li><a id="disable-Mnt" href="javascript:" onclick="stopMnt()">停用</a></li>
-						<li><a id="enable-Mnt" href="javascript:" onclick="startMnt()">启用</a></li>
-						<li><a id="delete-Mnt" href="javascript:" onclick="deleteMnt()">删除</a></li>
+					<ul class="dropdown-menu" style="margin-left: 100px; display: none;" id="opt_sel">
+						<li><a id="disable-Mnt" href="javascript:" onclick="stopRd()">停用</a></li>
+						<li><a id="enable-Mnt" href="javascript:" onclick="startRd()">启用</a></li>
+						<li><a id="delete-Mnt" href="javascript:" onclick="deleteRd()">删除</a></li>
 					</ul>
 				</div>
 			</div>
@@ -121,6 +314,7 @@
 				<tr id="tr_title">
 					<th class="chk"><input type="checkbox" onclick="checkAll();" class="J_chkForAll" title="全选/取消全选"></th>
 					<th class="sortable" sort="type"><span class="el">IP地址</span></th>
+					<th class="sortable" sort="type"><span class="el">域名</span></th>
 					<th class="sortable" sort="rr"><span class="el">解析状态</span></th>
 					<th>操作&nbsp;</th>
 				</tr>
@@ -128,7 +322,7 @@
 				<tbody id="myData">
                 	<if condition="count($rlist) == 0">
                     	<tr class="con-empty J_listEmpty" id="null_zone">
-                            <td colspan="6">
+                            <td colspan="5">
                                 <span class="ui-sorry">暂无域名反解析~</span>
                             </td>
                         </tr>
@@ -136,15 +330,16 @@
                         <volist name="rlist" id="item">
                             <tr class="data">
                                 <td class="chk"><input type="checkbox" class="data_chk" value="{$item.id}"></td>
-                                <td class="val">{$item.ip}</td>                                
+                                <td class="val">{$item.ip}</td>  
+                                <td class="val">{$item.domain}</td>                                
                                 <if condition="$item.status == 0">
-	                                <td class="rr">启用</td>
+	                                <td class="rr" style="color:green">启用</td>
                                 <else/>
-	                                <td class="rr">停用</td>
+	                                <td class="rr" style="color:red">停用</td>
                                 </if>
                                 <td class="iop">
-                                    <a class="icon-manage" title="配置监控参数" href="javascript:void(0);" onClick="editTable(this);"></a>
-                                    <a class="icon-del" rr-id="50321131" title="删除" href="javascript:void(0);" onClick="deleteReverse({$item.id},this)"></a>
+                                    <a class="icon-manage" title="修改" href="javascript:void(0);" onClick="editTable({$item.id},this);"></a>
+                                    <a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteReverse({$item.id},this)"></a>
                                 </td>
                             </tr>
                         </volist>

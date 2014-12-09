@@ -19,6 +19,7 @@ class IndexAction extends Action {
 
 			unset($_SESSION['user']);
 			unset($_SESSION['id']);
+			unset($_SESSION['is_reverse']);
 			$this->display();
 		}
 		else{
@@ -74,6 +75,7 @@ class IndexAction extends Action {
 							if(!empty($rslt)){
 								$_SESSION['user'] = $rslt["mail"];
 								$_SESSION['id'] = $rslt["id"];
+								$_SESSION['is_reverse'] = $rslt["is_reverse"];
 								
 								$last_login = strtotime($rslt["login_time"]);
 								$data["login_time"] = date("Y-m-d H:i:s");
@@ -212,6 +214,7 @@ class IndexAction extends Action {
 		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
 			unset($_SESSION['user']);
 			unset($_SESSION['id']);
+			unset($_SESSION['is_reverse']);
 			$this->display();
 		}else{
 			if(isset($_POST['mail']) && isset($_POST['pwd']) && isset($_POST['code'])){
@@ -224,10 +227,12 @@ class IndexAction extends Action {
 					$data['org_name'] = '';
 					$data['org_num'] = '';
 					$data["reg_time"] = date("Y-m-d H:i:s");
+					$data["login_time"] = date("Y-m-d H:i:s");
 					$is_ok = $client->add($data);
 					if($is_ok){
 						$_SESSION['user'] = $data["mail"];
 						$_SESSION['id'] = $is_ok;
+						$_SESSION['is_reverse'] = 0;
 						$this->ajaxReturn('个人用户注册成功，正在跳转到域名列表...', 'success',1);
 					}else{
 						$this->ajaxReturn('个人用户注册失败，请联系管理员', 'error',0);	
@@ -254,10 +259,12 @@ class IndexAction extends Action {
 					$data['org_name'] = trim($_POST['orgName']);
 					$data['org_num'] = trim($_POST['orgCode']);
 					$data["reg_time"] = date("Y-m-d H:i:s");
+					$data["login_time"] = date("Y-m-d H:i:s");
 					$is_ok = $client->add($data);
 					if($is_ok){
 						$_SESSION['user'] = $data["mail"];
 						$_SESSION['id'] = $is_ok;
+						$_SESSION['is_reverse'] = 0;
 						$this->ajaxReturn('企业用户注册成功，正在跳转到域名列表...', 'success',1);
 					}else{
 						$this->ajaxReturn('企业用户注册失败，请联系管理员', 'error',0);	
@@ -282,22 +289,24 @@ class IndexAction extends Action {
 		if($_SERVER['REQUEST_METHOD'] == 'GET'){
 			$this->display();	
 		}else{
-			if(!empty($_POST['mail']) && !empty($_POST['code'])){
+			if(!empty($_POST['mail']) && !empty($_POST['code']) && !empty($_POST['pwd'])){
 				if(trim($_POST['code']) != $_SESSION['num']){
 					$this->ajaxReturn('验证码错误，请输入正确的验证码！', 'error',0);
 				}else{
-					//$client = M('client');
-					//$pwd = md5(trim($_POST['pwd'])); //md5()
-					//$ret = $client->where("mail='".$_POST['mail']."'")->find();
-					$this->ajaxReturn(1, 'success',1);
-					/*$is_ok = $client->where("mail='".$_POST['mail']."'")->setField('pwd',$pwd);
-					if($is_ok){
+					$client = M('client');
+					$pwd = md5(trim($_POST['pwd'])); //md5()
+					$ret = $client->where("mail='".$_POST['mail']."'")->find();
+					
+					$is_ok = $client->where("mail='".$_POST['mail']."'")->setField('pwd',$pwd);
+					
+					if($is_ok===false){
+						$this->ajaxReturn('修改密码错误，请联系管理员！', 'error',0);
+					}else{					
 						$_SESSION['user'] = $ret["mail"];
 						$_SESSION['id'] = $ret['id'];
+						$_SESSION['is_reverse'] = $ret['is_reverse'];
 						$this->ajaxReturn("修改密码成功！3秒自动跳转域名管理页面", 'success',1);
-					}else{
-						$this->ajaxReturn('修改密码错误，请联系管理员！', 'error',0);
-					}*/
+					}
 				}
 			}
 		}
@@ -354,30 +363,6 @@ class IndexAction extends Action {
     }
 	
 	
-	
-	public function updatepwd(){
-		if($_SERVER['REQUEST_METHOD'] == 'GET'){
-			$this->assign('mail', $_GET['mail']);
-			$this->display();	
-		}else{
-			if(!empty($_POST['mail']) && !empty($_POST['pwd'])){
-				$client = M('client');
-				$pwd = md5(trim($_POST['pwd'])); //md5()
-				$ret = $client->where("mail='".$_POST['mail']."'")->find();
-				
-				$is_ok = $client->where("mail='".$_POST['mail']."'")->setField('pwd',$pwd);
-				
-				if($is_ok===false){
-					$this->ajaxReturn('修改密码错误，请联系管理员！', 'error',0);
-				}else{					
-					$_SESSION['user'] = $ret["mail"];
-					$_SESSION['id'] = $ret['id'];
-					$this->ajaxReturn("修改密码成功！3秒自动跳转域名管理页面", 'success',1);
-				}
-			}
-		}
-	}
-	
 	public function userUpdatepwd(){
 		if(!empty($_SESSION['user'])){
 			if($_SERVER['REQUEST_METHOD'] == 'GET'){
@@ -405,6 +390,8 @@ class IndexAction extends Action {
 					}else{					
 						$_SESSION['user'] = $rslt["mail"];
 						$_SESSION['id'] = $rslt['id'];
+						$_SESSION['is_reverse'] = $rslt['is_reverse'];
+						
 						$this->ajaxReturn("修改密码成功！3秒自动跳转用户信息", 'success',1);
 					}
 					
@@ -414,7 +401,68 @@ class IndexAction extends Action {
 			header("Location: ".__APP__."/Index/login");
 		}
 	}
-	
+	public function updateReverse(){
+		if(isset($_POST['val'])){
+			if($_POST['val'] == 1){
+				$zone = M('zone');
+				$entity = $zone->where('client_id=0')->find();
+				//第一个点击开启的触发
+				if(empty($entity)){
+					$data['domain'] = 'in-addr.arpa';
+					$data['client_id'] = 0;
+					//特殊domain
+					$val = array("name"=>strtolower('in-addr.arpa'));
+					$user = array("cid"=>0, "level"=>0, "info"=>"");
+					$param = array("type"=>"domain", "opt"=>"add", "data"=>$val,"user"=>$user);
+					$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);					
+					$rslt = json_decode($ret["content"],true);
+					if($rslt["ret"] == 0){
+						$is_ok = $zone->add($data);
+						//默认两条ns记录
+						$ns = M('nameserver');	
+						$client_domain = M('client_domain');					
+						$domain = M('domain');
+						$record = $ns->where('level=0')->select();
+						foreach($record as $n => $value){
+							$dt['host'] = '@';
+							$dt['type'] = 'NS';
+							$dt['view'] = $value['view'];
+							$dt['route'] = 0;
+							$dt['val'] = $value['val'];
+							$dt['mx'] = 0;
+							$dt['ttl'] = $value['ttl'];
+							$dt['is_edit'] = 0;//$zone['is_author'];//如果域名是付费的，则是可以编辑，默认是不可编辑
+							$dt['is_on'] = 1;
+							$d_id = $domain->add($dt);
+							
+							$ds = array("name"=>$dt['host'].".".$dt['domain'], "main"=>$data['domain'], "rid"=>(int)$d_id, "domain_ns"=>$dt['val'], "level"=>$dt['mx'], "ttl"=>(int)($dt['ttl'])*60, "viewid"=>$dt['view']);
+							$use = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+							$par = array("type"=>"record", "opt"=>"add", "data"=>$ds, "user"=>$use);
+							$rt = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $par);
+							$rs = json_decode($rt["content"], true);
+							if($rs["ret"] != 0){ //添加失败
+								$domain->where('id='.$d_id)->delete();
+							}else{
+								$rcd['client_id'] = 0;
+								$rcd['zone_id'] = $is_ok;
+								$rcd['domain_id'] = $d_id;
+								$client_domain->add($rcd);
+							}
+						}
+					}else{
+						$this->ajaxReturn(0,$rslt["error"],0);
+					}						
+				}
+			}
+			$client = M('client');
+			$is_ok = $client->where('id='.$_SESSION['id'])->setField('is_reverse',$_POST['val']);
+			if($is_ok === false){
+				$this->ajaxReturn('修改反向解析权限失败，请联系管理员。','error',0);
+			}
+			$_SESSION['is_reverse'] = $_POST['val'];
+			$this->ajaxReturn(1,'success',1);
+		}
+	}
 	
 	
 }

@@ -144,7 +144,11 @@
 			type: "post",
 			data:{'name':name, 'zone':zone, 'mask':mask,'id':$("#txt_id").val()},
 			success: function (data) {
-				$("#save_msg").html(data.info);
+				if(data.status==1){
+					window.location.href = "__APP__/Runmgr/route";
+				}else{
+					$("#save_msg").html(data.info);
+				}	
 			},
 			error: function (data) {
 				alert(data.statusText);
