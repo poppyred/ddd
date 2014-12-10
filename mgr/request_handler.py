@@ -7,7 +7,7 @@ import sys
 import json
 import types
 import mgr_conf
-from mgr_misc import _lineno, switch
+from mgr_misc import _lineno, switch, partition_reserve_ip_from_ptr
 import traceback
 import urllib
 import mgr_singleton
@@ -175,6 +175,8 @@ class req_handler(object):
     def handle_proxy_init_reply(worker, answ, addr):
         str_class = answ['class'].partition('_')[0]
         state_set = 0
+        if answ['type'] == msg.g_ptr_tbl:
+            answ['data'] = partition_reserve_ip_from_ptr(answ['data'])
         for case in switch(answ['result']):
             if case(0):
                 state_set = 1
