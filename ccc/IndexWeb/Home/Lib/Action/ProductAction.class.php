@@ -14,6 +14,7 @@ class ProductAction extends Action {
             if($result['result'] === 'success'){
                 $_SESSION['user'] = $email;
                 $_SESSION['id'] = $result['id'];
+                $_SESSION['is_reverse'] = $result['is_reverse'];
             }
         }
     }
