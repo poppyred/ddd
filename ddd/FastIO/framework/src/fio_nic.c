@@ -344,7 +344,7 @@ inline int fio_nic_txlimit(struct fio_nic *nic)
         txring = NETMAP_TXRING(txnifp, di);
         tx_limit += txring->avail;
     }
-    nic->txslow = tx_limit/5;
+    nic->txslow = tx_limit/10;
     nic->txfast = tx_limit-nic->txslow;
     nic->nictxavl = tx_limit;
     NOD("%s snd limit %d, slow %d, fast %d", nic->alise, tx_limit, nic->txslow, nic->txfast);
