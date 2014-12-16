@@ -607,7 +607,8 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         }
 #endif
 
-        if (0 && pkt_type == T_FIO_PKT_INTD)
+        if (slot->len<=60 && pkt_type == T_FIO_PKT_INTD ||
+                sysconfig.working == 2)
         {
             sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
                     NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
