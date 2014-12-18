@@ -26,7 +26,7 @@ struct fio_syslog
 
 struct fio_syslog g_fio_slog;
 
-const char * fio_slog_facilities[FIO_SYSLOG_FACILITIES] = {
+static const char * fio_slog_facilities[FIO_SYSLOG_FACILITIES] = {
 	"kern", "user", "mail", "daemon",
 	"auth", "syslog", "lpr", "news",
 	"uucp", "cron", "auth2", "ftp",
@@ -35,12 +35,12 @@ const char * fio_slog_facilities[FIO_SYSLOG_FACILITIES] = {
 	"local4", "local5", "local6", "local7"
 };
 
-const char *fio_slog_monthname[12] = {
+static const char *fio_slog_monthname[12] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };   
 
-int fio_slog_get_facility(const char *fac)
+static int fio_slog_get_facility(const char *fac)
 {
 	int facility;
 

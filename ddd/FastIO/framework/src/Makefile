@@ -15,7 +15,7 @@ OBJS      =  fio_mac_manager.o fio_conf.o fio_nm_util.o fio_map32.o \
 			 fio_ringbuf.o fio_statistics.o fio_context.o fio_nic.o \
 			 fio_sysconfig.o fio_handler.o fio_dns_logic.o fio_log.o \
 			 fio_pack_misc.o fio_icmp.o fio_syslog.o fio_sysstack.o \
-			 fio_sockpair.o fio_multip.o fio_mapstr.o fio_event.o \
+			 fio_sockpair.o fio_multip.o fio_mapstr.o fio_event.o bsd_udpcli.o \
 			 fio_test_send.o 
 
 CFLAGS    =  -Wall ${INCLUDE}
