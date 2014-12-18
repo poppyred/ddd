@@ -784,6 +784,7 @@ void dns_cache_clear()
         {
             
             list_del_init(&pos->list);
+            pthread_mutex_unlock(&pos->lock); 
             pthread_mutex_destroy(&pos->lock);    
             h_free(pos);
         }

@@ -191,7 +191,7 @@ int dns_edns_unpack(char *msg,int msglen)
     memcpy(&mask_ip,rdata,rdlen-8);
 
     
-    hyb_debug("Edns ip:%s\n",inet_ntoa(*(struct in_addr *)&mask_ip));
+    //hyb_debug("Edns ip:%s\n",inet_ntoa(*(struct in_addr *)&mask_ip));
 
     return mask_ip;
 }
@@ -257,6 +257,35 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
 }
 
 
+void handle_debug_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *out, struct fio_rxdata *rxdata)
+{
+    struct sockaddr_in client = {0};
+	char domain[MAX_DOMAIN_LEN] = {0};
+    int domainlen = 0;
+
+	char *recvmsg = rxdata->pbuf + UDP_HEAD_LEN;
+	int recvlen = rxdata->size - UDP_HEAD_LEN;
+
+	client.sin_addr.s_addr = rxdata->sip;
+	client.sin_port = rxdata->sport;
+	client.sin_family = AF_INET;
+    
+    struct MAIN_DNS_HEADER*head = (struct MAIN_DNS_HEADER*)recvmsg; 
+    int qcount = ntohs(head->q_count);
+	int addcount = ntohs(head->add_count);
+
+	int q_type = recv_request_analyze(recvmsg, recvlen, domain, &domainlen);
+	if(unlikely(q_type <= 0))
+	{
+        
+        /*local count*/
+        dns_lcllog_illreq_count();
+		return;
+	}
+
+    hyb_debug("Receive a Debug Msg:domain[%s]\n",domain);
+}
+
 
 /**
  * @brief   处理DNS请求
@@ -308,7 +337,7 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         int view_id = dns_mask_get_view(&client.sin_addr); 
         
         //view_id = 2;//***********test!!!!**************//
-        hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
+        //hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
 
 	    /*local count*/
 	    dns_lcllog_allreq_count();
@@ -329,7 +358,7 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         {                 
              /*查找用户对应视图*/
             int view_id = dns_mask_get_view((struct in_addr *)&client_ip); 
-            hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
+            //hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
                 
 	        /*local count*/
 	        dns_lcllog_allreq_count();
@@ -397,7 +426,7 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 		/*日志接口*/
 		//dns_pktlog_cache(log_t,dst->sin_addr.s_addr,view_id,domain,len,NIC_EXTRA_CONTEXT(log_t)->me,dst->sin_port);
 
-        hyb_debug("Cache Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
+        //hyb_debug("Cache Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
         dns_rsyslog("Cache Answer [view:%d]=>[%s] to user[%s:%d]",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
 
         dns_lcllog_reqcnt_log(domain,len,view_id,NIC_EXTRA_CONTEXT(src)->me);
@@ -425,7 +454,7 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 		/*日志接口*/
 		//dns_pktlog_cache(log_t,dst->sin_addr.s_addr,view_id,domain,len,NIC_EXTRA_CONTEXT(log_t)->me,dst->sin_port);
 
-        hyb_debug("Extche Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
+        //hyb_debug("Extche Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
         dns_rsyslog("Extche Answer [view:%d]=>[%s] to user[%s:%d]",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
 
 		return 0;
@@ -1106,6 +1135,7 @@ static void timer_callback5(void *user_data)
 			dns_lcllog_remake_path();
 			hyb_debug("Not The Same day, dns_lcllog_remake_path\n");
 			g_mday = g_tm->tm_mday;
+            dns_cache_check();
 
 		}
 	}
@@ -1132,10 +1162,12 @@ static int dns_timer_init()
 	}
 
     /*失效缓存检查 时间初期不需要太频繁*/
+    /*
 	if (!efly_timer_set(3600000,3600000, timer_callback3, NULL))
 	{
 		goto FAILED;
 	}
+	*/
 
      /*缓存节点内存清理*/
 	if (!efly_timer_set(17000,17000, timer_callback4, NULL))
@@ -1597,13 +1629,17 @@ dns_packet_handle(struct fio_nic *src, struct fio_nic *in, struct fio_nic *out,
 					dmac->ether_addr_octet[3], dmac->ether_addr_octet[4], dmac->ether_addr_octet[5]);
 		}
 
-        //unsigned short from_srv = htons(54);
 		switch(pkts->dport)
 		{
 			case 0x3500:
 				//TODO REQUEST
 				handle_query_msg(src,in,out,pkts);
 				break;
+             /*
+            case 0x3600:
+				handle_debug_msg(src,in,out,pkts);
+				break;
+			*/
 
 			case 0xE914:	 
 				handle_answer_msg(src,in,out,pkts);

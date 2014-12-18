@@ -349,6 +349,7 @@ st_extend_view_node * get_extend_veiw_node(char * domain,int domain_len,ushort v
 	return node;
 }
 
+/*
 static int domain_to_q_name(char*domain,int len,char*qname)
 {
     assert(domain);
@@ -375,7 +376,7 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 	memcpy_s(qname,temp,count);
 	return count;
 }
-
+*/
 
 static
 int make_dns_answer(char result[MAX_PACKET_LEN],char*domain,int domain_len,char ip[MAX_IP_LEN])

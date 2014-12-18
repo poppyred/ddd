@@ -15,6 +15,9 @@ void dns_edit_anum(char*result, unsigned short awnser_num);
 
 void dns_edit_logo(char*result, unsigned short logo);
 
+int domain_to_q_name(char*domain,int len,char*qname);
+
+int ip_to_q_name(char*ip,int len,char*qname);
 
 
 

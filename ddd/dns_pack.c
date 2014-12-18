@@ -122,7 +122,7 @@ void dns_edit_ttl(char* result, int total_len, unsigned short ttl)
 
 
 
-static int domain_to_q_name(char*domain,int len,char*qname)
+int domain_to_q_name(char*domain,int len,char*qname)
 {
     assert(domain);
     assert(qname);
@@ -149,7 +149,7 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 	return count;
 }
 
-static int ip_to_q_name(char*ip,int len,char*qname)
+int ip_to_q_name(char*ip,int len,char*qname)
 {
     assert(ip);
     assert(qname);

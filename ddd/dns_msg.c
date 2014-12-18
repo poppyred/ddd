@@ -852,7 +852,23 @@ void dns_msg_cache_delete(char *domain,int view_id,int type)
     }
     else
     {
-        ret = dns_cache_delete(domain,strlen(domain),view_id,type);
+        if (type == 0X000C)  
+        {
+            char origin[512] = {0};
+            char inaddr[512] = {0};
+            strcpy_n(origin,512,domain);
+            
+            if(ip_to_q_name(origin, strlen(origin), inaddr) < 0)
+            {
+                return;
+            }
+
+            ret = dns_cache_delete(inaddr,strlen(inaddr),view_id,type);
+        }
+        else
+        {
+            ret = dns_cache_delete(domain,strlen(domain),view_id,type);
+        }
     }
 
     
@@ -1012,14 +1028,14 @@ int dns_msg_view_analyze(char *msg)
             answer_to_mgr("view_reply",opt_id,0,view_id,mask_str,MGR_ANSWER_FAILED);
         }
           
-        hyb_debug("Receive a view-set msg[opt:%d mask:%s view:%d]\n", opt_id, mask_str, view_id);
+        //hyb_debug("Receive a view-set msg[opt:%d mask:%s view:%d]\n", opt_id, mask_str, view_id);
         
         switch(opt_id)
         {
             
         case VIEW_OPTION_ADD:
 
-            /*å…ˆçœ‹çœ‹æ˜¯å¦å­˜åœ¨*/
+            /*ÏÈ¿´¿´ÊÇ·ñ´æÔÚ*/
             dns_view_create(view_id);
             
             if (dns_mask_insert(ip, mask_num, view_id))

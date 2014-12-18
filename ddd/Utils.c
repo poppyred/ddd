@@ -601,6 +601,7 @@ int file_log_all(FILE*file,char*content)
 	return size;
 }
 
+/*
 int domain_to_q_name(char*domain,int len,char*qname)
 {
 	char temp_domain[256];
@@ -624,7 +625,7 @@ int domain_to_q_name(char*domain,int len,char*qname)
 	memcpy(qname,temp,count);
 	return count;
 }
-
+*/
 
 void arr_free(int num, char ** marks)
 {

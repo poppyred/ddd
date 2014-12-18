@@ -122,7 +122,7 @@ typedef struct extend_syn
 	char ipaddr[MAX_IP_LEN];
 }st_extend_syn;
 
-static int domain_to_q_name(char*domain,int len,char*qname);
+//static int domain_to_q_name(char*domain,int len,char*qname);
 
 
 static h_rbtree_st* tree_select(unsigned short type,int level)
@@ -822,7 +822,7 @@ int dns_ext_cache_del(char *domain,int domain_len,unsigned short type)
 	return 0;
 }
 
-
+/*
 static int domain_to_q_name(char*domain,int len,char*qname)
 {
     assert(domain);
@@ -849,6 +849,7 @@ static int domain_to_q_name(char*domain,int len,char*qname)
 	memcpy_s(qname,temp,count);
 	return count;
 }
+*/
 
 
 /**
