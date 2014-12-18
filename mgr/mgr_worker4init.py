@@ -65,4 +65,16 @@ class mgr_handler4init(queue_thread.Qthread):
         except Exception as e:
             self.loger.error(_lineno(self), 'inner error: ', repr(e))
             self.loger.error(traceback.format_exc())
+            
+    def reply_echo(self, data, host, port):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            addre = (host, port)
+            encodedjson = json.dumps(data)
+            s.sendto(encodedjson, addre)
+        except socket.error, msg:
+            self.loger.error(_lineno(self), 'dip(%s) (%s): %s' % (host, msg.args[0],msg.args[1]))
+            self.loger.error(traceback.format_exc())
+        finally:
+            s.close()
 
