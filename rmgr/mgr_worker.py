@@ -47,11 +47,11 @@ class mgr_handler(object):
             self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
         try:
             print >> sys.stderr,  'recv request class %s' % data['class']
-            if data['class'] == msg.g_class_init:
-                self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
-                msg.g_init_resp_expect = -1
-                mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
-                req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
+            #if data['class'] == msg.g_class_init:
+            #    self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
+            #    msg.g_init_resp_expect = -1
+            #    mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
+            #    req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
 
             if data['class'] == msg.g_class_init_test:
                 self.check_thd.del_tasknode_byname_lock(msg.g_class_init_test)
