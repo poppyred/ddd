@@ -174,8 +174,8 @@ class req_handler(object):
     def handle_proxy_init_reply(worker, answ, addr):
         str_class = answ['class'].partition('_')[0]
         state_set = 0
-        if answ['type'] == msg.g_ptr_tbl:
-            answ['data'] = partition_reserve_ip_from_ptr(answ['data'])
+        #if answ['type'] == msg.g_ptr_tbl:
+        #    answ['data'] = partition_reserve_ip_from_ptr(answ['data'])
         if answ['result'] == 0:
             state_set = 1
         if answ['result'] == 1:
