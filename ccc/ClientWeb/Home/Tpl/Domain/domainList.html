@@ -1009,9 +1009,9 @@
             			<ul>
                             <li><a class="active" href="__APP__/Domain/domainList?g=all" rel="all">全部域名</a></li>
                             <li><a href="__APP__/Domain/domainList?g=recent" rel="recent">有效域名</a></li>
+                            <li><a href="__APP__/Domain/domainList?g=error" rel="error">无效域名</a></li>
                             <li><a href="__APP__/Domain/domainList?g=star" rel="star">加星域名</a></li>
                             <li><a href="__APP__/Domain/domainList?g=vip" rel="vip">VIP域名</a></li>
-                            <li><a href="__APP__/Domain/domainList?g=error" rel="error">错误域名</a></li>
                 			<volist name="grouplist" id="g_vo">
                                 <li><a href="__APP__/Domain/domainList?g={$g_vo.id}" rel="{$g_vo.id}">{$g_vo.group}</a></li>
                        		</volist>

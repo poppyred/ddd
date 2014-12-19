@@ -332,7 +332,7 @@ class MonitorAction extends BaseAction {
 		}
 	}
 	//获取状态
-	public function returnMlist(){		
+	public function getStatus(){		
 		$monitor = M('monitor');
 		$mlist = $monitor->where('client_id='.$_SESSION['id'])->select();
 		foreach($mlist as $key =>$val){
@@ -344,14 +344,6 @@ class MonitorAction extends BaseAction {
 			}
 			$data = file_get_contents(C('NS_CHECH_URL').'/script/eflydns_monitor_domain.php?opt=status&val=['. substr($str,0,-1) .']');
 			$result = json_decode($data,true);
-			/*
-			$args["host"] = "121.201.12.61";//主机
-			$args["url"] = C('NS_CHECH_URL').'/script/eflydns_monitor_domain.php';//?opt=status&val=['. substr($str,0,-1) .']';
-			$args["method"] = "GET";//请求方式
-			$args["data"] = array("opt"=>"status","val"=>substr($str,0,-1));//参数
-			$this->asyn_request($args);
-			*/
-			
 			if($result['ret']==0){
 				$mlist[$key]['status'] = "<label style='color:green'>正常</label>";
 			}else{
@@ -361,8 +353,21 @@ class MonitorAction extends BaseAction {
 				$mlist[$key]['domain'] = substr($val['domain'],2);
 			}
 		}
-		return $mlist;
+		$this->ajaxReturn($mlist,'success',1);
+		
 	}
+	
+	//返回监控list
+	public function returnMlist(){		
+		$monitor = M('monitor');
+		$mlist = $monitor->where('client_id='.$_SESSION['id'])->select();
+		foreach($mlist as $key =>$val){			
+			$mlist[$key]['status'] = "<label style='color:#333'>获取中...</label>";
+		}
+		
+		return $mlist;
+	}	
+	
 	//获取图表
 	public function getData(){
 		$data = file_get_contents(C('NS_CHECH_URL').'/script/eflydns_monitor_domain.php?opt=chart&val=["'. $_GET['val'] .'"]');

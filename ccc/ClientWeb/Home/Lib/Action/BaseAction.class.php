@@ -2,7 +2,7 @@
 class BaseAction extends Action {
 	
 	public $user;
-	public function _initialize(){
+	public function _initialize(){					
 		$user = $this->saveCurrentUserSession();
 		if (empty($user)) {
 			$actionName = strtolower(ACTION_NAME);

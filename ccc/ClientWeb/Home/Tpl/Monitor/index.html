@@ -14,6 +14,18 @@
 	<script type="text/javascript" >
 	var show_hide=0;
     	$(function(){
+			load_layer = layer.load('正在获取实时状态...');
+			$.ajax({
+				url:'__APP__/Monitor/getStatus',
+				type:'post',
+				success:function(data){
+					setInterval(function (){layer.close(load_layer);},2000);
+					bindMyData(data);
+				},
+				error:function(data){
+					layer.msg('温馨提示：'+data.status,2,5);
+				}	
+			});
 			$("#type_sel").val($("#type").val());
 		//添加
 		/*

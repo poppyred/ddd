@@ -228,7 +228,7 @@ class DomainAction extends BaseAction {
 		$zone = M();
 		if(!empty($_GET['g']) && !empty($_SESSION['id'])){
 			if($_GET['g'] == 'all'){
-				$zoneList = $zone->query('select * from (select * from zone a left join (select zone_id,count(*) as count from client_domain group by zone_id ) as b on a.id=b.zone_id) as z left join client_domain cd on cd.zone_id=z.id where z.client_id=%d group by z.id order by z.id desc',$_SESSION['id']);
+				$zoneList = $zone->query('select * from (select * from zone a left join (select zone_id,count(*) as count from client_domain group by zone_id ) as b on a.id=b.zone_id) as z left join client_domain cd on cd.zone_id=z.id where z.client_id=%d group by z.id order by z.is_author desc',$_SESSION['id']);
 			}else if($_GET['g'] == 'star'){
 				$zoneList = $zone->query('select * from (select * from zone a left join (select zone_id,count(*) as count from client_domain group by zone_id ) as b on a.id=b.zone_id) as z left join client_domain cd on cd.zone_id=z.id where z.client_id=%d and z.is_star=1 group by z.id order by z.id desc',$_SESSION['id']);
 			}else if($_GET['g'] == 'recent'){
@@ -242,7 +242,7 @@ class DomainAction extends BaseAction {
 			}
 			$this->assign('group',$_GET['g']);
 		}else{
-			$zoneList = $zone->query('select * from (select * from zone a left join (select zone_id,count(*) as count from client_domain group by zone_id ) as b on a.id=b.zone_id) as z left join client_domain cd on cd.zone_id=z.id where z.client_id=%d group by z.id order by z.id desc limit 0,10',$_SESSION['id']);
+			$zoneList = $zone->query('select * from (select * from zone a left join (select zone_id,count(*) as count from client_domain group by zone_id ) as b on a.id=b.zone_id) as z left join client_domain cd on cd.zone_id=z.id where z.client_id=%d group by z.id order by z.is_author desc ',$_SESSION['id']);//limit 0,10
 			$this->assign('group','recent');
 		}
 		$name = M('zone_name');

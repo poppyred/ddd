@@ -80,7 +80,6 @@ struct fio_context {
     int used;
     int *notifyfds;
     LFQueue *q_recv;
-
     //just for test
     int n_test;
 };

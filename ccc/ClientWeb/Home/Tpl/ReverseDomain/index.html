@@ -73,7 +73,7 @@
 			});			
 		}
 		function addReverse(){
-			var ip = $("#txt_ip").val().trim(),domain = $("#txt_domain").val().trim();
+			var ip = $("#txt_ip").val().trim(),domain = $("#txt_domain").val().trim(),view = $("#txt_view").val();
 			if(!ip){
 				$("#txt_ip").focus();
 				return false;
@@ -90,7 +90,7 @@
 			$.ajax({
 				url:'__APP__/ReverseDomain/addReverse',
 				type:'post',
-				data:{'ip':ip,'domain':domain},
+				data:{'ip':ip,'domain':domain,'view':view},
 				success:function(data){
 					bindMyData(data);
 					$(".J_extendAddBox").slideToggle();
@@ -151,10 +151,10 @@
 			var str = "";
 			if(data.info=='success'){
 				if(!data.data){
-					$("#myData").html('<tr class="con-empty J_listEmpty" id="null_zone"><td colspan="5"><span class="ui-sorry">暂无域名反解析~</span></td></tr>');
+					$("#myData").html('<tr class="con-empty J_listEmpty" id="null_zone"><td colspan="6"><span class="ui-sorry">暂无域名反解析~</span></td></tr>');
 				}else{
 					for(var i=0;i<data.data.length;i++){
-						str += '<tr class="data"><td class="chk"><input type="checkbox" class="data_chk" value="' + data.data[i].id + '"></td><td class="val">' + data.data[i].ip + '</td><td class="val">' + data.data[i].domain + '</td>';
+						str += '<tr class="data"><td class="chk"><input type="checkbox" class="data_chk" value="' + data.data[i].id + '"></td><td class="val">' + data.data[i].ip + '</td><td class="val">' + data.data[i].domain + '</td><td class="val">' + data.data[i].view_name + '</td>';
 						if(data.data[i].status==0){
 							str += '<td class="rr" style="color:green">启用</td>';
 						}else{
@@ -169,14 +169,25 @@
 			}
 		}
 		function editTable(id,obj){
-			var ip = $(obj).parent().parent().find('td:eq(1)').html(),domain = $(obj).parent().parent().find('td:eq(2)').html();;
-			$(obj).parent().parent().find('td:eq(1)').html('<input class="ui-ipt-txt" id="ip" type="text" value="' + ip + '" />');			
-			$(obj).parent().parent().find('td:eq(2)').html('<input class="ui-ipt-txt" id="domain" type="text" value="' + domain + '" />');
-			$(obj).parent().html('<a href="javascript:void(0);" onClick="save(' + id + ')">确定</a><a style="margin-left:20px;" href="javascript:void(0);" onClick="cancel(\'' + ip + '\',\'' + domain + '\',' + id + ',this)">取消</a>');
-			$("#ip").focus();
+			if($("#ip").length==0){			
+				var ip = $(obj).parent().parent().find('td:eq(1)').html(),domain = $(obj).parent().parent().find('td:eq(2)').html(),view = $(obj).parent().parent().find('td:eq(3)').html();
+				$(obj).parent().parent().find('td:eq(1)').html('<input class="ui-ipt-txt" id="ip" type="text" value="' + ip + '" />');			
+				$(obj).parent().parent().find('td:eq(2)').html('<input class="ui-ipt-txt" id="domain" type="text" value="' + domain + '" />');
+				$(obj).parent().parent().find('td:eq(3)').html('<select id="view" class="ui-select">'+$("#txt_view").html()+'</select>');
+				$("#view option").each(function(){
+					if($(this).text() == view){
+						$(this).attr('selected','selected');
+					}
+				});
+				
+				$(obj).parent().html('<a href="javascript:void(0);" onClick="save(' + id + ')">确定</a><a style="margin-left:20px;" href="javascript:void(0);" onClick="cancel(\'' + ip + '\',\'' + domain + '\',\'' + view + '\',' + id + ',this)">取消</a>');
+				$("#ip").focus();			
+			}else{
+				layer.msg('温馨提示：一次只能修改一条反向解析记录',2,5);
+			}
 		}
 		function save(id){
-			var ip = $("#ip").val(), domain = $("#domain").val();
+			var ip = $("#ip").val(), domain = $("#domain").val(),view = $("#view").val();
 			if(!ip){
 				$("#ip").focus();
 				return false;
@@ -193,7 +204,7 @@
 			$.ajax({
 				url:'__APP__/ReverseDomain/updateReverse',	
 				type:'post',	
-				data:{'id':id,'ip':ip,'domain':domain},	
+				data:{'id':id,'ip':ip,'domain':domain,'view':view},	
 				async:false,	
 				success:function(data){	
 					bindMyData(data);
@@ -203,9 +214,10 @@
 				}	
 			});
 		}
-		function cancel(ip,domain,id,obj){				
+		function cancel(ip,domain,view,id,obj){				
 			$(obj).parent().parent().find('td:eq(1)').html(ip);
 			$(obj).parent().parent().find('td:eq(2)').html(domain);
+			$(obj).parent().parent().find('td:eq(3)').html(view);
 			$(obj).parent().html('<a class="icon-manage" title="修改" href="javascript:void(0);" onClick="editTable(' + id + ',this);"></a> <a class="icon-del" title="删除" href="javascript:void(0);" onClick="deleteReverse(' + id + ',this)"></a>');
 		}
 		function stopRd(){
@@ -287,6 +299,12 @@
                            	<input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="请输入ip地址" style="width:180px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_ip">
                             <span style="color:#666;margin-left:20px">域名</span>
                             <input class="ui-ipt-txt ipt-domain J_iptDomainSingle" placeholder="ip地址对应的域名" style="width:200px;" submit-with=".J_btnSubmitAddSingle" type="text" id="txt_domain">
+                            <span style="color:#666;margin-left:20px">线路</span>
+                            <select id="txt_view" class="ui-select">
+                            	<volist name="viewList" id="item">
+                                	<option value="{$item.id}">{$item.name}</option>
+                                </volist>
+                            </select>
                         </div>
                         <div class="ui-field-row">
                             <button class="ui-btn-red btn-add J_btnSubmitAddSingle" onclick="addReverse()">添 加</button>
@@ -315,6 +333,7 @@
 					<th class="chk"><input type="checkbox" onclick="checkAll();" class="J_chkForAll" title="全选/取消全选"></th>
 					<th class="sortable" sort="type"><span class="el">IP地址</span></th>
 					<th class="sortable" sort="type"><span class="el">域名</span></th>
+					<th class="sortable" sort="type"><span class="el">线路</span></th>
 					<th class="sortable" sort="rr"><span class="el">解析状态</span></th>
 					<th>操作&nbsp;</th>
 				</tr>
@@ -322,7 +341,7 @@
 				<tbody id="myData">
                 	<if condition="count($rlist) == 0">
                     	<tr class="con-empty J_listEmpty" id="null_zone">
-                            <td colspan="5">
+                            <td colspan="6">
                                 <span class="ui-sorry">暂无域名反解析~</span>
                             </td>
                         </tr>
@@ -331,7 +350,8 @@
                             <tr class="data">
                                 <td class="chk"><input type="checkbox" class="data_chk" value="{$item.id}"></td>
                                 <td class="val">{$item.ip}</td>  
-                                <td class="val">{$item.domain}</td>                                
+                                <td class="val">{$item.domain}</td>  
+                                <td class="val">{$item.view_name}</td>                                
                                 <if condition="$item.status == 0">
 	                                <td class="rr" style="color:green">启用</td>
                                 <else/>

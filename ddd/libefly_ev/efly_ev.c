@@ -312,7 +312,7 @@ static void on_read(int fd, short ev, void *arg)
         return;
     }
 
-    hyb_debug("received len:%d\n", len);
+    //hyb_debug("received len:%d\n", len);
 
     
     memcpy(&id,req,sizeof(unsigned short));

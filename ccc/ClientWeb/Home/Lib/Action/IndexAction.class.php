@@ -42,12 +42,15 @@ class IndexAction extends Action {
 							//$param = array("id"=>$rslt["id"]);
 							//http_post(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php", $param);
 							file_get_contents(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php?id=".$rslt["id"]);
-						}*/
-						
+						}
+						$_SESSION['user'] = $rslt["mail"];
+						$_SESSION['id'] = $rslt["id"];
+						$_SESSION['is_reverse'] = $rslt["is_reverse"];
+						*/
 						$list->where($cnd)->data($data)->save();
 						
-						echo '{"result":"success","id":'.$rslt["id"].'}'; //,"session":"'.$_SESSION['user'].'"
-											
+						echo '{"result":"success","id":'.$rslt["id"].',"is_reverse":'.$rslt["is_reverse"].'}'; //,"session":"'.$_SESSION['user'].'"
+						
 					} else {
 						echo 'error';
 					}
@@ -131,75 +134,91 @@ class IndexAction extends Action {
 		}
 	}
 	public function setCompany(){
-		if(isset($_POST['comp']) && isset($_POST['user']) ){
-			$cnd["mail"] = trim($_POST['user']);
-			$list = M("client");
-			$rslt = $list->where($cnd)->find();
-			if(empty($rslt)){
-					$this->ajaxReturn('error', '该用户不存在！', 0);
-			}else{
-				$data['org_name'] = $_POST['comp'];
-				$is_ok = $list->where($cnd)->data($data)->save();
-				if($is_ok===false){
-					$this->ajaxReturn('error', '企业名称修改失败！', 0);	
+		if(!empty($_SESSION['user'])){
+			if(isset($_POST['comp']) && isset($_POST['user']) ){
+				$cnd["mail"] = trim($_POST['user']);
+				$list = M("client");
+				$rslt = $list->where($cnd)->find();
+				if(empty($rslt)){
+						$this->ajaxReturn('error', '该用户不存在！', 0);
 				}else{
-					$this->ajaxReturn('success', '企业名称修改成功！', 1);
+					$data['org_name'] = $_POST['comp'];
+					$is_ok = $list->where($cnd)->data($data)->save();
+					if($is_ok===false){
+						$this->ajaxReturn('error', '企业名称修改失败！', 0);	
+					}else{
+						$this->ajaxReturn('success', '企业名称修改成功！', 1);
+					}
 				}
 			}
+		}else{
+			header("Location: ".__APP__."/Index/login");
 		}
 	}
 	public function setPhone(){
-		if(isset($_POST['phone']) && isset($_POST['user']) ){
-			$cnd["mail"] = trim($_POST['user']);
-			$list = M("client");
-			$rslt = $list->where($cnd)->find();
-			if(empty($rslt)){
-					$this->ajaxReturn('error', '该用户不存在！', 0);
-			}else{
-				$data['link_phone'] = $_POST['phone'];
-				$is_ok = $list->where($cnd)->data($data)->save();
-				if($is_ok===false){
-					$this->ajaxReturn('error', '手机号码修改失败！', 0);	
+		if(!empty($_SESSION['user'])){
+			if(isset($_POST['phone']) && isset($_POST['user']) ){
+				$cnd["mail"] = trim($_POST['user']);
+				$list = M("client");
+				$rslt = $list->where($cnd)->find();
+				if(empty($rslt)){
+						$this->ajaxReturn('error', '该用户不存在！', 0);
 				}else{
-					$this->ajaxReturn('success', '手机号码修改成功！', 1);
+					$data['link_phone'] = $_POST['phone'];
+					$is_ok = $list->where($cnd)->data($data)->save();
+					if($is_ok===false){
+						$this->ajaxReturn('error', '手机号码修改失败！', 0);	
+					}else{
+						$this->ajaxReturn('success', '手机号码修改成功！', 1);
+					}
 				}
 			}
+		}else{
+			header("Location: ".__APP__."/Index/login");
 		}
 	}
 	public function setMan(){
-		if(isset($_POST['man']) && isset($_POST['user']) ){
-			$cnd["mail"] = trim($_POST['user']);
-			$list = M("client");
-			$rslt = $list->where($cnd)->find();
-			if(empty($rslt)){
-					$this->ajaxReturn('error', '该用户不存在！', 0);
-			}else{
-				$data['link_man'] = $_POST['man'];
-				$is_ok = $list->where($cnd)->data($data)->save();
-				if($is_ok===false){
-					$this->ajaxReturn('error', '联系人修改失败！', 0);	
+		if(!empty($_SESSION['user'])){
+			if(isset($_POST['man']) && isset($_POST['user']) ){
+				$cnd["mail"] = trim($_POST['user']);
+				$list = M("client");
+				$rslt = $list->where($cnd)->find();
+				if(empty($rslt)){
+						$this->ajaxReturn('error', '该用户不存在！', 0);
 				}else{
-					$this->ajaxReturn('success', '联系人修改成功！', 1);
+					$data['link_man'] = $_POST['man'];
+					$is_ok = $list->where($cnd)->data($data)->save();
+					if($is_ok===false){
+						$this->ajaxReturn('error', '联系人修改失败！', 0);	
+					}else{
+						$this->ajaxReturn('success', '联系人修改成功！', 1);
+					}
 				}
 			}
+		}else{
+			header("Location: ".__APP__."/Index/login");
 		}
 	}
 	public function setWeixin(){
-		if(isset($_POST['weixin']) && isset($_POST['user']) ){
-			$cnd["mail"] = trim($_POST['user']);
-			$list = M("client");
-			$rslt = $list->where($cnd)->find();
-			if(empty($rslt)){
-					$this->ajaxReturn('error', '该用户不存在！', 0);
-			}else{
-				$data['link_weixin'] = $_POST['weixin'];
-				$is_ok = $list->where($cnd)->data($data)->save();
-				if($is_ok===false){
-					$this->ajaxReturn('error', '微信绑定失败！', 0);	
+		if(!empty($_SESSION['user'])){
+			if(isset($_POST['weixin']) && isset($_POST['user']) ){
+				$cnd["mail"] = trim($_POST['user']);
+				$list = M("client");
+				$rslt = $list->where($cnd)->find();
+				if(empty($rslt)){
+						$this->ajaxReturn('error', '该用户不存在！', 0);
 				}else{
-					$this->ajaxReturn('success', '微信绑定成功！', 1);
+					$data['link_weixin'] = $_POST['weixin'];
+					$is_ok = $list->where($cnd)->data($data)->save();
+					if($is_ok===false){
+						$this->ajaxReturn('error', '微信绑定失败！', 0);	
+					}else{
+						$this->ajaxReturn('success', '微信绑定成功！', 1);
+					}
 				}
 			}
+		}else{
+			header("Location: ".__APP__."/Index/login");
 		}
 	}
 	

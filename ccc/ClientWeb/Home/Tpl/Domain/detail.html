@@ -80,7 +80,38 @@
 				}				
 			});
 		}*/
+		function returnOptStr(){
+			var add_arr = ['湖南','湖北','广东','广西','河南','河北','山西','山东','浙江','江西','江苏','新疆','云南','贵州','福建','吉林','安徽','四川','海南','宁夏','辽宁','青海','甘肃','陕西','西藏','重庆','内蒙','北京','上海','天津','香港','台湾','澳门','黑龙江'];
+			var add_view = ['电信','联通','移动','铁通'];
+			var add_school = ['中山大学','北京大学','东华大学','东南大学','宁波大学','清华大学','复旦大学','武汉大学','四川大学','北京理工大学','上海交通大学','华南理工大学','中国科技大学'];
+			var add_country = ['美国','日本','英国','印度','巴西','德国','韩国','法国','俄罗斯','新加坡','加拿大','澳大利亚'];
+			var add_dz = ['非洲','亚洲','欧洲','北美洲','大洋洲','南美洲','南极洲'];
+			
+			var add_str = '<optgroup label="区域运营商">'	
+			for(var i=0;i<add_view.length;i++){
+				for(var j=0;j<add_arr.length;j++){
+					add_str += '<option>'+ add_arr[j] + add_view[i] +'</option>';
+				}
+			}
+			add_str += '</optgroup><optgroup label="高校">';	
+			for(var i=0;i<add_school.length;i++){
+				add_str += '<option>'+ add_school[i] +'</option>';
+			}
+			add_str += '</optgroup><optgroup label="国家">';	
+			for(var i=0;i<add_country.length;i++){
+				add_str += '<option>'+ add_country[i] +'</option>';
+			}
+			add_str += '</optgroup><optgroup label="大洲">';	
+			for(var i=0;i<add_dz.length;i++){
+				add_str += '<option>'+ add_dz[i] +'</option>';
+			}
+			add_str += '</optgroup>';			
+			return add_str;
+		}
+		
 		$(function(){
+			var otp_str = $("#sel_view").html();
+			$("#sel_view").html(otp_str);// + returnOptStr()
 			/*if($("#is_first").val() == "true"){
 				var loadi, domain = $("#txt_zone").val();
 				$.ajax({
@@ -348,7 +379,7 @@
 					}else{
 						spancls = "ui-help J_btnToggleHelp ui-help-opened";
 					}
-					var option = $("#viewOpt").html();
+					var option = $("#viewOpt").html();// + returnOptStr();
 					var zone = $("#cur_zone").html(),str_status="";
 					if(typeof(img)!='undefined'){
 						str_status = 'stop';
@@ -502,7 +533,8 @@
 					$("#null_domain").empty();
 				}
 				if(!$("#add_row").html()){
-					var option = $("#viewOpt").html();
+				var option = $("#viewOpt").html();// + returnOptStr();
+				//option = option + add_str;
 					$('#myData').prepend('<tr class="row-opened" id="add_row"><td class="chk"></td><td class="status"></td><td class="rr"><input value="" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+$("#txt_zone").val()+'">.'+$("#txt_zone").val()+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">--</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'add\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelAdd()">取消</button><span id="icon_open_close" class="ui-help J_btnToggleHelp ui-help-opened" onclick="slideInfo(this)"></span></td></tr><tr class="msg_info" id="tx_0"><td colspan="9" class="expand-outer">'+info_val+'</td></tr>');
 					//$("#add_row").after();
 					//$("#add_row").next().children().html(info_val);			
@@ -972,9 +1004,11 @@
                     </select>
                     <select class="ui-select" id="sel_view" onChange="selectByWhere()">
                     	<option value="">所有线路</option>
+                        <!--optgroup label="运营商"-->
                         <volist name="viewList" id="item">
                         	<option value="{$item.id}">{$item.name}</option>
                         </volist>
+                        <!--/optgroup-->
                     </select>
 					<input class="ui-ipt-txt ui-ipt-search J_iptSearchDomain" submit-with=".J_btnSearchDomain" id="searchTxt" type="text" placeholder="快速查找记录"><!-- onChange="pageReload(0)" -->
                     <button class="ui-btn-grey" onClick="selectBy(this)">查找</button>
@@ -987,9 +1021,11 @@
 					<button class="ui-btn-grey">搜索</button> 	
 				</div--> 
 				<select id="viewOpt" style="display:none;">
-				<volist name="viewList" id="rl">
-					<option value="{$rl.id}">{$rl.name}</option>
-				</volist>
+                    <!--optgroup label="运营商"-->
+                    <volist name="viewList" id="rl">
+                        <option value="{$rl.id}">{$rl.name}</option>
+                    </volist>
+                    <!--/optgroup-->
 				</select>
 			</div>
 			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">

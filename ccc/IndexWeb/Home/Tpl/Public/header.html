@@ -136,7 +136,7 @@
             dataType: 'json',
             type: 'post',
             success: function(data) {
-                // console.log(data);
+                // console.log(data);return;
 
                 if (data.status == 'success') {
                   cookie.set('peach', $form.find('input[name=email]').val(), {
@@ -147,6 +147,7 @@
 
                   //$(".outter-nav .account").hide();
                   //$(".outter-nav .info").show();
+
                   window.location.href = 'http://www.eflydns.com/client/Domain/domainList';
 
                 } else {
