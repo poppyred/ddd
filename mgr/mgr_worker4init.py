@@ -8,6 +8,8 @@ import mgr_conf
 from request_handler import *
 import sys
 import MySQL
+import socket
+import json
 import time
 from mgr_misc import _lineno, switch
 import traceback
@@ -60,12 +62,15 @@ class mgr_handler4init(queue_thread.Qthread):
                 if case(msg.g_class_inner_chk_task_db_heartbeat):
                     req_handler.handle_inner_chk_task_db_heartbeat(self)
                     break
+                if case(msg.g_class_proxy_heartbeat):
+                    req_handler.handle_proxy_heartbeat(self, data)
+                    break
                 if case():
                     self.loger.warn(_lineno(self), 'recv something else: ', data['class'])
         except Exception as e:
             self.loger.error(_lineno(self), 'inner error: ', repr(e))
             self.loger.error(traceback.format_exc())
-            
+
     def reply_echo(self, data, host, port):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
