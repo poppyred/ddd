@@ -1,8 +1,6 @@
 <?php
 
 $filename = $argv[1];
-$domain = "dprktimes.com";
-$replace_domain = ".".$domain;
 
 $fd = @fopen($filename, "r") or die("Couldn't open file"); ;
 
@@ -11,30 +9,39 @@ $cnt = 0;
 
 while($s=fgets($fd,1048)){ 
 $cnt ++;
+if ($cnt == 1)
+{
+	continue;
+}
 #echo "$cnt:$s - ";
 
-$s = split(' ',$s);
+$s = split('             ',$s);
 print_r($s);
 $s[0] = trim($s[0]);
 #$rev = strrev($s[0]);
-$record = substr($s[0],0,-1);
+#$record = substr($s[0],0,-1);
+$record = $s[0];
 
 $value = trim($s[1]);
-
+//$value = trim($value);
+$value = substr($value,0,-1);
 #echo "$record:$value\n";
 
 
 $arr[$record] = $value;
 #$value = substr($value,0,-1);
-$record =  str_replace($replace_domain, '', $record);
+#$record =  str_replace($replace_domain, '', $record);
 
-$url ="http://api.efly.cc/eflydns/record.php?opt=insert&user=yanfa@efly.cc&domain=".$domain."&host=".$record."&type=A&view=联通&val=".$value."&ttl=60";
+$url ="http://api.efly.cc/eflydns/reverse.php?opt=insert&user=yanfa@efly.cc&domain=".$value."&ip=".$record."&view=默认";
 echo $url."\n";
 
+if (1)
+{
 $ret = file_get_contents($url);
 $ret = json_decode($ret,true);
 print_r($ret);
 usleep(1000);
+}
 
 
 
