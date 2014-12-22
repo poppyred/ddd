@@ -14,7 +14,7 @@ fi
 ip='121.201.11.4'
 #ip=$1
 port="22"
-passwd='dnspro@zshj#321'
+passwd='dnspro@zshj#123'
 local_dir='release/dnspro'
 remote_dir='/usr/local'
 
