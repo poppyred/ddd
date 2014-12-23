@@ -78,7 +78,7 @@
 							<volist name="clist" id="s_vo">
 							<tr class="data"> 	 	
 								<td class="chk">{$i}</td>
-								<td class="val" style="text-align:left;">{$s_vo.mail}</td>
+								<td class="val" style="text-align:left;"><a title="{$s_vo.mail}" href="__APP__/Clientmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}" target="_blank">{$s_vo.mail}</a></td>
 								<td class="iop">{$s_vo.link_man}</td>
 								<td class="iop">{$s_vo.login_time}</td> 
 								<td class="rr" style="text-align:left;width:240px;">{$s_vo.reg_time}</td>

@@ -81,7 +81,7 @@
 							<tr class="data"> 	 	
 								<td class="chk">{$i}</td>
 								<td class="val" style="text-align:left;">
-									<a title="" href="__APP__/Domainmgr/record?r={$s_vo.id}">{$s_vo.domain}</a>
+									<a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">{$s_vo.domain}</a>
 								</td>
 								<td class="rr">{$s_vo.default_ttl}</td>
 								<td class="rr" style="width:80px;"><if condition="$s_vo.is_author eq 0">未修改<else/>已修改</if></td> 

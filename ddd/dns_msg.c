@@ -846,41 +846,48 @@ void dns_msg_cache_request(char *domain,int view_id,int type)
 void dns_msg_cache_delete(char *domain,int view_id,int type)
 {
     int ret = 0;
-    if (*domain == '*')
+    char inaddr[512] = {0};
+    char *target = domain;
+
+    if (type == 0X000C)  
     {
-        ret = dns_ext_cache_drop(domain+2,strlen(domain)-2,view_id,type);
+        char origin[512] = {0};
+        
+        strcpy_n(origin,512,domain);
+            
+        if(ip_to_q_name(origin, strlen(origin), inaddr) < 0)
+        {
+            return;
+        }
+
+        target = inaddr;
+    }
+
+    //hyb_debug("Delete Target:%s\n");
+    
+    if (*target == '*')
+    {
+
+        ret = dns_ext_cache_drop(target,strlen(target),view_id,type);
+        
     }
     else
     {
-        if (type == 0X000C)  
-        {
-            char origin[512] = {0};
-            char inaddr[512] = {0};
-            strcpy_n(origin,512,domain);
-            
-            if(ip_to_q_name(origin, strlen(origin), inaddr) < 0)
-            {
-                return;
-            }
-
-            ret = dns_cache_delete(inaddr,strlen(inaddr),view_id,type);
-        }
-        else
-        {
-            ret = dns_cache_delete(domain,strlen(domain),view_id,type);
-        }
+           
+        ret = dns_cache_delete(target,strlen(target),view_id,type);
+        
     }
 
     
     if (ret)
     {
         /*answer fail*/
-        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,domain,MGR_ANSWER_FAILED);
+        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,target,MGR_ANSWER_FAILED);
     }
     else
     {
         /*answer sucess*/
-        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,domain,MGR_ANSWER_SUCCESS);
+        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,target,MGR_ANSWER_SUCCESS);
     }
 
     

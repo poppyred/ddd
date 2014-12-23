@@ -92,9 +92,15 @@
 							<tr class="data">
 							    <td class="laber">用户</td>
 							    <td class="edit">
-                                <select id="txt_client">
+                                <span>yanfa@efly.cc</span>
+                                <a href="javascript:void(0);" onClick="selectVal(this)">自选</a>
+                                <select id="txt_client" style="display:none">
                                 	<volist name="clientList" id="item">
-                                	<option value="{$item.id}">{$item.mail}</option>
+                                    <if condition="$item[mail] == 'yanfa@efly.cc' ">
+                                		<option value="{$item.id}" selected>{$item.mail}</option>
+                                        <else/>
+                                        <option value="{$item.id}">{$item.mail}</option>
+                                    </if>
                                     </volist>
                                 </select>
                                 *</td>
@@ -118,8 +124,14 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	function selectVal(obj){
+		$(obj).hide();
+		$(obj).prev().hide();
+		$(obj).next().show();
+	}
 	function save(){
 		var ip = $("#txt_ip").val().trim(),domain = $("#txt_domain").val().trim(),view = $("#txt_view").val(),client = $("#txt_client").val();
+		alert(client);
 		if(!ip){
 			$("#txt_ip").focus();
 			return false;

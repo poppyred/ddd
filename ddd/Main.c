@@ -337,9 +337,9 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         /*正常DNS请求处理*/
         
         /*查找用户对应视图*/
-        //int view_id = dns_mask_get_view(&client.sin_addr); 
+        int view_id = dns_mask_get_view(&client.sin_addr); 
         
-        int view_id = 2;//***********test!!!!**************//
+        //int view_id = 2;//***********test!!!!**************//
         //hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
 
 	    /*local count*/

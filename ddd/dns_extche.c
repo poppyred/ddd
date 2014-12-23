@@ -698,7 +698,7 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
         return -1;
     }
 
-	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
+	if(h_rbtree_search(tree,domain+2,domain_len-2,(void **)&temp) != 0)
 	{
 		/*rbtree find failed*/
 		new_domain = (st_extend_view_array *)h_malloc(sizeof(st_extend_view_array));
@@ -720,8 +720,10 @@ int dns_ext_cache_set(char *domain,int domain_len,ushort view_id,char *pkt,
 	{
 		if(temp->view[view_id] != NULL)
 		{
-			he_debug("[create extend failed!] extend exist,dns_extend_create failed!\n");
-			return -1;
+            temp->view[view_id]->standup= 1;
+	        temp->view[view_id]->del_time = time(0) + 3;
+	        list_add_tail(&temp->view[view_id]->list, &g_extche_delete_list);
+            temp->view[view_id] = NULL;
 		}
 		if(extche_view_create(temp,domain,domain_len,view_id,pkt,pkt_len) != 0)
 		{
@@ -763,7 +765,7 @@ int dns_ext_cache_drop(char *domain,int domain_len,ushort view_id,unsigned short
         return -1;
     }
     
-	if(h_rbtree_search(tree,domain,domain_len,(void **)&temp) != 0)
+	if(h_rbtree_search(tree,domain+2,domain_len-2,(void **)&temp) != 0)
 	{
 		/*rbtree find failed*/
 		he_debug("[drop extend failed!] extend not exist,get_extend_veiw_node failed!\n");
