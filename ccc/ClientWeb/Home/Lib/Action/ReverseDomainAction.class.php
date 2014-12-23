@@ -2,8 +2,46 @@
 // 本类由系统自动生成，仅供测试用途
 class ReverseDomainAction extends BaseAction {
 	public function index(){
-		$this->assign('rlist',$this->returnList());		
+		
+		$page = 1;
+		if(!empty($_GET['p'])){
+			$page = $_GET['p'];
+		}
+		$where = "";
+		if(!empty($_GET['v'])){
+			$where = " and view_id=".$_GET['v'];
+		}
+		if(!empty($_GET['ip'])){
+			$where .= " and ip like '%".$_GET['ip']."%' ";
+		}
 		$view = M('view');
+		$reverse = M('reverse_domain');
+		$rlist = $reverse->query('select * from reverse_domain where client_id='.$_SESSION['id'].' '.$where.' order by id desc '.' limit ' . ($page-1) * 50 . ',50' );
+		
+		$count = $reverse->query('select count(*) as count from reverse_domain where client_id='.$_SESSION['id'].' '.$where);
+		if($count[0]['count']<=50){
+			$pageCount = 1;
+		}else{
+			if($count[0]['count'] % 50 == 0){
+				$pageCount = $count[0]['count'] / 50;
+			}else{
+				$pageCount = ($count[0]['count'] - $count[0]['count'] % 50) / 50 + 1;
+			}
+		}
+		
+		foreach($rlist as $key => $val){
+			$tem = $view->where('id='.$val['view_id'])->find();
+			$rlist[$key]['view_name'] = $tem['name'];
+		}
+		$this->assign('sum',$count[0]['count']);
+		$this->assign('page',$page);
+		$this->assign('view',$_GET['v']);
+		$this->assign('ip',$_GET['ip']);
+		$this->assign('pageCount',$pageCount);
+		
+		$this->assign('rlist',$rlist);
+		$this->assign('count', count($rlist));	
+		
 		$viewList = $view->select();
 		$this->assign('viewList',$viewList);
 		$this->display();	
@@ -114,15 +152,15 @@ class ReverseDomainAction extends BaseAction {
 		}
 	}	
 	
-	public function returnList(){		
+	public function returnList($page){		
 		$reverse = M('reverse_domain');
 		$view = M('view');
-		$rlist = $reverse->where('client_id='.$_SESSION['id'])->select();
+		$rlist = $reverse->where('client_id='.$_SESSION['id'])->order('id desc')->limit(($page-1) * 50,50)->select();
+		
 		foreach($rlist as $key => $val){
 			$tem = $view->where('id='.$val['view_id'])->find();
 			$rlist[$key]['view_name'] = $tem['name'];
 		}
-		
 		return $rlist;
 	}
 }

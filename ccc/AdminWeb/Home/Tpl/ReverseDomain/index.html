@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd on">
+                <h3>反向解析管理</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/ReverseDomain">反向解析列表</a></li>
+                    <li><a href="__APP__/ReverseDomain/addReverse">添加反向解析</a></li>
+                </ul>
+            </div>
+        </div>
+	</div>
+		<!--div class="hd">
+			<h3>其他功能</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a href="#"></a></li>
+				<li><a href="#"></a></li>
+			</ul>
+		</div-->
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">反向解析列表</h2>
+			</div>
+			<div class="bd">
+				<ul>
+                	<div class="table-toolbar">
+						<div class="lf">共
+							{$page}
+						</div>
+						<div class="rf" style="margin-right:10px;"> 
+                        	<select onChange="selectBy()" id="sel_view">
+                            	<volist name="viewList" id="item">
+                                	<if condition="$item[id] == $view">
+	                            		<option value="{$item.id}" selected>{$item.name}</option>
+                                    <else/>
+	                            		<option value="{$item.id}">{$item.name}</option>
+                                	</if>                                    	
+                                </volist>
+                            </select>
+                            <input class="ui-ipt-txt ui-ipt-search " id="txt_ip" value="{$ip}" type="text" placeholder="输入IP进行快速查询">
+							<button class="ui-btn-grey" onClick="selectBy()">搜索</button>
+						</div> 
+					</div>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
+						<thead>
+						<tr id="tr_title">
+							<th class="chk" style="text-align:center;">编号</th>
+							<th style="text-align:left;"><span class="el">IP</span></th>
+							<!--th><span class="el">密码</span></th-->
+							<th>域名</th>
+							<th>线路</th>
+							<th>操作&nbsp;</th>
+						</tr>
+						</thead> 	
+						<tbody id="myData">
+							<volist name="rlist" id="item">
+							<tr class="data"> 	 	
+								<td class="chk">{$i}</td>
+								<td class="val">{$item.ip}</td>
+								<td class="iop">{$item.domain}</td> 
+								<td class="rr">{$item.view_name}</td>
+								<td class="iop">
+									<a title="修改反向解析" href="__APP__/ReverseDomain/updateReverse?id={$item.id}">修改</a>
+									<a title="删除反向解析" href="javascript:void(0);" onclick="deleteReverse({$item.id},{$item.client_id},this)">删除</a>
+                                    <if condition="$item[status] == 0">
+                                    	<a title="停用反向解析" href="javascript:void(0);" onclick="startStopReverse({$item.id},{$item.client_id},1)">停用</a>
+                                        <else/>
+                                        <a title="启用反向解析" href="javascript:void(0);" onclick="startStopReverse({$item.id},{$item.client_id},0)">启用</a>
+                                    </if>
+								</td>
+							</tr>
+							</volist>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function startStopReverse(id,cid,status){
+		$.ajax({
+			url: '__APP__/ReverseDomain/startStopReverse',
+			type: "post",
+			data:{'id':id,'cid':cid,'status':status},
+			success: function (data) {
+				if(data.info == "success"){
+					window.location.reload();	
+				}else{
+					alert(data.data);	
+				}							
+			},
+			error: function (data) {
+				alert(data.statusText);
+			}
+		});
+	}
+	function deleteReverse(id,cid,evt){
+		if(confirm('确认删除该反向解析吗？')){
+			$.ajax({
+				url: '__APP__/ReverseDomain/deleteReverse',
+				type: "post",
+				data:{'id':id,'cid':cid},	
+				success: function (data) {
+					if(data.status == 1)
+						window.location.reload();	
+				},
+				error: function (data) {
+					alert(data.statusText);
+				}
+			});
+		}
+	}
+	function selectBy(){
+		var ip = $("#txt_ip").val(),v = $("#sel_view").val();
+		window.location.href = "__APP__/ReverseDomain/index?v="	+ v + "&ip=" + ip;
+	}
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

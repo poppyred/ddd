@@ -50,6 +50,8 @@ h_rbtree_st * g_mx_tree[MAX_DOMAIN_LEVEL];
 h_rbtree_st * g_ns_tree[MAX_DOMAIN_LEVEL];
 h_rbtree_st * g_cname_tree[MAX_DOMAIN_LEVEL];
 h_rbtree_st * g_txt_tree[MAX_DOMAIN_LEVEL];
+h_rbtree_st * g_ptr_tree[MAX_DOMAIN_LEVEL];
+
 
 
 struct list_head g_extche_delete_list;
@@ -137,6 +139,10 @@ static h_rbtree_st* tree_select(unsigned short type,int level)
         
     case 0x0002:
         select_table = g_ns_tree[level];
+        break;
+
+    case 0x000C:
+        select_table = g_ptr_tree[level];
         break;
         
     case 0x0005:
@@ -585,6 +591,14 @@ int dns_ext_cache_init()
             //extend_syn_from_mysql();
             return -1;
         }
+
+        g_ptr_tree[i] = h_rbtree_create(extche_member_destroy,extche_member_compare);
+        if (!g_ptr_tree[i])
+        {
+            he_debug("[dns extend init fail!]\n");
+            //extend_syn_from_mysql();
+            return -1;
+        }
     }
     return 0;
 }
@@ -639,6 +653,12 @@ void dns_ext_cache_destroy()
         {
             h_rbtree_destroy(g_txt_tree[i]);
             g_txt_tree[i] = NULL;
+        } 
+
+        if (g_ptr_tree[i])
+        {
+            h_rbtree_destroy(g_ptr_tree[i]);
+            g_ptr_tree[i] = NULL;
         } 
     }
     list_for_each_entry_safe(pos,n,&g_extche_delete_list,list)

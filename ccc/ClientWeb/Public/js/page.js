@@ -47,7 +47,16 @@ function downclick(){
 	}
 }
 function selectByPage(val,page,ord){
-	window.location.href = APP + "/Domain/detail?d=" + val + "&p=" + page + "&o=" + ord + "&t=" + $("#sel_type").val() + "&h=" + $("#searchTxt").val() + "&v=" + $("#sel_view").val();
+	var url = window.location.href;
+	switch(true){
+		case url.indexOf('Domain/detail')!=-1:		
+		window.location.href = APP + "/Domain/detail?d=" + val + "&p=" + page + "&o=" + ord + "&t=" + $("#sel_type").val() + "&h=" + $("#searchTxt").val() + "&v=" + $("#sel_view").val();
+		break;
+		case url.indexOf('ReverseDomain/index')!=-1:		
+		window.location.href = APP + "/ReverseDomain/index?p=" + page;
+		break;
+	}
+	
 }
 //分页的的首页和未页
 $("#first").bind("click",function(){

@@ -40,6 +40,9 @@
 			$(".navBar ul li:eq(8)").addClass('on');
 			break;
 			case url.indexOf('System')!=-1:
+			$(".navBar ul li:eq(12)").addClass('on');
+			break;
+			case url.indexOf('ReverseDomain')!=-1:
 			$(".navBar ul li:eq(10)").addClass('on');
 			break;
 		}	
@@ -76,6 +79,10 @@
                 <li class="s">|</li>
                 <li class="m">
                     <h3><a target="_self" href="__APP__/System/user">账号权限</a></h3>
+                </li>
+                <li class="s">|</li>
+                <li class="m">
+                    <h3><a target="_self" href="__APP__/ReverseDomain">反向解析</a></h3>
                 </li>
             </if>
 			<li class="s">|</li>

@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-CN">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+		
+        <div id="sideMenu" class="side">    
+            <div class="hd on">
+                <h3>反向解析管理</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/ReverseDomain">反向解析列表</a></li>
+                    <li><a href="__APP__/ReverseDomain/addReverse">添加反向解析</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+		<!--div class="hd">
+			<h3>其他功能</h3>
+		</div>
+		<div class="bd">
+			<ul>
+				<li><a href="#"></a></li>
+				<li><a href="#"></a></li>
+			</ul>
+		</div-->
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">修改反向解析</h2>
+			</div>
+			<div class="bd">
+				<ul>
+					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab" style="margin-left:20px;">
+						<!--thead>
+							<tr id="tr_title">
+								<th style="text-align:left;font-size:13px;color:#404040;">[基本信息]</th>
+								<th colspan="2">
+							</tr>
+						</thead--> 	
+						<tbody id="myData">
+							<tr class="data">
+							    <td class="laber">IP</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="txt_ip" value="{$ret.ip}" placeholder="IP"></td>
+							    <td class="info">例如：11.11.11.11</td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">域名</td>
+							    <td class="edit"><input class="ui-ipt-txt" type="text" id="txt_domain" value="{$ret.domain}" placeholder="域名"> *</td>
+							    <td class="info"></td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">线路</td>
+							    <td class="edit">
+                                <select id="txt_view">
+                                	<volist name="viewList" id="item">
+                                    	<if condition="$item[id] eq $ret[view_id]">
+                                		<option value="{$item.id}" selected>{$item.name}</option>
+                                        <else/>
+                                		<option value="{$item.id}">{$item.name}</option>
+                                        </if>
+                                    </volist>
+                                </select>
+                                *</td>
+							    <td class="info"></td>
+							</tr>
+							<tr class="data">
+							    <td class="laber">用户</td>
+							    <td class="edit">
+                                <select id="txt_client">
+                                	<volist name="clientList" id="item">
+                                		<if condition="$item[id] == $ret[client_id]">
+                                		<option value="{$item.id}" selected>{$item.mail}</option>
+                                        <else/>
+                                		<option value="{$item.id}">{$item.mail}</option>
+                                        </if>
+                                    </volist>
+                                </select>
+                                *</td>
+							    <td class="info"></td>
+							</tr>
+							<tr class="data">
+							    <td class="laber"></td> 	
+							    <td class="edit">
+								    <button id="submit_btn" onclick="save();">保存</button> <span id="save_msg" style="color:#3CADED"></span>
+							    </td>
+							    <td class="info"></td>  
+							</tr>
+						</tbody> 
+					</table>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">
+	function save(){
+		var ip = $("#txt_ip").val().trim(),domain = $("#txt_domain").val().trim(),view = $("#txt_view").val(),client = $("#txt_client").val(),id = '{$ret.id}';
+		if(!ip){
+			$("#txt_ip").focus();
+			return false;
+		}
+		/*if(!CheckIp(ip)){
+			$("#txt_ip").focus();
+			layer.msg('温馨提示：输入的ip格式不正确。',2,5)
+			return false;
+		}*/
+		if(!domain){
+			$("#txt_domain").focus();
+			return false;
+		}
+		$.ajax({
+			url:'__APP__/ReverseDomain/updateReverse',
+			type:'post',
+			data:{'id':id,'ip':ip,'domain':domain,'view':view,'client':client},
+			success:function(data){
+				if(data.info=='success'){
+					window.location.href = "__APP__/ReverseDomain"
+				}else{
+					alert('温馨提示：'+data.data);	
+				}
+			},
+			error:function(data){
+				alert('温馨提示：'+data.status);
+			}
+		});
+	}
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>

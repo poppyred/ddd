@@ -212,47 +212,50 @@ answer_to_client(struct fio_nic *src, struct fio_rxdata *rxdata, int recvlen,
 		return;
 	}
 
-    /*view_id= 1 为默认视图*/
+    
     if(likely(view_id > 0 && view_id < MAX_VIEM_NUM)) //在用户ip视图中找到
     {
         /*反向解析处理*/
         if(q_type == 0x000c)
 	    {
+            /*view_id= 1 为默认视图*/
             int ret = dns_cache_answer_check(src, txdata, domain, domainlen, 1, 
-                q_type,client,qurey_id,rxdata->dip,rxdata->smac);
+                    q_type,client,qurey_id,rxdata->dip,rxdata->smac);
             if (ret)
             {
                 dns_deal_ptr_answer(src,rxdata,txdata,recvlen,domain,domainlen,client);
             }
             return;
         }
-
-        /*检查是否已缓存*/
-        int ret = dns_cache_answer_check(src, txdata, domain, domainlen, view_id, 
-                q_type,client,qurey_id,rxdata->dip,rxdata->smac);
-        if (ret)
+        else
         {
-            /*找不到*/
-            struct sockaddr_in *dst = (struct sockaddr_in *)client;
-            dns_lcllog_errdst_count();
-			dns_lcllog_errdst_viewcount(view_id);
-			dns_lcllog_errdst(NIC_EXTRA_CONTEXT(src)->me,view_id,
-										domain,dst->sin_addr.s_addr);
-            if (q_type == 0x001c)
+
+            /*检查是否已缓存*/
+            int ret = dns_cache_answer_check(src, txdata, domain, domainlen, view_id, 
+                    q_type,client,qurey_id,rxdata->dip,rxdata->smac);
+            if (ret)
             {
-                ///hyb_debug("AAAA NULL ANSWER!\n");
-                txdata->dmac = &rxdata->smac;
-			    txdata->dstip = rxdata->sip;
-			    txdata->dstport = rxdata->sport;
-		        txdata->srcip = rxdata->dip;
-		        txdata->srcport = htons(53);
-                dns_edit_logo(txdata->pdata,0x8500);
-			    fio_send(src, htons(recvlen), txdata, 1);
+                /*找不到*/
+                struct sockaddr_in *dst = (struct sockaddr_in *)client;
+                dns_lcllog_errdst_count();
+			    dns_lcllog_errdst_viewcount(view_id);
+			    dns_lcllog_errdst(NIC_EXTRA_CONTEXT(src)->me,view_id,
+										domain,dst->sin_addr.s_addr);
+                if (q_type == 0x001c)
+                {
+                    ///hyb_debug("AAAA NULL ANSWER!\n");
+                    txdata->dmac = &rxdata->smac;
+			        txdata->dstip = rxdata->sip;
+			        txdata->dstport = rxdata->sport;
+		            txdata->srcip = rxdata->dip;
+		            txdata->srcport = htons(53);
+                    dns_edit_logo(txdata->pdata,0x8500);
+			        fio_send(src, htons(recvlen), txdata, 1);
             
-                return;
+                    return;
+                }
             }
         }
-
     }
 }
 
@@ -334,9 +337,9 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         /*正常DNS请求处理*/
         
         /*查找用户对应视图*/
-        int view_id = dns_mask_get_view(&client.sin_addr); 
+        //int view_id = dns_mask_get_view(&client.sin_addr); 
         
-        //view_id = 2;//***********test!!!!**************//
+        int view_id = 2;//***********test!!!!**************//
         //hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
 
 	    /*local count*/
@@ -1324,6 +1327,29 @@ static void dns_handle_view_option(void *buf, int32_t b_len, char *src,char *ans
 
 }
 
+static void dns_handle_debug_option(void *buf, int32_t b_len, char *src,char *answer)
+{
+	assert(buf);
+
+    char ip[32] = {0};
+
+    memcpy(ip,buf,b_len);
+
+    hyb_debug("Receive ip:%s\n",ip);
+
+    struct in_addr addr_t;
+
+    inet_aton(ip, &addr_t);
+    int view_id = dns_mask_get_view(&addr_t); 
+
+    hyb_debug("Match view:%d\n",view_id);
+
+    return;
+    
+
+}
+
+
 
 static int dns_event_init()
 {
@@ -1363,6 +1389,11 @@ static int dns_event_init()
 	} 
 
     if (efly_ipc_reg_func(g_ipc_svr, 5, dns_handle_view_option))
+	{
+		goto FAILED;
+	} 
+
+    if (efly_ipc_reg_func(g_ipc_svr, 6, dns_handle_debug_option))
 	{
 		goto FAILED;
 	} 

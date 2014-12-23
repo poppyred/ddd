@@ -10,6 +10,9 @@
 	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
 	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript">
+		var APP = "__APP__";
+    </script>
 	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
 	<script type="text/javascript" >
 		$(function(){
@@ -19,12 +22,13 @@
 					$("#opt_sel").slideToggle();
 				}
 			});
+			$("#sel_view").val('{$view}');
 			
 			$(".table-toolbar .ui-btn-blue").click(function(){
 				$(".J_iptDomainSingle").val('');
 				$(".J_extendAddBox").slideToggle();
 			});
-			$(".J_extendAddBox .J_btnCloseExtendBox").click(function(){
+			$(".J_extendAddBox .J_btnCloseExtendBox,.J_closeExtendBox").click(function(){
 				$(".J_iptDomainSingle").val('');
 				$(".J_extendAddBox").slideToggle();
 			});
@@ -60,7 +64,8 @@
 							data:{'id':id},	
 							async:false,	
 							success:function(data){								
-								bindMyData(data);
+								//bindMyData(data);								
+								selectByWhere();
 							},	
 							error:function(data){	
 								layer.msg('温馨提示：'+data.status,2,5);	
@@ -92,7 +97,8 @@
 				type:'post',
 				data:{'ip':ip,'domain':domain,'view':view},
 				success:function(data){
-					bindMyData(data);
+					//bindMyData(data);
+					selectByWhere();
 					$(".J_extendAddBox").slideToggle();
 				},
 				error:function(data){
@@ -135,7 +141,8 @@
 							data:{'id':returnID()},	
 							async:false,	
 							success:function(data){	
-								bindMyData(data);
+								//bindMyData(data);
+								selectByWhere();
 							},	
 							error:function(data){	
 								layer.msg('温馨提示：'+data.status,2,5);	
@@ -146,6 +153,17 @@
 					}	
 				}	
 			});
+		}
+		function selectBy(){
+			var val = $("#searchTxt").val();
+			if(val){				
+				selectByWhere();
+			}else{
+				messageBox('message','请输入IP地址（支持模糊查询）');
+			}
+		}
+		function selectByWhere(){
+			window.location.href = "__APP__/ReverseDomain/index?p=" + $("#xiye").html() + "&v=" + $("#sel_view").val() + "&ip=" + $("#searchTxt").val();
 		}
 		function bindMyData(data){
 			var str = "";
@@ -207,7 +225,8 @@
 				data:{'id':id,'ip':ip,'domain':domain,'view':view},	
 				async:false,	
 				success:function(data){	
-					bindMyData(data);
+//					bindMyData(data);
+					window.location.reload();
 				},	
 				error:function(data){	
 					layer.msg('温馨提示：'+data.status,2,5);	
@@ -319,13 +338,27 @@
 					<button class="ui-btn-blue" style="" >添加反向解析</button>
 					<button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onclick="optSelect(this)">更多
 						<span class="caret"></span>
-					</button> 
+					</button>
 					<ul class="dropdown-menu" style="margin-left: 100px; display: none;" id="opt_sel">
 						<li><a id="disable-Mnt" href="javascript:" onclick="stopRd()">停用</a></li>
 						<li><a id="enable-Mnt" href="javascript:" onclick="startRd()">启用</a></li>
 						<li><a id="delete-Mnt" href="javascript:" onclick="deleteRd()">删除</a></li>
-					</ul>
+					</ul>                        
 				</div>
+                <div class="ui-pop-box small-con-box" id="message" style="float:left; margin-left:10px; display:none;width:auto;height:auto;">
+                    <div style="position: relative;background-color: #fff;border: solid 1px #999; height:20px;line-height:20px; padding:2px 10px 2px 10px">这里是提示信息</div>
+                </div>
+                <div class="rf">              
+                	<select class="ui-select" id="sel_view" onChange="selectByWhere()">
+                    	<option value="">所有线路</option>
+                        <volist name="viewList" id="item">
+                        	<option value="{$item.id}">{$item.name}</option>
+                        </volist>
+                    </select>
+                    <input class="ui-ipt-txt ui-ipt-search J_iptSearchDomain" submit-with=".J_btnSearchDomain" id="searchTxt" value="{$ip}" type="text" placeholder="快速查找记录">
+                    <button class="ui-btn-grey" onClick="selectBy()">查找</button>
+                    <button class="ui-btn-grey" onClick="javascript:window.location.href='__APP__/ReverseDomain/index'">重置</button>
+                </div>
 			</div>
 			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
 				<thead>
@@ -366,9 +399,26 @@
                     </if>
 				</tbody> 
 			</table>
+            <div class="page">            	
+                <ul>        
+                	<li style="border:none;">总记录数：{$sum}，本页记录数：{$count}</li>
+                    <li id="first">首页</li>
+                    <li id="top" onclick="topclick()">上一页</li>
+                    <li class="xifenye" id="xifenye">
+                        <a id="xiye">{$page}</a>/<a id="mo">{$pageCount}</a>
+                        <div class="xab" id="xab" style="display:none">
+                            <ul id="uljia">                                    
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="down" onclick="downclick()">下一页</a></li>
+                    <li id="last">末页</li>
+                </ul>                
+            </div>
 		</div> 
 		<!-- footer -->
 		<include file="Public:footer" />
 	</div>
 </body>
 </html>
+<script type="text/javascript" src="__ROOT__/Public/js/page.js"></script>
