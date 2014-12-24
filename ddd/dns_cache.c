@@ -839,9 +839,9 @@ int dns_cache_info()
     hyb_debug("[The PTR Cache-Table num:%d]\n",ptr_cnt);
 
 
-    if (!a_cnt && !aaaa_cnt && !mx_cnt && !ns_cnt && !cname_cnt && !txt_cnt && !ptr_cnt)
+    if (a_cnt || aaaa_cnt || mx_cnt || ns_cnt || cname_cnt || txt_cnt || ptr_cnt)
     {
-        return -1;
+        return 1;
     }
 
     return 0;

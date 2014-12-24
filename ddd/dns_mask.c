@@ -350,6 +350,7 @@ int mask_view_insert(char ipaddr[MAX_IP_LEN],ushort mask,ushort view_id)
         if(compare==0)
         {
         	//node exist
+        	hyb_debug("New insert mask : %s/%d Exist mask:%s/%d\n",ipaddr,mask,pos->ipaddr,pos->mask);
 			goto FAILURE;
         }
         else if(compare>0)	//当新值比当前位置地址小或个数多时
