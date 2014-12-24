@@ -18,8 +18,9 @@ class handle_init_thread(threading.Thread):
         threading.Thread.__init__(self)
         self.dbip = mgr_conf.g_db_ip
         self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
-        self.json_data = json_data;
-        self.worker = worker;
+        self.json_data = json_data
+        self.worker = worker
+        self.check_thd = worker.check_thd
         if self.dbcon.conn_error:
             raise Exception('[handle_init_thread] Database configure error!!!')
 
