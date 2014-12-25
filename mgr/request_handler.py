@@ -104,6 +104,7 @@ class req_handler(object):
         msgobj = []
         count = 0
         cur_cnt = 0
+        dbobj = []
 
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
@@ -112,6 +113,7 @@ class req_handler(object):
                 continue
             for row in result:
                 mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
+                dbobj.append(['dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add])
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                         0, msg.g_opt_add))
@@ -121,6 +123,7 @@ class req_handler(object):
 
                 if atbl == 'cname_record':
                     mgr_singleton.g_singleton.get_loger().care(_lineno(), "send 1 more A for CNAME : %s" % (row[0],))
+                    dbobj.append(['dns', msg.g_dict_type['a_record'], row[1], row[0], 0, msg.g_opt_add])
                     if False:
                         worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
                             0, msg.g_opt_add))
@@ -150,6 +153,7 @@ class req_handler(object):
         if result:
             for row in result:
                 mgr_singleton.g_singleton.get_loger().care(_lineno(), row)
+                #dbobj.append(['view', 0, row[0], row[1], 0, msg.g_opt_add])
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt':msg.g_opt_add, 'view':row[0], 'mask':row[1]})
@@ -163,6 +167,12 @@ class req_handler(object):
             if cur_cnt > 0:
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     return
+
+        for dbrow in dbobj:
+            worker.dbcon.query(msg.g_sql_add_snd_req % (dbrow[0], dbrow[1], dbrow[2], dbrow[3], dbrow[4], dbrow[5]))
+
+        msgobj = {'complete':1}
+        worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
 
         msg.g_init_resp_expect = count
         #msg.g_init_complete = True
@@ -224,16 +234,6 @@ class req_handler(object):
     @staticmethod
     def handle_inner_chk_snd(worker):
         msgobj = []
-        worker.dbcon.query(msg.g_inner_sql_chksnd_view)
-        result = worker.dbcon.show()
-        if result:
-            for row in result:
-                msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
-                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[2], row[0], row[1])
-            req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-
-        del msgobj[:]
         worker.dbcon.query(msg.g_inner_sql_chksnd_dns)
         result = worker.dbcon.show()
         if result:
@@ -241,6 +241,16 @@ class req_handler(object):
                 msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
                 mgr_singleton.g_singleton.get_err_info().add_record_timeout(row[3], row[1], row[2], row[0])
+            req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
+
+        del msgobj[:]
+        worker.dbcon.query(msg.g_inner_sql_chksnd_view)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
+                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
+                mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[2], row[0], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod

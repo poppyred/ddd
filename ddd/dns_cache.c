@@ -478,7 +478,7 @@ int dns_cache_set(char *domain,int domain_len,unsigned int view_id,char* answer,
     
     if (g_cache_off)
     {
-        hyb_debug("cache off!");
+        hyb_debug("[set cache failed!] cache off!");
         return -1;
     }
 
@@ -488,7 +488,7 @@ int dns_cache_set(char *domain,int domain_len,unsigned int view_id,char* answer,
     h_hash_st * cache_table = table_select(type);
     if (!cache_table)
     {
-        hyb_debug("Set wrong type cache!\n");
+        hyb_debug("[set cache failed!] Set wrong type cache!\n");
         return -1;
     }
     
@@ -543,7 +543,8 @@ int dns_cache_set(char *domain,int domain_len,unsigned int view_id,char* answer,
 	return 0;
 
 FAILED:
-    
+
+    hyb_debug("[set cache failed!] - [%s]-[view_id:%d]-[type:%d]\n",domain,view_id,type);
     return -1;
 }
 

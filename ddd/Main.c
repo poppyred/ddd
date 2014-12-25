@@ -45,18 +45,20 @@
 
 
 #define CORE_IP_ADDR "121.201.11.3"
+#define MAX_INIT_ERROR_CNT  (5)
 
 static int dnsheadsize = sizeof(dnsheader);
 time_t global_now = 0; //全局时间，每秒+1s
 int g_hour = 0;
 int g_mday = 0;
 struct tm *g_tm = NULL;
-
+int g_ready_to_work = 0;
 
 
 
 char *g_mgr_ip; //主DNS地址
 char *g_core_ip; //绑定公网地址
+int g_init_error_cnt = 0;
 
 efly_ipc_svr *g_ipc_svr = NULL;
 
@@ -304,7 +306,11 @@ void handle_debug_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
  **/
 void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *out, struct fio_rxdata *rxdata)
 {
-
+    if (!g_ready_to_work)
+    {
+        return;
+    }
+    
 	struct sockaddr_in client = {0};
 	char domain[MAX_DOMAIN_LEN] = {0};
     int domainlen = 0;
@@ -781,8 +787,14 @@ void handle_answer_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *
                 recvlen = recvlen - 11;
                 if (head->rcode == 0)
                 {
-                    answer_to_cache(domain,view_id,recvmsg,recvlen,type);  
-                    answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_SUCCESS);
+                    if (answer_to_cache(domain,view_id,recvmsg,recvlen,type))
+                    {
+                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_FAILED);
+                    }
+                    else
+                    {
+                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_SUCCESS);
+                    }
                 }
                 else
                 {
@@ -1086,7 +1098,12 @@ static void timer_callback2(void *user_data)
 	}
     else
     {
-        init_to_mgr();
+        g_init_error_cnt++;
+        if (g_init_error_cnt >= MAX_INIT_ERROR_CNT)
+        {
+            init_to_mgr();
+            g_init_error_cnt = 0;
+        }
     }
 
 #ifdef _DISPLAY_TABLE
@@ -1349,6 +1366,17 @@ static void dns_handle_debug_option(void *buf, int32_t b_len, char *src,char *an
 
 }
 
+static void dns_handle_ready_option(void *buf, int32_t b_len, char *src,char *answer)
+{
+	assert(buf);
+
+    g_ready_to_work = 1;
+    return;
+    
+
+}
+
+
 
 
 static int dns_event_init()
@@ -1394,6 +1422,11 @@ static int dns_event_init()
 	} 
 
     if (efly_ipc_reg_func(g_ipc_svr, 6, dns_handle_debug_option))
+	{
+		goto FAILED;
+	} 
+
+    if (efly_ipc_reg_func(g_ipc_svr, 7, dns_handle_ready_option))
 	{
 		goto FAILED;
 	} 

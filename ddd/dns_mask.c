@@ -764,11 +764,11 @@ int dns_mask_insert(char ipaddr[MAX_IP_LEN],int mask,ushort view_id)
 	result = mask_view_insert(ipaddr,mask,view_id);
 	if(result == 0)
 	{
-		//hyb_debug("insert mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
+		hyb_debug("insert sucess! mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
 	}
     else
     {
-        hyb_debug("insert failed!!! mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
+        hyb_debug("insert failed! mask[%s/%d] to view[%d]\n",ipaddr,mask,view_id);
     }
 	return result;
 }
