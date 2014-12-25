@@ -1513,7 +1513,7 @@ err:
 
 int fio_start()
 {
-    sysconfig.working = 1;
+    sysconfig.working = 2;
     if (fio_stack_start() < 0)
         goto start_err;
 

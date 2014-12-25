@@ -533,7 +533,7 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
     uint8_t ip_type = 0;
     uint16_t eh_type = 0;
 
-    static int loper = 2;
+    static int loper = 9;
     static int loper_p = 0;
 
     for (cur = 0; cur < T_FIO_PKT_DISCARD; cur++)
@@ -607,7 +607,7 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         }
 #endif
 
-        if (slot->len<=60 && pkt_type == T_FIO_PKT_INTD ||
+        if ((slot->len<=60 && pkt_type == T_FIO_PKT_INTD) ||
                 sysconfig.working == 2)
         {
             sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
@@ -629,7 +629,7 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
                     NIC_EXTRA_CONTEXT(nic)->me, nic->alise, loper_p, loper, (loper_p%loper));
 
             if (sysconfig.working == 2 
-                    && ((loper_p++)%loper == 0)
+                    && ((pb->sip+(loper_p++))%loper == 0)
                     && slot->len >= 54+strlen(STR_TESTCOM) 
                     && memcmp((const char*)(p+54), STR_TESTCOM, strlen(STR_TESTCOM)))
             {
