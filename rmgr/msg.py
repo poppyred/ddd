@@ -56,8 +56,8 @@ g_class_inner_chk_task_db_heartbeat = 'chk_task_db_heartbeat'
 g_class_inner_reqtype_map = {g_class_inner_chk_task_domain: 'domain', g_class_inner_chk_task_record: 'record'}
 g_class_inner_map = {g_class_inner_chk_task_domain: g_class_inner_chk_task_domain_reply,
  g_class_inner_chk_task_record: g_class_inner_chk_task_record_reply}
-g_init_sql_view = "SELECT viewid as view, network as mask from view_mask         mk left join view_index idx on mk.viewid=idx.id where mk.status='true' "
-g_init_sql_dns = 'SELECT ar.name as domain, ze.view as view FROM %s ar         left join zone ze on ar.zone=ze.id where ar.enable=1'
+g_init_sql_view = "SELECT viewid as view, network as mask from view_mask mk left join view_index idx on mk.viewid=idx.id where mk.status='true' "
+g_init_sql_dns = 'SELECT distinct ar.name as domain, ze.view as view FROM %s ar left join zone ze on ar.zone=ze.id where ar.enable=1'
 g_init_sql_chk_init_ok = 'SELECT COUNT(*) FROM snd_record WHERE state!=0'
 g_proc_add_snd_req = 'add_snd_req'
 g_proc_update_snd_req = 'update_snd_req'
@@ -70,11 +70,14 @@ g_proc_set_a_domain = 'onoff_a_domain'
 g_proc_get_subrecord_inline = 'get_subrecord_inline'
 g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
 g_sql_add_a_domain_ns = "INSERT INTO domain_ns(domain,ttl,`server`,`rid`)VALUES('%s',%d,'%s',%d)         ON DUPLICATE KEY UPDATE domain='%s',ttl=%d,`server`='%s'"
+g_sql_add_snd_req = 'INSERT INTO `snd_record` (class,`type`,viewid,`data`,state,`opt`) \
+        VALUES(\'%s\',%d,%d,\'%s\',%d,%d)'
 g_inner_sql_chksnd_view = "SELECT viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0         and class='view' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND)         ORDER BY `id` ASC"
 g_inner_sql_chksnd_dns = "SELECT `type`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0         and class='dns' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND)         ORDER BY `id` ASC"
 g_inner_sql_db_heartbeat = 'SELECT 1'
 g_pack_head_init_view = 5
 g_pack_head_init_dns = 4
+g_pack_head_init_complete = 7
 g_opt_add = 1
 g_opt_del = 2
 g_http_response_OK = 200

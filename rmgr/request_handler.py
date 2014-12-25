@@ -100,6 +100,7 @@ class req_handler(object):
         msgobj = []
         count = 0
         cur_cnt = 0
+        dbobj = []
 
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % atbl)
@@ -108,6 +109,7 @@ class req_handler(object):
                 continue
             for row in result:
                 print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
+                dbobj.append(['dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add])
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type[atbl], row[1], row[0],
                         0, msg.g_opt_add))
@@ -116,6 +118,7 @@ class req_handler(object):
                 cur_cnt += 1
                 if atbl == 'cname_record':
                     print >> sys.stderr,  'send 1 more A for CNAME : %s' % (row[0],)
+                    dbobj.append(['dns', msg.g_dict_type['a_record'], row[1], row[0], 0, msg.g_opt_add])
                     if False:
                         worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('dns', msg.g_dict_type['a_record'], row[1], row[0],
                             0, msg.g_opt_add))
@@ -145,6 +148,7 @@ class req_handler(object):
         if result:
             for row in result:
                 print >> sys.stderr,  row
+                #dbobj.append(['view', 0, row[0], row[1], 0, msg.g_opt_add])
                 if False:
                     worker.dbcon.call_proc(msg.g_proc_add_snd_req, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
                 msgobj.append({'opt': msg.g_opt_add, 'view': row[0], 'mask': row[1]})
@@ -161,6 +165,12 @@ class req_handler(object):
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     req_handler.lockdb = False
                     return
+
+        for dbrow in dbobj:
+            worker.dbcon.query(msg.g_sql_add_snd_req % (dbrow[0], dbrow[1], dbrow[2], dbrow[3], dbrow[4], dbrow[5]))
+
+        msgobj = {'complete':1}
+        worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
 
         req_handler.lockdb = False
 
@@ -205,17 +215,6 @@ class req_handler(object):
     @staticmethod
     def handle_inner_chk_snd(worker):
         msgobj = []
-        worker.dbcon.query(msg.g_inner_sql_chksnd_view)
-        result = worker.dbcon.show()
-        if result:
-            for row in result:
-                msgobj.append({'opt': row[2], 'view': row[0], 'mask': row[1],
-                    'pkt_head': msg.g_pack_head_init_view})
-                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_view_timeout(row[2], row[0], row[1])
-
-            req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-        del msgobj[:]
         worker.dbcon.query(msg.g_inner_sql_chksnd_dns)
         result = worker.dbcon.show()
         if result:
@@ -224,7 +223,17 @@ class req_handler(object):
                     'pkt_head': msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
                 mgr_err_describe.g_err_desc.add_record_timeout(row[3], row[1], row[2], row[0])
+            req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
+        del msgobj[:]
+        worker.dbcon.query(msg.g_inner_sql_chksnd_view)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                msgobj.append({'opt': row[2], 'view': row[0], 'mask': row[1],
+                    'pkt_head': msg.g_pack_head_init_view})
+                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
+                mgr_err_describe.g_err_desc.add_view_timeout(row[2], row[0], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
