@@ -15,8 +15,9 @@ import time
 
 __all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_ptr', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
-        'req_handler_domain', 'req_handler_view','req_handler_mask']
+        'req_handler_domain', 'req_handler_view','req_handler_mask','g_init_should_stop']
 
+g_init_should_stop = 0
 
 class req_handler(object):
     @staticmethod
@@ -53,6 +54,7 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_init_new(worker, addr):
+        g_init_should_stop = 0
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
         worker.dbcon.query(msg.g_sql_clean_snd_req)
         #query dns
@@ -80,6 +82,7 @@ class req_handler(object):
                 cur_cnt += 1
 
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
+                    if g_init_should_stop == 1: return
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                         return
                     cur_cnt = 0
@@ -87,6 +90,7 @@ class req_handler(object):
                     time.sleep(1)
 
         if cur_cnt > 0:
+            if g_init_should_stop == 1: return
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
             time.sleep(1)
@@ -111,13 +115,17 @@ class req_handler(object):
                 count += 1
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
+                    if g_init_should_stop == 1: return
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                         return
                     cur_cnt = 0
                     del msgobj[:]
             if cur_cnt > 0:
+                if g_init_should_stop == 1: return
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     return
+
+        if g_init_should_stop == 1: return
 
         msgobj = {'complete':1}
         worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)

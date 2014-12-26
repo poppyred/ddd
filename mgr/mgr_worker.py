@@ -88,6 +88,7 @@ class mgr_handler(queue_thread.Qthread):
                     msg.g_init_resp_expect = -1
                     #msg.g_init_complete = False
                     mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
+                    g_init_should_stop = 1
                     req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
                     break
                 if case(msg.g_class_init_test):
@@ -96,6 +97,7 @@ class mgr_handler(queue_thread.Qthread):
                     msg.g_init_resp_expect = -1
                     #msg.g_init_complete = False
                     mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
+                    g_init_should_stop = 1
                     req_handler.handle_proxy_init_new(self, '121.201.12.66')
                     break
                 if case(msg.g_class_proxy_register):
