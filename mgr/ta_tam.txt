@@ -60,11 +60,11 @@ BEGIN
 					EXECUTE stmt;
 				END IF;
 				IF @same_dn_cnt > 0 THEN
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
 				ELSE
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
 				END IF;
-				select @oname, @oview, cut_tbl, @same_dn_cnt;			
+				-- select @oname, @oview, cut_tbl, @same_dn_cnt;			
 			end if;
 		END IF;
 		set i = i + 1;  
@@ -115,7 +115,11 @@ BEGIN
 	EXECUTE stmt;  
 	
 	DEALLOCATE PREPARE stmt; 
-	CALL add_snd_req('dns', tbl_to_dnstype(tab_name), n_view, str_name, 0, 1);
+	IF n_enable = 0 THEN
+		CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), n_view, str_name, 0, 2);
+	ELSE
+		CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), n_view, str_name, 0, 1);
+	END IF;
 	
     END */$$
 DELIMITER ;
@@ -173,11 +177,11 @@ BEGIN
 					EXECUTE stmt;
 				END IF;
 				IF @same_dn_cnt > 0 THEN
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
 				ELSE
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
 				END IF;
-				SELECT @oname, @oview, cut_tbl, @same_dn_cnt;
+				-- SELECT @oname, @oview, cut_tbl, @same_dn_cnt;
 			END IF;
 			
 		END IF;
@@ -198,7 +202,11 @@ BEGIN
 	
 	DEALLOCATE PREPARE stmt; 
 	
-	CALL add_snd_req('dns', tbl_to_dnstype('mx_record'), n_view, str_name, 0, 1);
+	IF n_enable = 0 THEN
+		CALL add_snd_req_new('dns', tbl_to_dnstype('mx_record'), n_view, str_name, 0, 2);
+	ELSE
+		CALL add_snd_req_new('dns', tbl_to_dnstype('mx_record'), n_view, str_name, 0, 1);
+	END IF;
 	
     END */$$
 DELIMITER ;
@@ -257,9 +265,9 @@ BEGIN
 					EXECUTE stmt;
 				END IF;
 				IF @same_dn_cnt > 0 THEN
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 1);
 				ELSE
-					CALL add_snd_req('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
+					CALL add_snd_req_new('dns', tbl_to_dnstype(cut_tbl), @oview, @oname, 0, 2);
 				END IF;
 				SELECT @oname, @oview, cut_tbl, @same_dn_cnt;
 			END IF;
@@ -268,7 +276,7 @@ BEGIN
 		SET i = i + 1;  
 	END WHILE;
 	
-	-- update鐨勬椂鍊欐墠鐢ㄥ埌
+	-- update的时候才用到
 	-- SET @sqlcmd = CONCAT("UPDATE `ptr_record` SET `enable`=", n_enable, " WHERE rid=", n_rid);
 	-- PREPARE stmt FROM @sqlcmd;
 	-- EXECUTE stmt;
@@ -282,7 +290,11 @@ BEGIN
 	
 	DEALLOCATE PREPARE stmt; 
 	
-	CALL add_snd_req('dns', tbl_to_dnstype('ptr_record'), n_view, str_ip, 0, 1);
+	IF n_enable = 0 THEN
+		CALL add_snd_req_new('dns', tbl_to_dnstype('ptr_record'), n_view, str_ip, 0, 2);
+	ELSE
+		CALL add_snd_req_new('dns', tbl_to_dnstype('ptr_record'), n_view, str_ip, 0, 1);
+	END IF;
 	
     END */$$
 DELIMITER ;

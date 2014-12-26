@@ -77,6 +77,17 @@ g_init_sql_view = 'SELECT viewid as view, network as mask from view_mask \
 g_init_sql_dns = 'SELECT distinct ar.name as domain, ze.view as view FROM %s ar \
         left join zone ze on ar.zone=ze.id where ar.enable=1'
 g_init_sql_chk_init_ok = 'SELECT COUNT(*) FROM snd_record WHERE state!=0'
+g_init_sql_inittask_dns = 'SELECT `id`,`type`,viewid,`data` FROM snd_record WHERE state=0 \
+        and class=\'dns\' and `opt`=1 ORDER BY `id` ASC'
+g_init_sql_inittask_dns_inited = 'update snd_record set state=4 WHERE `id`=%d'
+g_init_sql_inittask_view = 'SELECT `id`,viewid,`data` FROM snd_record WHERE state=0 \
+        and class=\'view\' AND `opt`=1 ORDER BY `id` ASC'
+g_init_sql_inittask_view_inited = 'update snd_record set state=4 WHERE `id`=%d'
+g_init_sql_replytask = 'update snd_record set state=%d WHERE `id`=%d'
+g_init_sql_gettask_dns = 'SELECT `id`,`type`,viewid,`data`,`opt` FROM snd_record WHERE state=0 \
+        and class=\'dns\' ORDER BY `id` ASC'
+g_init_sql_gettask_mask = 'SELECT `id`,viewid,`data`,`opt` FROM snd_record WHERE state=0 \
+        and class=\'view\' ORDER BY `id` ASC'
 
 g_proc_add_snd_req = 'add_snd_req'
 #g_proc_add_snd_req_ret = 'select @_' + g_proc_add_snd_req + '_6'
@@ -89,6 +100,8 @@ g_proc_del_a_record = 'del_a_record'
 g_proc_del_a_domain = 'del_a_domain'
 g_proc_set_a_domain = 'onoff_a_domain'
 g_proc_get_subrecord_inline = 'get_subrecord_inline'
+g_proc_add_task = 'add_snd_req_new'
+
 g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
 #g_sql_get_a_record_in_set = 'SELECT ar.name,ze.view FROM a_record ar LEFT JOIN zone ze \
 #        ON ar.`zone`=ze.`id` WHERE ar.`enable`=1 AND ar.rid=%s'
@@ -103,12 +116,10 @@ g_sql_del_a_mask = 'DELETE FROM `view_mask` WHERE `network`=\'%s\' and `viewid`=
 g_sql_add_snd_req = 'INSERT INTO `snd_record` (class,`type`,viewid,`data`,state,`opt`) \
         VALUES(\'%s\',%d,%d,\'%s\',%d,%d)'
 
-g_inner_sql_chksnd_view = 'SELECT viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0 \
-        and class=\'view\' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND) \
-        ORDER BY `id` ASC'
-g_inner_sql_chksnd_dns = 'SELECT `type`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=0 \
-        and class=\'dns\' AND chktime<=DATE_ADD(NOW(),INTERVAL -9 SECOND) \
-        ORDER BY `id` ASC'
+g_inner_sql_chksnd_view = 'SELECT `id`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=4 \
+        and class=\'view\' AND chktime<=DATE_ADD(NOW(),INTERVAL -20 SECOND) ORDER BY `id` ASC'
+g_inner_sql_chksnd_dns = 'SELECT `id`,`type`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=4 \
+        and class=\'dns\' AND chktime<=DATE_ADD(NOW(),INTERVAL -20 SECOND) ORDER BY `id` ASC'
 
 g_inner_sql_db_heartbeat = 'SELECT 1'
 
