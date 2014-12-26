@@ -12,6 +12,22 @@ import select
 import threading
 import mgr_conf
 import MySQL
+import inspect
+import ctypes
+
+def _async_raise(tid, exctype):
+    """raises the exception, performs cleanup if needed"""
+    if not inspect.isclass(exctype):
+        exctype = type(exctype)
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
+    if res == 0:
+        raise ValueError("invalid thread id")
+    elif res != 1:
+        # """if it returns a number greater than one, you're in trouble,
+        # and you should call it again with exc=NULL to revert the effect"""
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
+
 
 class handle_init_thread(threading.Thread):
     def __init__(self, json_data, worker):
@@ -69,6 +85,9 @@ class handle_init_thread(threading.Thread):
         finally:
             s.close()
 
+    def stop_thread(self):
+        _async_raise(self.ident, SystemExit)
+
 
 class reply_thread(threading.Thread):
     def __init__(self, worker4init, worker, host = '', port = 54321, bufsize = 1024):
@@ -80,6 +99,7 @@ class reply_thread(threading.Thread):
         self.BUFSIZE = bufsize
         self.worker4init = worker4init
         self.worker = worker
+        self.hdl_init = []
 
     def run(self):
         ADDR = (self.HOST, self.PORT)
@@ -111,9 +131,15 @@ class reply_thread(threading.Thread):
                         print >> sys.stderr,  '*********1'
                         self.worker.proxy_addr[decodejson['inner_addr'][0]] = [decodejson['inner_addr'], self.worker.proxy_health]
                         mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
-                        hdl_init = handle_init_thread(decodejson, self.worker)
+                        hdl_new = handle_init_thread(decodejson, self.worker)
                         print >> sys.stderr,  '*********3'
-                        hdl_init.start()
+                        hdl_new.start()
+
+                        for ahdl in self.hdl_init:
+                            if ahdl.is_alive():
+                                ahdl.stop_thread()
+                        del self.hdl_init[:]
+                        self.hdl_init.append(hdl_new)
                     else:
                         self.worker.handler(decodejson)
 
