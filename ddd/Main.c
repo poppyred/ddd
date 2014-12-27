@@ -338,7 +338,8 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
 
     ushort q_id = *((ushort *)recvmsg);
 
-    if (addcount == 0 && qcount == 1)
+    //if (addcount == 0 && qcount == 1)
+    if (qcount == 1)
     {     
         /*正常DNS请求处理*/
         
@@ -346,7 +347,7 @@ void handle_query_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *o
         int view_id = dns_mask_get_view(&client.sin_addr); 
         
         //int view_id = 2;//***********test!!!!**************//
-        //hyb_debug("[New query in view:%d domain:%s type:%d]\n",view_id,domain,q_type);
+        //hyb_debug("[New query in view:%d domain:%s type:%d from:%s[%d]]\n",view_id,domain,q_type,inet_ntoa(*(struct in_addr *)&client.sin_addr.s_addr),client.sin_addr.s_addr);
 
 	    /*local count*/
 	    dns_lcllog_allreq_count();
@@ -1357,6 +1358,7 @@ static void dns_handle_debug_option(void *buf, int32_t b_len, char *src,char *an
     struct in_addr addr_t;
 
     inet_aton(ip, &addr_t);
+    hyb_debug("Valus:%d\n",addr_t.s_addr);
     int view_id = dns_mask_get_view(&addr_t); 
 
     hyb_debug("Match view:%d\n",view_id);

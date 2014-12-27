@@ -97,6 +97,7 @@
 										<a title="停用" href="javascript:void(0);" onclick="startOrStop({$s_vo.id},this)">停用</a>
                                     </if>
 									<a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">管理</a>
+                                    <a title="升级" href="javascript:void(0);" onClick="empower('{$s_vo.domain}',8)" >升级</a>
 								</td>
 							</tr>
 							<tr style="background:#fff;display:none;"><td colspan="8" style="text-align:left"></td></tr>
@@ -112,6 +113,26 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	function empower(domain,vip){
+		if(confirm('确认将域名升级成VIP？')){
+			$.ajax({
+				url: '__APP__/Domainmgr/empower',
+				type: "post",
+				data: { 'domain': domain,'vip': vip },
+				success: function (data) {
+					//$("#save_msg").html(data.info);
+					if(data.info == 'success'){
+						window.location.reload();//$($(evt).parent().parent()).remove();
+					}else{
+						alert(data.data);
+					}
+				},
+				error: function (data) {
+					alert(data.statusText);
+				}
+			});
+		}
+	}
 	function seach(obj){
 		var val = $(obj).prev().val();
 		if(!val){

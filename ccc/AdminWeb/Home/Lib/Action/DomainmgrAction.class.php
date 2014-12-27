@@ -31,6 +31,17 @@ class DomainmgrAction extends BaseAction {
 		$this->assign('page',$show);// 赋值分页输出
 		$this->display();
 	}
+	public function empower(){
+		if(isset($_POST['vip']) && !empty($_POST['domain'])){
+			
+			$data = file_get_contents(C('API_URL')."/domain.php?opt=empower&domain=".$_POST['domain']."&vip=".$_POST['vip']);			
+			$result = json_decode($data,true);
+			if($result['ret']!=0){				
+				$this->ajaxReturn('域名授权失败，请联系管理员！','error',0);
+			}
+			$this->ajaxReturn(1,'success',1);
+		}
+	}
 	public function mgrClient(){
 		$this->assign('mail',$_GET['mail']);
 		$this->assign('pwd',$_GET['pwd']);
