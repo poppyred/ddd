@@ -153,7 +153,7 @@ class req_handler(object):
             #    answ['data'], state_set, answ['opt']))
             worker.dbcon.query(msg.g_init_sql_replytask % (state_set, answ['id']))
 
-        if worker.just4testcnt > 0:
+        if False and worker.just4testcnt > 0:
             if str_class == 'dns':
                 mgr_err_describe.g_err_desc.del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
             if str_class == 'view':
@@ -177,7 +177,8 @@ class req_handler(object):
                 msgobj.append({'id':row[0],'opt':row[4],'domain':row[3],'view':row[2],'type':row[1],
                     'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_record_timeout(row[4], row[2], row[3], row[1])
+                if False:
+                    mgr_err_describe.g_err_desc.add_record_timeout(row[4], row[2], row[3], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
         del msgobj[:]
@@ -189,27 +190,9 @@ class req_handler(object):
                 msgobj.append({'id':row[0],'opt':row[3],'view':row[1],'mask':row[2],
                     'pkt_head':msg.g_pack_head_init_view})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_err_describe.g_err_desc.add_view_timeout(row[3], row[1], row[2])
+                if False:
+                    mgr_err_describe.g_err_desc.add_view_timeout(row[3], row[1], row[2])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-
-        #if result:
-        #    for row in result:
-        #        msgobj.append({'opt': row[3], 'domain': row[2], 'view': row[1], 'type': row[0],
-        #            'pkt_head': msg.g_pack_head_init_dns})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-        #        mgr_err_describe.g_err_desc.add_record_timeout(row[3], row[1], row[2], row[0])
-        #    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-
-        #del msgobj[:]
-        #worker.dbcon.query(msg.g_inner_sql_chksnd_view)
-        #result = worker.dbcon.show()
-        #if result:
-        #    for row in result:
-        #        msgobj.append({'opt': row[2], 'view': row[0], 'mask': row[1],
-        #            'pkt_head': msg.g_pack_head_init_view})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-        #        mgr_err_describe.g_err_desc.add_view_timeout(row[2], row[0], row[1])
-        #    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
     def travel_dictionary(decodejson):
