@@ -86,7 +86,7 @@ int dns_msg_cache_analyze(char *msg);
 
 int dns_msg_view_analyze(char *msg);
 
-int dns_msg_pack_answer(char *nameclass,int opt,int type,int view,char *data, int result,char *msg);
+int dns_msg_pack_answer(char *nameclass,int opt,unsigned int msg_id,int type,int view,char *data, int result,char *msg);
 
 int dns_msg_pack_init(char *msg);
 

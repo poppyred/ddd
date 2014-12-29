@@ -14,7 +14,7 @@
 * @see     
 * @author hyb      @date 2014/05/20
 **/
-void request_to_core(char *domain,int type,int view);
+void request_to_core(char *domain,int type,int view,unsigned msg_id);
 
 
 /**
@@ -30,7 +30,7 @@ void request_to_core(char *domain,int type,int view);
 * @see     
 * @author hyb      @date 2014/05/22
 **/
-void answer_to_mgr(char *nameclass,int opt,int type,int view,char *data, int result);
+void answer_to_mgr(char *nameclass,int opt,unsigned int msg_id,int type,int view,char *data, int result);
 
 
 #endif

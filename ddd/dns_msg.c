@@ -12,6 +12,7 @@
 #include "dns_pkt.h"
 #include "dns_cache.h"
 #include "dns_extche.h"
+#include "dns_pack.h"
 
 #include <assert.h>
 #include "libbase.h"
@@ -803,7 +804,7 @@ int dns_msg_pack_register(char *msg)
 
 
 
-int dns_msg_pack_answer(char *nameclass,int opt,int type,int view,char *data, int result,char *msg)
+int dns_msg_pack_answer(char *nameclass,int opt,unsigned int msg_id,int type,int view,char *data, int result,char *msg)
 {
     assert(msg);
     assert(nameclass);
@@ -816,6 +817,7 @@ int dns_msg_pack_answer(char *nameclass,int opt,int type,int view,char *data, in
 
         cJSON_AddStringToObject(root, "class", nameclass);
         cJSON_AddNumberToObject(root, "opt", opt);
+        cJSON_AddNumberToObject(root, "id", msg_id);
         cJSON_AddNumberToObject(root, "type", type);
         cJSON_AddNumberToObject(root, "viewid", view);
         cJSON_AddStringToObject(root, "data", data);
@@ -835,15 +837,15 @@ int dns_msg_pack_answer(char *nameclass,int opt,int type,int view,char *data, in
 }
 
 
-void dns_msg_cache_request(char *domain,int view_id,int type)
+void dns_msg_cache_request(char *domain,int view_id,int type,unsigned int msg_id)
 {
     
-    request_to_core(domain,view_id,type);
+    request_to_core(domain,view_id,type,msg_id);
     
 }
 
 
-void dns_msg_cache_delete(char *domain,int view_id,int type)
+void dns_msg_cache_delete(char *domain,int view_id,int type,unsigned int msg_id)
 {
     int ret = 0;
     char inaddr[512] = {0};
@@ -882,12 +884,12 @@ void dns_msg_cache_delete(char *domain,int view_id,int type)
     if (ret)
     {
         /*answer fail*/
-        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,target,MGR_ANSWER_FAILED);
+        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,msg_id,type,view_id,target,MGR_ANSWER_FAILED);
     }
     else
     {
         /*answer sucess*/
-        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,type,view_id,target,MGR_ANSWER_SUCCESS);
+        answer_to_mgr("dns_reply",CACHE_OPTION_DEL,msg_id,type,view_id,target,MGR_ANSWER_SUCCESS);
     }
 
     
@@ -909,6 +911,10 @@ int dns_msg_cache_analyze(char *msg)
    // "[{\"opt\": 1, \"domain\": \"www.he.com\", \"type\": 1, \"view\": 2}, {\"opt\": 1, \"domain\": \"he.com\", \"type\": 2, \"view\": 2}]";
 
     cJSON *json_arr = NULL;
+   unsigned int msg_id = 0;
+   int opt_id = 0;
+   int type_id= 0;
+   int view_id = 0;
     
 	json_arr = cJSON_Parse(msg);
     if (!json_arr)
@@ -925,10 +931,28 @@ int dns_msg_cache_analyze(char *msg)
         char domain_str[256] = {0};
         cJSON *json = cJSON_GetArrayItem(json_arr, i);
 
+        cJSON *id = cJSON_GetObjectItem(json,"id");
+        if (id)
+        {
+            char *id_js = cJSON_Print(id);
+            if (id_js)
+            {
+                msg_id = atoi(id_js);
+                //printf("msgid %u %s\n",msg_id, id_js);
+                free(id_js);
+            }
+        }
+        
         cJSON *opt = cJSON_GetObjectItem(json,"opt");
-        char *opt_js = cJSON_Print(opt);
-        int opt_id = atoi(opt_js);
-        free(opt_js);
+        if (opt)
+        {
+            char *opt_js = cJSON_Print(opt);
+            if (opt_js)
+            {
+                opt_id = atoi(opt_js);
+                free(opt_js);
+            }
+        }
         
         cJSON *domain = cJSON_GetObjectItem(json,"domain");
         if (domain)
@@ -946,27 +970,38 @@ int dns_msg_cache_analyze(char *msg)
         }
         
         cJSON *type = cJSON_GetObjectItem(json,"type");
-        char *type_js = cJSON_Print(type);
-        int type_id = atoi(type_js);
-        free(type_js);
-        //cJSON_Delete(type);
+        if (type)
+        {
+            char *type_js = cJSON_Print(type);
+            if (type_js)
+            {
+                type_id = atoi(type_js);
+                free(type_js);
+            }
+        }
         
         cJSON *view = cJSON_GetObjectItem(json,"view");
-        char *view_js = cJSON_Print(view);
-        int view_id = atoi(view_js);
-        free(view_js);
-        //cJSON_Delete(view);
+        if (view)
+        {
+            char *view_js = cJSON_Print(view);
+            if (view_js)
+            {
+                view_id = atoi(view_js);
+                free(view_js);
+            }
+        }
+
 
         hyb_debug("Receive a cache-set msg[opt:%d domain:%s type:%d view:%d]\n",opt_id,domain_str,type_id,view_id);
 
         switch(opt_id)
         {
         case CACHE_OPTION_REF:
-            dns_msg_cache_request(domain_str,view_id,type_id);
+            dns_msg_cache_request(domain_str,view_id,type_id, msg_id);
             break;
             
         case CACHE_OPTION_DEL:
-            dns_msg_cache_delete(domain_str,view_id,type_id);
+            dns_msg_cache_delete(domain_str,view_id,type_id, msg_id);
             break;
             
         default:
@@ -994,6 +1029,11 @@ int dns_msg_view_analyze(char *msg)
 {
     int i = 0;
 
+    unsigned int msg_id = 0;
+    int opt_id = 0;
+    int type_id= 0;
+    int view_id = 0;
+
     cJSON *json_arr = NULL;
 	json_arr = cJSON_Parse(msg);
     if (!json_arr)
@@ -1011,28 +1051,58 @@ int dns_msg_view_analyze(char *msg)
         int mask_num = 0;
         
         cJSON *json = cJSON_GetArrayItem(json_arr, i);
+
+        
         cJSON *opt = cJSON_GetObjectItem(json,"opt");
-        char *opt_js = cJSON_Print(opt);
-        int opt_id = atoi(opt_js);
-        free(opt_js);
-        //cJSON_Delete(opt);
+        if (opt)
+        {
+            char *opt_js = cJSON_Print(opt);
+            if (opt_js)
+            {
+                opt_id = atoi(opt_js);
+                free(opt_js);
+            }
+        }
+
+        cJSON *id = cJSON_GetObjectItem(json,"id");
+        if (id)
+        {
+            char *id_js = cJSON_Print(id);
+            if (id_js)
+            {
+                msg_id = atoi(id_js);
+                free(id_js);
+            }
+        }
         
         cJSON *view = cJSON_GetObjectItem(json,"view");
-        char *view_js = cJSON_Print(view);
-        int view_id = atoi(view_js);
-        free(view_js);
-        //cJSON_Delete(view);
+        if (view)
+        {
+            char *view_js = cJSON_Print(view);
+            if (view_js)
+            {
+                view_id = atoi(view_js);
+                free(view_js);
+            }
+        }
+
         
         cJSON *mask = cJSON_GetObjectItem(json,"mask");
-        char *mask_js = cJSON_Print(mask);
-        strcpy_n(mask_str, 64 ,mask_js);
-        deal_json_str(mask_str);
-        free(mask_js);
-        //cJSON_Delete(mask);
+        if (mask)
+        {
+            char *mask_js = cJSON_Print(mask);
+            if (mask_js)
+            {
+                strcpy_n(mask_str, 64 ,mask_js);
+                deal_json_str(mask_str);
+                free(mask_js);
+            }
+        }
+
 
         if (deal_mask_str(mask_str,&mask_num,ip))
         {
-            answer_to_mgr("view_reply",opt_id,0,view_id,mask_str,MGR_ANSWER_FAILED);
+            answer_to_mgr("view_reply",opt_id,msg_id,0,view_id,mask_str,MGR_ANSWER_FAILED);
         }
           
         //hyb_debug("Receive a view-set msg[opt:%d mask:%s view:%d]\n", opt_id, mask_str, view_id);
@@ -1047,30 +1117,29 @@ int dns_msg_view_analyze(char *msg)
             
             if (dns_mask_insert(ip, mask_num, view_id))
             {
-                answer_to_mgr("view_reply",VIEW_OPTION_ADD,0,view_id,mask_str,MGR_ANSWER_NOEXIST);
+                answer_to_mgr("view_reply",VIEW_OPTION_ADD,msg_id,0,view_id,mask_str,MGR_ANSWER_NOEXIST);
             }
             else
             {
                 dns_mask_fresh_view_to_control_nowait();
-                answer_to_mgr("view_reply",VIEW_OPTION_ADD,0,view_id,mask_str,MGR_ANSWER_SUCCESS);
+                answer_to_mgr("view_reply",VIEW_OPTION_ADD,msg_id,0,view_id,mask_str,MGR_ANSWER_SUCCESS);
             }
             break;
             
         case VIEW_OPTION_DEL:
             if (dns_mask_remove(ip, mask_num))
             {
-                answer_to_mgr("view_reply",VIEW_OPTION_DEL,0,view_id,mask_str,MGR_ANSWER_FAILED);
+                answer_to_mgr("view_reply",VIEW_OPTION_DEL,msg_id,0,view_id,mask_str,MGR_ANSWER_FAILED);
             }
             else
             {
                 dns_mask_fresh_view_to_control_nowait();
-                answer_to_mgr("view_reply",VIEW_OPTION_DEL,0,view_id,mask_str,MGR_ANSWER_SUCCESS);
+                answer_to_mgr("view_reply",VIEW_OPTION_DEL,msg_id,0,view_id,mask_str,MGR_ANSWER_SUCCESS);
             }
             break;
             
         default:
             hyb_debug("receive uncorrect opt msg!\n");
-            //answer_to_mgr("view_reply",0,view_id,mask_str,MGR_ANSWER_FAILED);
             break;
         }
 

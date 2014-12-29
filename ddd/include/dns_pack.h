@@ -33,7 +33,7 @@ int ip_to_q_name(char*ip,int len,char*qname);
 * @see     
 * @author hyb      @date 2014/05/08
 **/
-int dns_pack_query(char*result,char*domain,int domain_len, int view, int type);
+int dns_pack_query(char*result,char*domain,int domain_len, int view, int type, unsigned int msg_id);
 
 
 

@@ -756,11 +756,24 @@ void handle_answer_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *
 	int recvlen = 0;
     
     unsigned short view_id = 0;
-    unsigned short type;
+    unsigned short type = 0;;
+    unsigned int msg_id = 0;
 
 	recvmsg = rxdata->pbuf + UDP_HEAD_LEN;
 	recvlen = rxdata->size - UDP_HEAD_LEN;
     st_dns_info pkt = {0};
+
+    if (rxdata->size > 8)
+    {
+        if (rxdata->pbuf[rxdata->size -8] == '\x01' &&
+                rxdata->pbuf[rxdata->size -7] == '\x01' && 
+                rxdata->pbuf[rxdata->size -6] == '\x00' &&
+                rxdata->pbuf[rxdata->size -5] == '\x00')
+        {
+            memcpy(&msg_id, &rxdata->pbuf[rxdata->size -4], 4);
+            recvlen -= 8;
+        }
+    }
 
     if (recvlen > 12 && recvlen < MAX_DATA_SIZE) 
 	{
@@ -790,16 +803,16 @@ void handle_answer_msg(struct fio_nic *src, struct fio_nic *in, struct fio_nic *
                 {
                     if (answer_to_cache(domain,view_id,recvmsg,recvlen,type))
                     {
-                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_FAILED);
+                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,msg_id,type,view_id,domain,MGR_ANSWER_FAILED);
                     }
                     else
                     {
-                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_SUCCESS);
+                        answer_to_mgr("dns_reply",CACHE_OPTION_REF,msg_id,type,view_id,domain,MGR_ANSWER_SUCCESS);
                     }
                 }
                 else
                 {
-                    answer_to_mgr("dns_reply",CACHE_OPTION_REF,type,view_id,domain,MGR_ANSWER_NOEXIST);
+                    answer_to_mgr("dns_reply",CACHE_OPTION_REF,msg_id,type,view_id,domain,MGR_ANSWER_NOEXIST);
                 }
 
             }
@@ -950,7 +963,7 @@ static void send_pkt_debug(char *domain,int type)
     
     char buf[1500] = {0};
     
-    int buflen = dns_pack_query(buf,domain,strlen(domain),1,type);
+    int buflen = dns_pack_query(buf,domain,strlen(domain),1,type,0);
 
     if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
         fprintf(stderr,"IP error:%sn",strerror(errno));
@@ -969,7 +982,7 @@ static void send_pkt_debug(char *domain,int type)
 }
 
 
-void request_to_core(char *domain,int view, int type)
+void request_to_core(char *domain,int view, int type,unsigned int msg_id)
 {
     
 	int txcount = 0;
@@ -990,7 +1003,7 @@ void request_to_core(char *domain,int view, int type)
     
     char buf[1500] = {0};
 
-    int buflen = dns_pack_query(buf,domain,strlen(domain),view,type);
+    int buflen = dns_pack_query(buf,domain,strlen(domain),view,type,msg_id);
 
     if(inet_aton(g_core_ip,&addr.sin_addr) < 0) {
         fprintf(stderr,"IP error:%sn",strerror(errno));
@@ -1003,6 +1016,7 @@ void request_to_core(char *domain,int view, int type)
 	txdata->srcport = htons(5353);
     
     memcpy(txdata->pdata,buf,buflen);
+    printf("msgid %d %d %d %d\n", txdata->pdata[buflen-4], txdata->pdata[buflen-3], txdata->pdata[buflen-2], txdata->pdata[buflen-1]);
     
 	fio_send(t, htons(buflen), txdata, 1);
 
@@ -1886,11 +1900,11 @@ static void register_to_mgr()
 * @see     
 * @author hyb      @date 2014/05/22
 **/
-void answer_to_mgr(char *nameclass,int opt,int type,int view,char *data, int result)
+void answer_to_mgr(char *nameclass,int opt,unsigned int msg_id,int type,int view,char *data, int result)
 {
     char msg[512]={0};
     
-    int ret = dns_msg_pack_answer(nameclass,opt,type,view,data,result,msg);
+    int ret = dns_msg_pack_answer(nameclass,opt,msg_id,type,view,data,result,msg);
     if(ret)
     {
         hyb_debug("dns_msg_pack_answer error!\n");

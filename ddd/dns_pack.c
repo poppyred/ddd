@@ -48,9 +48,11 @@ typedef struct st_edns_struct {
     unsigned short		a_type;
 	unsigned short		a_payload;
     unsigned char       a_rcode;
-    unsigned char      a_version;
+    unsigned char       a_version;
 	unsigned short		a_z;
 	unsigned short	    a_datalen;
+    unsigned char       a_addflag[4];
+    unsigned int        a_data;
     
 }st_edns_struct;
 
@@ -235,7 +237,7 @@ int dns_pack_head(char*result,char*domain,int domain_len)
 }
 
 
-int dns_pack_query(char*result,char*domain,int domain_len, int view, int type)
+int dns_pack_query(char*result,char*domain,int domain_len, int view, int type,unsigned int msg_id)
 {
     if (!result || !domain)
     {
@@ -302,9 +304,11 @@ int dns_pack_query(char*result,char*domain,int domain_len, int view, int type)
     dns_query->a_z = 0;
     dns_query->a_datalen = 0;
 
-    memcpy_s(result+total_len, &dns_query->a_name+1, 11);
+    memcpy_s(dns_query->a_addflag, "\x01\x01\x00\x00", 4);
+    dns_query->a_data = msg_id;
+    memcpy_s(result+total_len, &dns_query->a_name+1, 11+8);
 
-    total_len = total_len+11;
+    total_len = total_len+11+8;
     
 
     return total_len;
