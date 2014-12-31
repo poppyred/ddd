@@ -41,7 +41,7 @@ int buc_open(char *svr_ip, uint16_t svr_port)
     if(connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == -1)
     {
         OD("connect to [%s:%d] error", svr_ip, svr_port);
-        return -1;
+        //return -1; //这里不要返回，这里不要这么严谨
     }
 
     //do_cli(stdin, sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
