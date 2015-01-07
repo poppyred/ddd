@@ -54,7 +54,7 @@ class ReverseDomainAction extends BaseAction {
 			if($is_ok === false){
 				$this->ajaxReturn('删除域名反解析失败，请联系管理员','error',0);
 			}
-			$this->ajaxReturn($this->returnList(),'success',1);				
+			$this->ajaxReturn(1,'success',1);				
 		}
 	}	
 	public function addReverse(){
@@ -93,7 +93,7 @@ class ReverseDomainAction extends BaseAction {
 					$this->ajaxReturn(0,'添加域名反解析失败，请联系管理员',0);
 				}
 				
-				$this->ajaxReturn($this->returnList(),'success',1);
+				$this->ajaxReturn(1,'success',1);
 			}
 		}
 	}
@@ -135,7 +135,7 @@ class ReverseDomainAction extends BaseAction {
 				if($rslt["ret"] != 0){
 					$this->ajaxReturn(0,'修改域名反解析失败，请联系管理员',0);
 				}
-				$this->ajaxReturn($this->returnList(),'success',1);
+				$this->ajaxReturn(1,'success',1);
 			}
 		}
 	}
@@ -173,7 +173,7 @@ class ReverseDomainAction extends BaseAction {
 					}
 				}			
 			}
-			$this->ajaxReturn($this->returnList(),'success',1);
+			$this->ajaxReturn(1,'success',1);
 		}
 	}	
 	
