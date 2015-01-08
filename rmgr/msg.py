@@ -66,7 +66,7 @@ g_init_sql_inittask_view = 'SELECT `id`,viewid,`data` FROM snd_record WHERE stat
         and class=\'view\' AND `opt`=1 ORDER BY `id` ASC'
 g_init_sql_inittask_view_inited = 'update snd_record set state=4 WHERE `id`=%d'
 g_init_sql_replytask = 'update snd_record set state=%d WHERE `id`=%d'
-g_init_sql_gettask_dns = 'SELECT `id`,`type`,viewid,`data` FROM snd_record WHERE state=0 \
+g_init_sql_gettask_dns = 'SELECT `id`,`type`,viewid,`data`,`opt` FROM snd_record WHERE state=0 \
         and class=\'dns\' ORDER BY `id` ASC'
 g_init_sql_gettask_mask = 'SELECT `id`,viewid,`data`,`opt` FROM snd_record WHERE state=0 \
         and class=\'view\' ORDER BY `id` ASC'
