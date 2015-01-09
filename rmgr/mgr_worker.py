@@ -81,7 +81,7 @@ class mgr_handler(object):
                     mgr_conf.g_row_perpack = 10
                     print >> sys.stderr,  'on init add timers OK'
 
-            if data['class'] == msg.g_class_inner_chk_snd:
+            if data['class'] == msg.g_class_inner_chk_snd or data['class'] == msg.g_class_inner_chk_init:
                 print >> sys.stderr,  (str(data['class']) + '...')
                 del_items = []
                 for k, v in self.proxy_addr.iteritems():

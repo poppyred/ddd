@@ -9,6 +9,8 @@ g_websvr_ip = '121.201.11.4'
 g_now = 0
 g_log_maxline = 90000
 g_init_resp_expect = -1
+g_init_maxid = 0
+g_init_sendstate = 0 #0 uncare , 1 sending , 2 sent
 g_a_tbl = 1
 g_ns_tbl = 2
 g_cname_tbl = 5
@@ -47,6 +49,7 @@ g_class_init_view_reply = 'view_reply'
 g_class_init_dns_reply = 'dns_reply'
 g_class_inner_chk_init_ok = 'chk_init_ok'
 g_class_inner_chk_snd = 'chk_snd'
+g_class_inner_chk_init = 'chk_init'
 g_class_inner_chk_task_domain = 'chk_task_domain'
 g_class_inner_chk_task_domain_reply = 'chk_task_domain_reply'
 g_class_inner_chk_task_record = 'chk_task_record'
@@ -70,6 +73,7 @@ g_init_sql_gettask_dns = 'SELECT `id`,`type`,viewid,`data`,`opt` FROM snd_record
         and class=\'dns\' ORDER BY `id` ASC'
 g_init_sql_gettask_mask = 'SELECT `id`,viewid,`data`,`opt` FROM snd_record WHERE state=0 \
         and class=\'view\' ORDER BY `id` ASC'
+g_init_sql_counttask = 'SELECT count(*), max(id) FROM `snd_record` where class=\'view\' or class=\'dns\''
 
 g_proc_add_snd_req = 'add_snd_req'
 g_proc_update_snd_req = 'update_snd_req'

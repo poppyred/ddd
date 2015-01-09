@@ -48,16 +48,34 @@ class req_handler(object):
             return
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
+     staticmethod
+    def set_chk_init_timer(worker):
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_init, mgr_conf.g_inner_chk_init_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
+        print >> sys.stderr,  'set chk_init_time'
+
+    @staticmethod
+    def set_chk_snd_timer(worker):
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+        print >> sys.stderr,  'set chk_snd_time'
+
     @staticmethod
     def handle_proxy_init_new(worker, addr):
+        msg.g_init_sendstate = 1
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
         req_handler.lockdb = True
         worker.dbcon.query(msg.g_sql_clean_snd_req)
 
         msgobj = []
         count = 0
         cur_cnt = 0
+        expect_cnt = 0
 
+        #生成任务 record
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
@@ -66,24 +84,46 @@ class req_handler(object):
             for row in result:
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add))
 
-            worker.dbcon.query(msg.g_init_sql_inittask_dns)
-            result = worker.dbcon.show()
-            if not result:
-                continue
+        #生成任务 mask
+        worker.dbcon.query(msg.g_init_sql_view)
+        result = worker.dbcon.show()
+        if result:
             for row in result:
-                worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
-                print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
-                msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
-                count += 1
-                cur_cnt += 1
+                worker.dbcon.call_proc(msg.g_proc_add_task, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
 
-                if cur_cnt >= mgr_conf.g_row_perpack4init:
-                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
-                        req_handler.lockdb = False
-                        return
-                    cur_cnt = 0
-                    del msgobj[:]
-                    time.sleep(1)
+        #计算任务数量
+        worker.dbcon.query(msg.g_init_sql_counttask)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                expect_cnt = int(row[0])
+                msg.g_init_maxid = int(row[1])
+        else:
+            print >> sys.stderr,  'count task error'
+            req_handler.lockdb = False
+            return
+
+        #发送通知
+        worker.dbcon.query(msg.g_init_sql_inittask_dns)
+        result = worker.dbcon.show()
+        if not result:
+            continue
+        for row in result:
+            worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
+            print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
+            msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
+            count += 1
+            if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
+                msg.g_init_sendstate = 2
+                req_handler.set_chk_init_timer(worker)
+            cur_cnt += 1
+            if cur_cnt >= mgr_conf.g_row_perpack4init:
+                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                    req_handler.lockdb = False
+                    return
+                cur_cnt = 0
+                del msgobj[:]
+                time.sleep(1)
 
         if cur_cnt > 0:
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
@@ -95,11 +135,6 @@ class req_handler(object):
         del msgobj[:]
         cur_cnt = 0
 
-        worker.dbcon.query(msg.g_init_sql_view)
-        result = worker.dbcon.show()
-        if result:
-            for row in result:
-                worker.dbcon.call_proc(msg.g_proc_add_task, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_inittask_view)
         result = worker.dbcon.show()
         if result:
@@ -108,6 +143,9 @@ class req_handler(object):
                 print >> sys.stderr,  row
                 msgobj.append({'id':row[0], 'opt':msg.g_opt_add, 'view':row[1], 'mask':row[2]})
                 count += 1
+                if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
+                    msg.g_init_sendstate = 2
+                    req_handler.set_chk_init_timer(worker)
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
@@ -127,10 +165,6 @@ class req_handler(object):
         req_handler.lockdb = False
 
         msg.g_init_resp_expect = count
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-        print >> sys.stderr,  'set timers'
 
     @staticmethod
     def handle_proxy_init_reply(worker, answ, addr):
@@ -149,8 +183,6 @@ class req_handler(object):
                 ' ' + str(answ['data']) + ' ' + str(state_set) + ' ' + str(answ['opt']))
 
         if worker.just4testcnt > 0:
-            #worker.dbcon.call_proc(msg.g_proc_update_snd_req, (str_class, answ['type'], answ['viewid'],
-            #    answ['data'], state_set, answ['opt']))
             worker.dbcon.query(msg.g_init_sql_replytask % (state_set, answ['id']))
 
         if False and worker.just4testcnt > 0:
@@ -158,6 +190,10 @@ class req_handler(object):
                 mgr_err_describe.g_err_desc.del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
             if str_class == 'view':
                 mgr_err_describe.g_err_desc.del_view_timeout(answ['opt'], answ['viewid'], answ['data'])
+
+        if msg.g_init_sendstate == 2 and msg.g_init_maxid-int(answ['id']) < 10:
+            req_handler.set_chk_snd_timer(worker)
+            msg.g_init_sendstate = 0
 
     @staticmethod
     def handle_inner_chk_init_ok(worker):
