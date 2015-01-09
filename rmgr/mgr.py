@@ -24,6 +24,7 @@ if __name__ == '__main__':
     g_factory.get_repth_thread()
     g_factory.get_http_thread()
     g_factory.get_mgr_worker().set_buddy_thread(g_factory.get_http_thread(), g_factory.get_check_thread())
+    g_factory.get_mgr_worker4init().set_buddy_thread(g_factory.get_check_thread())
     g_factory.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_db_heartbeat,
             mgr_conf.g_inner_chk_task_db_heartbeat)
     g_factory.get_repth_thread().start()

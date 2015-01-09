@@ -46,7 +46,6 @@ class handle_init_thread(threading.Thread):
             if self.json_data['class'] == msg.g_class_init:
                 #self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
                 #msg.g_init_resp_expect = -1
-                #mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
                 req_handler.handle_proxy_init_new(self, self.json_data['inner_addr'][0])
         except Exception as e:
             print >> sys.stderr,  ('inner error: ' + repr(e))
@@ -130,7 +129,6 @@ class reply_thread(threading.Thread):
                     elif decodejson['class'] == msg.g_class_init:
                         print >> sys.stderr,  '*********1'
                         self.worker.proxy_addr[decodejson['inner_addr'][0]] = [decodejson['inner_addr'], self.worker.proxy_health]
-                        mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
                         hdl_new = handle_init_thread(decodejson, self.worker)
                         print >> sys.stderr,  '*********3'
                         hdl_new.start()

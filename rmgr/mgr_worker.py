@@ -52,7 +52,6 @@ class mgr_handler(object):
                 self.check_thd.del_tasknode_byname_lock(msg.g_class_init_test)
                 self.proxy_addr['121.201.12.66'] = [('121.201.12.66', 12353), self.proxy_health]
                 msg.g_init_resp_expect = -1
-                mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
                 req_handler.handle_proxy_init_new(self, '121.201.12.66')
 
             if data['class'] == msg.g_class_proxy_register:
@@ -63,7 +62,6 @@ class mgr_handler(object):
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-                    mgr_conf.g_row_perpack = 10
                     msg.g_init_resp_expect = 0
                     print >> sys.stderr,  'on register add timers OK'
 
@@ -78,7 +76,6 @@ class mgr_handler(object):
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
                     self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-                    mgr_conf.g_row_perpack = 10
                     print >> sys.stderr,  'on init add timers OK'
 
             if data['class'] == msg.g_class_inner_chk_snd or data['class'] == msg.g_class_inner_chk_init:

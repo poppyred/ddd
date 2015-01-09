@@ -20,6 +20,9 @@ class mgr_handler4init(object):
         self.just4testcnt = 0
         mgr_handler4init.lockdb = False
 
+    def set_buddy_thread(self, check_thd):
+        self.check_thd = check_thd
+
     def handler(self, data):
         if self.dbcon.conn_error:
             self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
