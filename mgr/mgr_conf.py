@@ -15,7 +15,8 @@ g_listen_port = 54321
 g_reply_port = 12345
 
 g_inner_chk_init_ok_time = 2
-g_inner_chk_snd_time = 180
+g_inner_chk_snd_time = 20
+g_inner_chk_init_time = 180
 g_inner_chk_task_domain_time = 5
 g_inner_chk_task_record_time = 2
 g_inner_chk_task_db_heartbeat = 10

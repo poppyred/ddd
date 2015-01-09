@@ -100,9 +100,6 @@ class MyDaemon(Daemon):
         mgr_singleton.g_singleton.get_http_thread()
         if False:
             mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_init_ok, mgr_conf.g_inner_chk_init_ok_time)
-        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
-        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
-        #mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
         if False: #test
             mgr_singleton.g_singleton.get_check_thread().add_tasknode_byinterval_lock(msg.g_class_init_test, mgr_conf.g_inner_chk_init_ok_time)
         mgr_singleton.g_singleton.get_worker().set_buddy_thread(mgr_singleton.g_singleton.get_http_thread(), mgr_singleton.g_singleton.get_check_thread())

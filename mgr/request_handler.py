@@ -53,15 +53,33 @@ class req_handler(object):
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
+    def set_chk_init_timer(worker):
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_init, mgr_conf.g_inner_chk_init_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), 'set chk_init_time')
+
+    @staticmethod
+    def set_chk_snd_timer(worker):
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
+        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), 'set chk_snd_time')
+
+    @staticmethod
     def handle_proxy_init_new(worker, addr):
         g_init_should_stop = 0
+        msg.g_init_sendstate = 1
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
+        worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
         worker.dbcon.query(msg.g_sql_clean_snd_req)
         #query dns
         msgobj = []
         count = 0
         cur_cnt = 0
+        expect_cnt = 0
 
+        #生成任务 record
         for atbl in msg.g_list_tbl:
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
@@ -69,42 +87,56 @@ class req_handler(object):
                 continue
             for row in result:
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add))
-
-            worker.dbcon.query(msg.g_init_sql_inittask_dns)
-            result = worker.dbcon.show()
-            if not result:
-                continue
+        #生成任务 mask
+        worker.dbcon.query(msg.g_init_sql_view)
+        result = worker.dbcon.show()
+        if result:
             for row in result:
-                worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
-                mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
-                msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
-                count += 1
-                cur_cnt += 1
+                worker.dbcon.call_proc(msg.g_proc_add_task, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
+        #计算任务数量
+        worker.dbcon.query(msg.g_init_sql_counttask)
+        result = worker.dbcon.show()
+        if result:
+            for row in result:
+                expect_cnt = int(row[0])
+                msg.g_init_maxid = int(row[1])
+        else:
+            mgr_singleton.g_singleton.get_loger().error(_lineno(), "count task error")
+            return
 
-                if cur_cnt >= mgr_conf.g_row_perpack4init:
-                    if g_init_should_stop == 1: return
-                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
-                        return
-                    cur_cnt = 0
-                    del msgobj[:]
-                    time.sleep(1)
+        #发送通知
+        worker.dbcon.query(msg.g_init_sql_inittask_dns)
+        result = worker.dbcon.show()
+        if not result:
+            continue
+        for row in result:
+            worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
+            mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
+            msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
+            count += 1
+            if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
+                msg.g_init_sendstate = 2
+                req_handler.set_chk_init_timer(worker)
+            cur_cnt += 1
+            if cur_cnt >= mgr_conf.g_row_perpack4init:
+                if g_init_should_stop == 1: return
+                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                    return
+                cur_cnt = 0
+                del msgobj[:]
+                time.sleep(1)
 
         if cur_cnt > 0:
             if g_init_should_stop == 1: return
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
             time.sleep(1)
-        mgr_singleton.g_singleton.get_loger().info(_lineno(), "sent %d records" % (count,));
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), "sent %d records" % (count,))
 
         #query view
         del msgobj[:]
         cur_cnt = 0
 
-        worker.dbcon.query(msg.g_init_sql_view)
-        result = worker.dbcon.show()
-        if result:
-            for row in result:
-                worker.dbcon.call_proc(msg.g_proc_add_task, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_inittask_view)
         result = worker.dbcon.show()
         if result:
@@ -113,6 +145,9 @@ class req_handler(object):
                 mgr_singleton.g_singleton.get_loger().care(_lineno(), row)
                 msgobj.append({'id':row[0], 'opt':msg.g_opt_add, 'view':row[1], 'mask':row[2]})
                 count += 1
+                if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
+                    msg.g_init_sendstate = 2
+                    req_handler.set_chk_init_timer(worker)
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
                     if g_init_should_stop == 1: return
@@ -132,10 +167,6 @@ class req_handler(object):
 
         msg.g_init_resp_expect = count
         #msg.g_init_complete = True
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
-        worker.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-        mgr_singleton.g_singleton.get_loger().info(_lineno(), 'set timers')
 
     @staticmethod
     def handle_proxy_init_reply(worker, answ, addr):
@@ -159,12 +190,9 @@ class req_handler(object):
                 answ['data'], ' ', state_set, ' ', answ['opt'])
 
         if worker.just4testcnt > 0:
-            #worker.dbcon.call_proc(msg.g_proc_update_snd_req, (str_class, answ['type'], answ['viewid'],
-            #    answ['data'], state_set, answ['opt']))
             worker.dbcon.query(msg.g_init_sql_replytask % (state_set, answ['id']))
 
-
-        if worker.just4testcnt > 0:
+        if False and worker.just4testcnt > 0:
             for case in switch(str_class):
                 if case('dns'):
                     mgr_singleton.g_singleton.get_err_info().del_record_timeout(answ['opt'], answ['viewid'], answ['data'], answ['type'])
@@ -175,11 +203,9 @@ class req_handler(object):
                 if case():
                     mgr_singleton.g_singleton.get_loger().warn(_lineno(), 'can not del error describe for unknow type ', str_class)
 
-        #worker.dbcon.query(msg.g_proc_update_snd_req_ret)
-        #update_ret = worker.dbcon.show()
-        #mgr_singleton.g_singleton.get_loger().debug(_lineno(), str_class, ' update return:', repr(update_ret))
-        #if not update_ret or update_ret[0][0] != 1 :
-        #    mgr_singleton.g_singleton.get_loger().error(_lineno(), '%s update database fail!!!!' % (str_class))
+        if msg.g_init_sendstate == 2 and msg.g_init_maxid-int(answ['id']) < 10:
+            req_handler.set_chk_snd_timer(worker)
+            msg.g_init_sendstate = 0
 
     @staticmethod
     def handle_inner_chk_init_ok(worker):
@@ -200,7 +226,8 @@ class req_handler(object):
                 msgobj.append({'id':row[0],'opt':row[4],'domain':row[3],'view':row[2],'type':row[1],
                     'pkt_head':msg.g_pack_head_init_dns})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_singleton.g_singleton.get_err_info().add_record_timeout(row[4], row[2], row[3], row[1])
+                if False:
+                    mgr_singleton.g_singleton.get_err_info().add_record_timeout(row[4], row[2], row[3], row[1])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
         del msgobj[:]
@@ -212,25 +239,9 @@ class req_handler(object):
                 msgobj.append({'id':row[0],'opt':row[3],'view':row[1],'mask':row[2],
                     'pkt_head':msg.g_pack_head_init_view})
                 req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-                mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[3], row[1], row[2])
+                if False:
+                    mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[3], row[1], row[2])
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-
-        #if result:
-        #    for row in result:
-        #        msgobj.append({'opt':row[3], 'domain':row[2], 'view':row[1], 'type':row[0], 'pkt_head':msg.g_pack_head_init_dns})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-        #        mgr_singleton.g_singleton.get_err_info().add_record_timeout(row[3], row[1], row[2], row[0])
-        #    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
-
-        #del msgobj[:]
-        #worker.dbcon.query(msg.g_inner_sql_chksnd_view)
-        #result = worker.dbcon.show()
-        #if result:
-        #    for row in result:
-        #        msgobj.append({'opt':row[2], 'view':row[0], 'mask':row[1], 'pkt_head':msg.g_pack_head_init_view})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-        #        mgr_singleton.g_singleton.get_err_info().add_view_timeout(row[2], row[0], row[1])
-        #    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], True)
 
     @staticmethod
     def travel_dictionary(decodejson):

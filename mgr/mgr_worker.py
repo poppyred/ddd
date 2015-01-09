@@ -128,7 +128,7 @@ class mgr_handler(queue_thread.Qthread):
                         #msg.g_init_complete = True
                         self.loger.info(_lineno(self), 'on init add timers OK')
                     break
-                if case(msg.g_class_inner_chk_snd):
+                if case(msg.g_class_inner_chk_snd) or case(msg.g_class_inner_chk_init):
                     self.loger.info(_lineno(self), data['class'], '...')
                     del_items = []
                     for k, v in self.proxy_addr.iteritems():
