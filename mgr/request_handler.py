@@ -15,11 +15,10 @@ import time
 
 __all__ = ['req_handler', 'req_handler_record_a', 'req_handler_record_ptr', 'req_handler_record_aaaa', 'req_handler_record_cname',
         'req_handler_record_ns', 'req_handler_record_txt', 'req_handler_record_mx', 'req_handler_record_domain_ns',
-        'req_handler_domain', 'req_handler_view','req_handler_mask','g_init_should_stop']
-
-g_init_should_stop = 0
+        'req_handler_domain', 'req_handler_view','req_handler_mask']
 
 class req_handler(object):
+    g_init_should_stop = 0
     @staticmethod
     def notify_proxy(worker, msgobj, addr, flush=False):
         if not flush and len(msgobj) >= mgr_conf.g_row_perpack or flush and len(msgobj) > 0:
@@ -68,7 +67,7 @@ class req_handler(object):
 
     @staticmethod
     def handle_proxy_init_new(worker, addr):
-        g_init_should_stop = 0
+        req_handler.g_init_should_stop = 0
         msg.g_init_sendstate = 1
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_snd)
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
@@ -87,6 +86,24 @@ class req_handler(object):
                 continue
             for row in result:
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add))
+        #发送一些先，防止收到多个init
+        worker.dbcon.query(msg.g_init_sql_inittask_dns_limit1)
+        result = worker.dbcon.show()
+        if result:
+            row = result[0]
+            msg.g_init_maxid = int(row[0])
+            worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
+            mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
+            msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
+            count += 1
+            cur_cnt += 1
+            expect_cnt += 1
+            if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                return
+            del msgobj[:]
+            cur_cnt = 0
+        msg.g_init_resp_expect = count
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), "sent first some %d records" % (count,))
         #生成任务 mask
         worker.dbcon.query(msg.g_init_sql_view)
         result = worker.dbcon.show()
@@ -96,38 +113,41 @@ class req_handler(object):
         #计算任务数量
         worker.dbcon.query(msg.g_init_sql_counttask)
         result = worker.dbcon.show()
-        if result:
-            for row in result:
-                expect_cnt = int(row[0])
-                msg.g_init_maxid = int(row[1])
+        if result and int(result[0][0]) != 0:
+            expect_cnt += int(result[0][0])
+            msg.g_init_maxid = int(result[0][1])
         else:
-            mgr_singleton.g_singleton.get_loger().error(_lineno(), "count task error")
+            msg.g_init_sendstate = 2
+            req_handler.set_chk_init_timer(worker)
+            req_handler.set_chk_snd_timer(worker)
+            mgr_singleton.g_singleton.get_loger().error(_lineno(), "count task error open all timer")
             return
+
+        mgr_singleton.g_singleton.get_loger().info(_lineno(), "g_init_should_stop %d" % (req_handler.g_init_should_stop,))
 
         #发送通知
         worker.dbcon.query(msg.g_init_sql_inittask_dns)
         result = worker.dbcon.show()
-        if not result:
-            continue
-        for row in result:
-            worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
-            mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
-            msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
-            count += 1
-            if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
-                msg.g_init_sendstate = 2
-                req_handler.set_chk_init_timer(worker)
-            cur_cnt += 1
-            if cur_cnt >= mgr_conf.g_row_perpack4init:
-                if g_init_should_stop == 1: return
-                if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
-                    return
-                cur_cnt = 0
-                del msgobj[:]
-                time.sleep(1)
+        if result:
+            for row in result:
+                worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
+                mgr_singleton.g_singleton.get_loger().care(_lineno(), "dns query %s res: %s" % (atbl, row))
+                msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
+                count += 1
+                if msg.g_init_sendstate == 1 and expect_cnt-count < 10:
+                    msg.g_init_sendstate = 2
+                    req_handler.set_chk_init_timer(worker)
+                cur_cnt += 1
+                if cur_cnt >= mgr_conf.g_row_perpack4init:
+                    if req_handler.g_init_should_stop == 1: return
+                    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+                        return
+                    cur_cnt = 0
+                    del msgobj[:]
+                    time.sleep(1)
 
         if cur_cnt > 0:
-            if g_init_should_stop == 1: return
+            if req_handler.g_init_should_stop == 1: return
             if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
                 return
             time.sleep(1)
@@ -150,21 +170,20 @@ class req_handler(object):
                     req_handler.set_chk_init_timer(worker)
                 cur_cnt += 1
                 if cur_cnt >= mgr_conf.g_row_perpack4init:
-                    if g_init_should_stop == 1: return
+                    if req_handler.g_init_should_stop == 1: return
                     if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                         return
                     cur_cnt = 0
                     del msgobj[:]
             if cur_cnt > 0:
-                if g_init_should_stop == 1: return
+                if req_handler.g_init_should_stop == 1: return
                 if worker.sendto_(msgobj, addr, msg.g_pack_head_init_view, mgr_conf.g_reply_port) != True:
                     return
 
-        if g_init_should_stop == 1: return
+        if req_handler.g_init_should_stop == 1: return
 
         msgobj = {'complete':1}
         worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
-
         msg.g_init_resp_expect = count
         #msg.g_init_complete = True
 
@@ -1006,4 +1025,3 @@ http_tbl_realname = {'A' : 'a_record',
                      }
 http_opt_str2int = {'add':msg.g_opt_add, 'del':msg.g_opt_del}
 http_type_to_proxy_header = {'record':msg.g_pack_head_init_dns, 'domain':msg.g_pack_head_init_view}
-

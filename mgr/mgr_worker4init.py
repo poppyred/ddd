@@ -48,6 +48,9 @@ class mgr_handler4init(queue_thread.Qthread):
 
         sys.exit()
 
+    def set_buddy_thread(self, check_thd):
+        self.check_thd = check_thd
+
     def handler(self, data):
         if self.dbcon.conn_error:
             self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd,

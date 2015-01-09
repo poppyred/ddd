@@ -12,6 +12,7 @@ import Queue
 import select
 from mgr_misc import _lineno, switch
 import traceback
+from request_handler import *
 
 class reply_thread(threading.Thread):
     def __init__(self, worker4init, worker, loger, host='', port=54321, bufsize=1024):
@@ -62,6 +63,11 @@ class reply_thread(threading.Thread):
                             #    self.loger.info(_lineno(self), 'send to 4init')
                             #    self.worker4init.put(decodejson)
                             self.worker4init.put(decodejson)
+                            break
+                        if case(msg.g_class_init):
+                            req_handler.g_init_should_stop = 1
+                            self.loger.info(_lineno(self), 'set g_init_should_stop %d' % (req_handler.g_init_should_stop,))
+                            self.worker.put(decodejson)
                             break
                         if case():
                             self.worker.put(decodejson)

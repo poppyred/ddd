@@ -82,6 +82,8 @@ g_init_sql_dns = 'SELECT distinct ar.name as domain, ze.view as view FROM %s ar 
 g_init_sql_chk_init_ok = 'SELECT COUNT(*) FROM snd_record WHERE state!=0'
 g_init_sql_inittask_dns = 'SELECT `id`,`type`,viewid,`data` FROM snd_record WHERE state=0 \
         and class=\'dns\' and `opt`=1 ORDER BY `id` ASC'
+g_init_sql_inittask_dns_limit1 = 'SELECT `id`,`type`,viewid,`data` FROM snd_record WHERE state=0 \
+        and class=\'dns\' and `opt`=1 ORDER BY `id` ASC limit 1'
 g_init_sql_inittask_dns_inited = 'update snd_record set state=4 WHERE `id`=%d'
 g_init_sql_inittask_view = 'SELECT `id`,viewid,`data` FROM snd_record WHERE state=0 \
         and class=\'view\' AND `opt`=1 ORDER BY `id` ASC'

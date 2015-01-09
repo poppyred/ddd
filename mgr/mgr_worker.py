@@ -87,8 +87,8 @@ class mgr_handler(queue_thread.Qthread):
                     self.proxy_addr[data['inner_addr'][0]] = [data['inner_addr'], self.proxy_health]
                     msg.g_init_resp_expect = -1
                     #msg.g_init_complete = False
-                    mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
-                    g_init_should_stop = 1
+                    req_handler.g_init_should_stop = 1
+                    self.loger.info(_lineno(self), 'set g_init_should_stop %d' % (req_handler.g_init_should_stop,))
                     req_handler.handle_proxy_init_new(self, data['inner_addr'][0])
                     break
                 if case(msg.g_class_init_test):
@@ -96,8 +96,7 @@ class mgr_handler(queue_thread.Qthread):
                     self.proxy_addr['121.201.12.66'] = [('121.201.12.66', 12353), self.proxy_health]
                     msg.g_init_resp_expect = -1
                     #msg.g_init_complete = False
-                    mgr_conf.g_row_perpack = mgr_conf.g_row_perpack4init
-                    g_init_should_stop = 1
+                    req_handler.g_init_should_stop = 1
                     req_handler.handle_proxy_init_new(self, '121.201.12.66')
                     break
                 if case(msg.g_class_proxy_register):
@@ -108,7 +107,6 @@ class mgr_handler(queue_thread.Qthread):
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-                        mgr_conf.g_row_perpack = 10
                         msg.g_init_resp_expect = 0
                         #msg.g_init_complete = True
                         self.loger.info(_lineno(self), 'on register add timers OK')
@@ -124,7 +122,6 @@ class mgr_handler(queue_thread.Qthread):
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_snd, mgr_conf.g_inner_chk_snd_time)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_domain, mgr_conf.g_inner_chk_task_domain_time)
                         self.check_thd.add_tasknode_byinterval_lock(msg.g_class_inner_chk_task_record, mgr_conf.g_inner_chk_task_record_time)
-                        mgr_conf.g_row_perpack = 10
                         #msg.g_init_complete = True
                         self.loger.info(_lineno(self), 'on init add timers OK')
                     break
