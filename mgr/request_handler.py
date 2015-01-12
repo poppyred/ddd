@@ -865,15 +865,6 @@ class req_handler_domain(req_handler_impl):
         n_enable = 1 if int(data['enable'])==0 else 0
         self.loger.info(_lineno(), 'update domain:', data['name'], '[', n_enable, '] from database')
         worker.dbcon.call_proc(msg.g_proc_set_a_domain, (data['name'], n_enable))
-        #result = []
-        #ars = worker.dbcon.show()
-        #while ars and len(ars) > 0:
-        #    for i in range(len(ars)):
-        #        result.append(ars[i])
-        #    worker.dbcon.nextset()
-        #    ars = worker.dbcon.show()
-        #worker.dbcon.fetch_proc_reset()
-        #self.loger.info(_lineno(), 'select old:', result)
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return True, True, result
@@ -883,49 +874,19 @@ class req_handler_domain(req_handler_impl):
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
 
+        for atbl in msg.g_list_tbl:
+            #worker.dbcon.query(msg.g_sql_get_exist_records)
+            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
+            result = worker.dbcon.show()
+            if result and len(result)>0:
+                self.loger.error(_lineno(), 'deleting domain:', data['name'], ', find sub records:', repr(result), ' has sub records!!')
+                return False, False, None
         #{"name":"test.com"}
         self.loger.info(_lineno(), 'deleting domain:', data['name'], ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
-        #result = []
-        #ars = worker.dbcon.show()
-        #while ars and len(ars) > 0:
-        #    for i in range(len(ars)):
-        #        result.append(ars[i])
-        #    worker.dbcon.nextset()
-        #    ars = worker.dbcon.show()
-        #worker.dbcon.fetch_proc_reset()
-        #self.loger.info(_lineno(), 'select old:', result)
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return True, True, result
-
-    #def donotify(self, worker, msgobj, opt, data, odata, real_tbl):
-    #    self.loger.debug(_lineno(), 'enter opt:', opt, ' data:', data, ' odata:', odata)
-    #    if len(worker.proxy_addr.keys()) < 1:
-    #        return False
-    #    for case in switch(opt):
-    #        if case('del'):
-    #            for od in odata:
-    #                if (len(od) >= 3 and od[0] and od[1] != None and od[2]):
-    #                    self.loger.debug(_lineno(), 'notify od for del:', od)
-    #                    msgobj.append({'opt':http_opt_str2int[opt], 'domain':od[0], 'view':od[1], 'type':msg.g_dict_type[od[2]],
-    #                        'pkt_head':msg.g_pack_head_init_dns})
-    #                    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-    #            break
-    #        if case('set'):
-    #            ropt = 'add'
-    #            if data.has_key('enable') and int(data['enable'])==0:
-    #                ropt = 'del'
-    #            for od in odata:
-    #                if (len(od) >= 3 and od[0] and od[1] != None and od[2]):
-    #                    self.loger.debug(_lineno(), 'notify od for set:', od)
-    #                    msgobj.append({'opt':http_opt_str2int[ropt], 'domain':od[0], 'view':od[1], 'type':msg.g_dict_type[od[2]],
-    #                        'pkt_head':msg.g_pack_head_init_dns})
-    #                    req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-    #            break
-    #        if case():
-    #            self.loger.warn(_lineno(), 'opt:', opt, ' has not been implemented!')
-    #    return False
 
 class req_handler_view(req_handler_impl):
     def __init__(self, loger):
