@@ -497,46 +497,6 @@ class req_handler_impl(req_hdl_abstract):
             req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
         req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
 
-        #print >> sys.stderr,  ('opt:' + str(opt) + ' data:' + str(data))
-        #if opt == 'add':
-        #    if odata and len(odata) > 0 and len(odata[0]) >= 4:
-        #        odata0 = odata[0]
-        #        ropt = 'del'
-        #        if odata0[3] > 0:
-        #            ropt = 'add'
-        #        msgobj.append({'opt': http_opt_str2int[ropt], 'domain': odata0[0], 'view': odata0[1],
-        #            'type': msg.g_dict_type[odata0[2]], 'pkt_head': msg.g_pack_head_init_dns})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
-        #    msgobj.append({'opt': http_opt_str2int['add'], 'domain': data['name'].lstrip('@.'),
-        #        'view': int(data['viewid']), 'type': msg.g_dict_type[real_tbl],
-        #        'pkt_head': msg.g_pack_head_init_dns})
-
-        #if opt == 'set':
-        #    if odata and len(odata) > 0 and len(odata[0]) >= 4:
-        #        odata0 = odata[0]
-        #        ropt = 'del'
-        #        if odata0[3] > 0:
-        #            ropt = 'add'
-        #        msgobj.append({'opt': http_opt_str2int[ropt], 'domain': odata0[0], 'view': odata0[1],
-        #            'type': msg.g_dict_type[odata0[2]], 'pkt_head': msg.g_pack_head_init_dns})
-        #        req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
-        #    ropt = 'add'
-        #    if data.has_key('enable') and int(data['enable']) == 0:
-        #        ropt = 'del'
-        #    msgobj.append({'opt': http_opt_str2int[ropt], 'domain': data['name'].lstrip('@.'),
-        #        'view': int(data['viewid']), 'type': msg.g_dict_type[real_tbl],
-        #        'pkt_head': msg.g_pack_head_init_dns})
-
-        #if opt == 'del':
-        #    if odata and len(odata) > 0 and len(odata[0]) >= 3:
-        #        odata0 = odata[0]
-        #        ropt = opt
-        #        if odata0[2] > 0:
-        #            ropt = 'add'
-        #        msgobj.append({'opt': http_opt_str2int[ropt], 'domain': odata0[0], 'view': odata0[1],
-        #            'type': msg.g_dict_type[real_tbl], 'pkt_head': msg.g_pack_head_init_dns})
-
-        #req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0], False)
         return False
 
 class req_handler_record_a(req_handler_impl):
@@ -899,10 +859,11 @@ class req_handler_domain(req_handler_impl):
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
         for atbl in msg.g_list_tbl:
-            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl))
+            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
+            #worker.dbcon.query(msg.g_sql_get_exist_records)
             result = worker.dbcon.show()
-            print >> sys.stderr,  ('deleting domain:' + repr(result))
-            if result or count(result)>0:
+            if result and len(result)>0:
+                print >> sys.stderr,  ('deleting domain:' + repr(result) + ' but has sub records!!')
                 return False, False, None
         print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
@@ -911,7 +872,7 @@ class req_handler_domain(req_handler_impl):
         return (True, True, result)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        return self.donotify(worker, msgobj, opt, data, odata)
+        return self.donotify(worker, msgobj, opt, data, odata, None)
 
 class req_handler_view_mask(req_handler_impl):
     def __init__(self):
