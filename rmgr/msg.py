@@ -88,9 +88,14 @@ g_proc_get_subrecord_inline = 'get_subrecord_inline'
 g_proc_add_task = 'add_snd_req_new'
 
 g_sql_clean_snd_req = 'DELETE FROM `snd_record`'
-g_sql_add_a_domain_ns = "INSERT INTO domain_ns(domain,ttl,`server`,`rid`)VALUES('%s',%d,'%s',%d)         ON DUPLICATE KEY UPDATE domain='%s',ttl=%d,`server`='%s'"
+g_sql_add_a_domain_ns = "INSERT INTO domain_ns(domain,ttl,`server`,`rid`)VALUES('%s',%d,'%s',%d) \
+        ON DUPLICATE KEY UPDATE domain='%s',ttl=%d,`server`='%s'"
 g_sql_add_snd_req = 'INSERT INTO `snd_record` (class,`type`,viewid,`data`,state,`opt`) \
         VALUES(\'%s\',%d,%d,\'%s\',%d,%d)'
+g_sql_get_exist_records = 'SELECT DISTINCT ze.domain FROM a_record ar LEFT JOIN zone ze ON ar.zone = ze.id \
+        WHERE ze.domain = \'lkx.cc\' and ar.enable=1'
+#g_sql_get_exist_records = 'SELECT DISTINCT ze.domain FROM a_record ar LEFT JOIN zone ze ON ar.zone = ze.id \
+#        WHERE ze.domain = \'%s\' and ar.enable=1'
 
 g_inner_sql_chksnd_view = 'SELECT `id`,viewid,`data`,`opt`,chktime FROM snd_record WHERE state=4 \
         and class=\'view\' AND chktime<=DATE_ADD(NOW(),INTERVAL -20 SECOND) ORDER BY `id` ASC'

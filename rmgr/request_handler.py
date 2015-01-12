@@ -890,17 +890,6 @@ class req_handler_domain(req_handler_impl):
         n_enable = 1 if int(data['enable']) == 0 else 0
         print >> sys.stderr,  ('update domain:' + str(data['name']) + '[' + str(n_enable) + '] from database')
         worker.dbcon.call_proc(msg.g_proc_set_a_domain, (data['name'], n_enable))
-        #result = []
-        #ars = worker.dbcon.show()
-        #while ars and len(ars) > 0:
-        #    for i in range(len(ars)):
-        #        result.append(ars[i])
-
-        #    worker.dbcon.nextset()
-        #    ars = worker.dbcon.show()
-
-        #worker.dbcon.fetch_proc_reset()
-        #print >> sys.stderr,  ('select old:' + str(result))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
@@ -909,56 +898,20 @@ class req_handler_domain(req_handler_impl):
         if False:
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
+        for atbl in msg.g_list_tbl:
+            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl))
+            result = worker.dbcon.show()
+            print >> sys.stderr,  ('deleting domain:' + repr(result))
+            if result or count(result)>0:
+                return False, False, None
         print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
-        #result = []
-        #ars = worker.dbcon.show()
-        #while ars and len(ars) > 0:
-        #    for i in range(len(ars)):
-        #        result.append(ars[i])
-
-        #    worker.dbcon.nextset()
-        #    ars = worker.dbcon.show()
-
-        #worker.dbcon.fetch_proc_reset()
-        #print >> sys.stderr,  ('select old:' + str(result))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
         return self.donotify(worker, msgobj, opt, data, odata)
-
-    #def donotify(self, worker, msgobj, opt = None, data = None, odata = None, real_tbl = None):
-    #    print >> sys.stderr,  ('enter opt:' + str(opt) + ' data:' + str(data) + ' odata:' + str(odata))
-    #    if len(worker.proxy_addr.keys()) < 1:
-    #        return False
-
-    #    if opt == 'del':
-    #        for od in odata:
-    #            if len(od) >= 3 and od[0] and od[1] != None and od[2]:
-    #                print >> sys.stderr,  ('notify od for del:' + str(od))
-    #                msgobj.append({'opt': http_opt_str2int[opt],
-    #                    'domain': od[0],
-    #                    'view': od[1],
-    #                    'type': msg.g_dict_type[od[2]],
-    #                    'pkt_head': msg.g_pack_head_init_dns})
-    #                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-
-    #    if opt == 'set':
-    #        ropt = 'add'
-    #        if data.has_key('enable') and int(data['enable']) == 0:
-    #            ropt = 'del'
-    #        for od in odata:
-    #            if len(od) >= 3 and od[0] and od[1] != None and od[2]:
-    #                print >> sys.stderr,  ('notify od for set:' + str(od))
-    #                msgobj.append({'opt': http_opt_str2int[ropt],
-    #                    'domain': od[0],
-    #                    'view': od[1],
-    #                    'type': msg.g_dict_type[od[2]],
-    #                    'pkt_head': msg.g_pack_head_init_dns})
-    #                req_handler.notify_proxy(worker, msgobj, worker.proxy_addr.keys()[0])
-    #    return False
 
 class req_handler_view_mask(req_handler_impl):
     def __init__(self):
