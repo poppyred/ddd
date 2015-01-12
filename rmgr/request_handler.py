@@ -859,11 +859,11 @@ class req_handler_domain(req_handler_impl):
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
         for atbl in msg.g_list_tbl:
-            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
             #worker.dbcon.query(msg.g_sql_get_exist_records)
+            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
             result = worker.dbcon.show()
             if result and len(result)>0:
-                print >> sys.stderr,  ('deleting domain:' + repr(result) + ' but has sub records!!')
+                print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ', find sub records:' + repr(result) + ' has sub records!!')
                 return False, False, None
         print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
@@ -872,7 +872,7 @@ class req_handler_domain(req_handler_impl):
         return (True, True, result)
 
     def notify(self, worker, msgobj, opt = None, data = None, odata = None):
-        return self.donotify(worker, msgobj, opt, data, odata, None)
+        return self.donotify(worker, msgobj, opt, data, odata, 'domain')
 
 class req_handler_view_mask(req_handler_impl):
     def __init__(self):
