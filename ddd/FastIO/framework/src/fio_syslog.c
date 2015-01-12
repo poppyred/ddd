@@ -7,7 +7,7 @@
 #include "fio_sysconfig.h"
 #include "fio_route_manager.h"
 #include "fio_log.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include "fio_statistics.h"
 
 struct fio_syslog

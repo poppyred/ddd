@@ -1,7 +1,7 @@
 #include "fio_sysstack.h"
 #include "fio_sysconfig.h"
 #include "fio_context.h"
-#include "log_log.h"
+//#include "log_log.h"
 
 #include <assert.h>
 

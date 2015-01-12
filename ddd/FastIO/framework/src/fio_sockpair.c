@@ -6,7 +6,7 @@
 #include <sys/un.h> 
 #include "fio_sockpair.h"
 #include "fio_nm_util.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include "fio_sysconfig.h"
 
 int fio_socketpair(int af, struct in_addr *if_ip, uint16_t sport, uint16_t delta, int type, int protocol, int fd[2])
@@ -105,7 +105,7 @@ int fio_socketpair(int af, struct in_addr *if_ip, uint16_t sport, uint16_t delta
     return 0;
 }
 
-#define NFIO_DOMAIN "/tmp/nfio.domain" 
+#define NFIO_DOMAIN "/var/nfio.domain" 
 int fio_usocketpair(struct in_addr *if_ip, uint16_t sport, int fd[2])
 {
     int listen_socket;

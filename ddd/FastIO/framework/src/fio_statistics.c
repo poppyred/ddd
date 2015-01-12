@@ -3,9 +3,10 @@
 #include "fio_statistics.h"
 #include "fio_sysconfig.h"
 #include "fio_context.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include "bsd_udpcli.h"
  #include <syslog.h>
+#include <stdarg.h>
 
 #define MAX_SYSLOG_DATA 10240
 #define SYSLOG_FACILITIES 24

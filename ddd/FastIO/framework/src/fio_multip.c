@@ -9,7 +9,7 @@
 #include "fio_timer.h"
 #include "fio_context.h"
 #include "fio_map32.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include "fio_mapstr.h"
 #include "fio_route_manager.h"
 

@@ -3,7 +3,7 @@
 #include "fio_timer.h"
 #include "fio_nm_util.h"
 #include "fio_map32.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include "fio_sysconfig.h"
 
 #define constMaxTimerHandler 1024

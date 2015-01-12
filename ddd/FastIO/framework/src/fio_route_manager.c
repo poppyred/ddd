@@ -65,7 +65,7 @@ int splite_str(char *str, int str_size, char *buf, int buf_size,
 #include "fio_sysconfig.h"
 #include "fio_nic.h"
 #include "fio_map32.h"
-#include "log_log.h"
+//#include "log_log.h"
 #endif
 
 #define FIO_SYS_ROUTE_PATH "/proc/net/route"  

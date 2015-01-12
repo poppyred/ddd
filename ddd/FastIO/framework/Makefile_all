@@ -20,7 +20,7 @@ endif
 
 LIBPATH = -L ./
 
-LDFLAGS += -lfio_as -lcommon
+LDFLAGS += -lfio_as
 LDFLAGS += -lrt -lpthread
 
 SUBDIR = src

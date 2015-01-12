@@ -9,7 +9,7 @@
 #include <netdb.h>
 #include <sys/stat.h>
 #include <assert.h>
-#include <log_log.h>
+//#include <log_log.h>
 
 int verbose = 0;
 

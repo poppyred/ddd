@@ -116,7 +116,7 @@ int mac_pack(struct in_addr *ip_snd, struct ether_addr *mac_snd, struct in_addr 
 #include "fio_sysconfig.h"
 #include "fio_sysstack.h"
 #include "fio_map32.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include <assert.h>
 
 #define STR_SHUTDOWN "c2h1dGRvd24="
@@ -590,12 +590,10 @@ int fio_mac_handle_arp(struct fio_nic *from, struct fio_nic *to, struct fio_rxda
                 from->alise, rep_addr, req_addr);
         if (!strncmp((const char*)preq_arp->padding, STR_SHUTDOWN, strlen(STR_SHUTDOWN)))
         {   
-            OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
             sysconfig.working = 2;
         }  
         else if (!strncmp((const char*)preq_arp->padding, STR_STARTUP, strlen(STR_STARTUP)))
         {   
-            OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(from)->me);
             sysconfig.working = 1;
         }  
         ip = ip_recv->s_addr;

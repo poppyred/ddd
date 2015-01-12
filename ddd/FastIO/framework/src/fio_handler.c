@@ -8,7 +8,7 @@
 #include "fio_context.h"
 #include "fio_icmp.h"
 #include "fio_sysstack.h"
-#include "log_log.h"
+//#include "log_log.h"
 
 struct fio_map_t *g_cbf_tbl;
 struct fio_map_t *g_eth_handles;

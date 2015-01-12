@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fio_sysconfig.h"
-#include "log_log.h"
+//#include "log_log.h"
 
 struct IPMAC * g_ip_macs[MAX_IPMAC];
 int g_mac_num = 0;

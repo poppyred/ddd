@@ -4,7 +4,7 @@
 #include "fio_sysconfig.h"
 #include "fio_context.h"
 #include "fio_sysstack.h"
-#include "log_log.h"
+//#include "log_log.h"
 
 int g_icmp_pkt_size = sizeof(struct icmp_packet);
 

@@ -9,7 +9,7 @@
 #include "fio_map32.h"
 #include "fio_mapstr.h"
 #include "fio_handler.h"
-#include "log_log.h"
+//#include "log_log.h"
 #include <assert.h>
 
 #define STR_SHUTDOWN "c2h1dGRvd24="
@@ -610,31 +610,21 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
         if ((slot->len<=60 && pkt_type == T_FIO_PKT_INTD) ||
                 sysconfig.working == 2)
         {
-            sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d\n", 
-                    NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport));
-
             if (!strncmp((const char*)p+g_payload_offset, STR_SHUTDOWN, strlen(STR_SHUTDOWN)))
             {   
-                OD( "tid %d recv shutdown!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
                 sysconfig.working = 2;
                 loper = atoi(p+g_payload_offset+strlen(STR_SHUTDOWN));
             }  
             else if (!strncmp((const char*)p+g_payload_offset, STR_STARTUP, strlen(STR_STARTUP)))
             {   
-                OD( "tid %d recv startup!!!!!!\n\n\n\n\n", NIC_EXTRA_CONTEXT(nic)->me);
                 sysconfig.working = 1;
             }  
-
-            sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s %d%%%d = %d\n", 
-                    NIC_EXTRA_CONTEXT(nic)->me, nic->alise, loper_p, loper, (loper_p%loper));
 
             if (sysconfig.working == 2 
                     && ((pb->sip+(loper_p++))%loper == 0)
                     && slot->len >= 54+strlen(STR_TESTCOM) 
                     && memcmp((const char*)(p+54), STR_TESTCOM, strlen(STR_TESTCOM)))
             {
-                sysconfig.maclog.vtbl.print(&sysconfig.maclog, "tid %d nic %s dport %d discard %s\n", 
-                        NIC_EXTRA_CONTEXT(nic)->me, nic->alise, ntohs(pb->dport), (const char*)(p+54));
                 goto _pkt_discard;
             }
         }

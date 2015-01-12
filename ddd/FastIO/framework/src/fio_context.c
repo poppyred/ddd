@@ -15,10 +15,10 @@
 #include "fio_syslog.h"
 #include "fio_sysstack.h"
 #include "fio_sockpair.h"
-#include "log_util.h"
+//#include "log_util.h"
 #include "fio_dns_logic.h"
 #include "fio_test_send.h"
-#include "log_log.h"
+//#include "log_log.h"
 
 struct fio_context *g_contexts;
 struct fio_context *g_syscontext;
@@ -26,7 +26,7 @@ struct fio_context *g_syscontext;
 static pthread_t g_count_id = 0;
 static int g_started_count = 0;
 
-#define LOCKFILE "/tmp/nfio.pid"
+#define LOCKFILE "/var/nfio.pid"
 #define LOCKMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 static int lockfile(int fd)
 {
