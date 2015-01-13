@@ -858,13 +858,16 @@ class req_handler_domain(req_handler_impl):
         if False:
             data['enable'] = 0
             return self.set(worker, data, ali_tbl)
-        for atbl in msg.g_list_tbl:
-            #worker.dbcon.query(msg.g_sql_get_exist_records)
-            worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
-            result = worker.dbcon.show()
-            if result and len(result)>0:
-                print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ', find sub records:' + repr(result) + ' has sub records!!')
-                return False, False, None
+
+        #here for release clean
+        #for atbl in msg.g_list_tbl:
+        #    #worker.dbcon.query(msg.g_sql_get_exist_records)
+        #    worker.dbcon.query(msg.g_sql_get_exist_records % (atbl, data['name']))
+        #    result = worker.dbcon.show()
+        #    if result and len(result)>0:
+        #        print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ', find sub records:' + repr(result) + ' has sub records!!')
+        #        return False, False, None
+
         print >> sys.stderr,  ('deleting domain:' + str(data['name']) + ' from database')
         worker.dbcon.call_proc(msg.g_proc_del_a_domain, (data['name'],))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
