@@ -153,7 +153,10 @@ static void dns_deal_ptr_answer(struct fio_nic *src,struct fio_rxdata *rxdata,
 		txdata->srcport = htons(53);
 		fio_send(src, htons(len), txdata, 0);
 
-        hyb_debug("Rarp Answer =>[%s] to user[%s:%d]\n",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
+        dns_lcllog_record_count();
+		//dns_lcllog_cache_viewcount(view_id);
+        
+        //hyb_debug("Rarp Answer =>[%s] to user[%s:%d]\n",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
         dns_rsyslog("Rarp Answer =>[%s] to user[%s:%d]",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
 
    // }
@@ -1016,7 +1019,6 @@ void request_to_core(char *domain,int view, int type,unsigned int msg_id)
 	txdata->srcport = htons(5353);
     
     memcpy(txdata->pdata,buf,buflen);
-    printf("msgid %d %d %d %d\n", txdata->pdata[buflen-4], txdata->pdata[buflen-3], txdata->pdata[buflen-2], txdata->pdata[buflen-1]);
     
 	fio_send(t, htons(buflen), txdata, 1);
 

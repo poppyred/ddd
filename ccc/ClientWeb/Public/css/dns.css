@@ -51,7 +51,7 @@
 
 .table-toolbar{width:940px;height:30px;/*line-height:30px;*/margin:0 auto;text-align:right;padding-top:0}
 .table-toolbar .icon{display:inline-block;background:url(../img/icon.gif) -1000px 0 no-repeat;padding-left:18px;margin-left:20px}
-.table-toolbar .icon-log{background-position:0 -30px}
+.table-toolbar .icon-log{background-position:0 -38px}
 .table-toolbar .icon-export{background-position:0 8px}
 .table-box{width:898px;margin:0 auto 30px;padding:10px 20px;border:solid 1px #ddd;box-shadow:0 0 4px #ddd;-webkit-box-shadow:0 0 4px #ddd;-moz-box-shadow:0 0 4px #ddd;*margin-top:-1px!important;}
 .table-box .chk{width:38px;text-align:center}
@@ -99,7 +99,7 @@
 .page-logs .table-box{padding:0;width:938px;margin-top:32px}
 .page-logs .ui-table{padding:0 20px}
 .page-logs th{height:48px;font-weight:300;color:#999}
-.page-logs .ipt-date{height:22px;line-height:22px;background:url(../img/date_icon.gif) right center no-repeat;margin-right:10px}
+.page-logs .ipt-date{height:22px;line-height:22px;}
 .page-logs .toolbar{padding:20px 0;margin:0 20px;border-bottom:solid 1px #ccc}
 .page-logs .toolbar .w{padding-right:10px}
 .page-logs .btn-s-l{margin-right:10px}

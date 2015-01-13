@@ -7,6 +7,7 @@ class DomainmgrAction extends BaseAction {
 		$client = M('client',Null,'DB_NEWS'); 
 		import('ORG.Util.Page');// 导入分页类
 		$map['level'] = array('lt','8');
+		$map['internal'] = 0;
 		if(!empty($_GET['domain'])){
 			$map["domain"] = array('like','%'.$_GET['domain'].'%');
 			$this->assign('domain',$_GET['domain']);
@@ -31,6 +32,54 @@ class DomainmgrAction extends BaseAction {
 		$this->assign('page',$show);// 赋值分页输出
 		$this->display();
 	}
+	public function addDomain(){
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){			
+			$client = M('client',Null,'DB_NEWS'); 
+			$list = $client->select();
+			$this->assign("list",$list);
+			$this->display();		
+		}else{
+			if(isset($_POST['level']) && !empty($_POST['zone']) && !empty($_POST['mail'])){
+				$data = file_get_contents(C('API_URL')."/domain.php?opt=insert&user=".$_POST['mail']."&domain=".$_POST['zone']."&level=".$_POST['level']);
+				$result = json_decode($data,true);
+				if($result['ret'] != 0){
+					$this->ajaxReturn($result['error'],'error',0);
+				}
+				$this->ajaxReturn("添加域名成功",'success',1);
+			}
+		}
+	}
+	public function transfer(){
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
+		
+			$client = M('client',Null,'DB_NEWS'); 
+			$list = $client->where("mail!='".$_GET['cid']."'")->select();
+			
+			$this->assign('list', $list);	
+			$this->assign('id', $_GET['id']);	
+			$this->display();
+			
+		}else{
+			$client = M('client',Null,'DB_NEWS'); 
+			$zone = M('zone',Null,'DB_NEWS'); 
+			$client_domain = M('client_domain',Null,'DB_NEWS'); 
+			//$client_group = M('client_group',Null,'DB_NEWS'); 
+			$vo = $zone->where('id='.$_POST['id'])->find();
+			if($vo){
+				//修改client_id有关数据
+				$is_ok = $client_domain->where('zone_id='.$_POST['id'])->setField('client_id',$_POST['mail']);
+				//$is_ok2 = $client_group->where('client_id='.$_POST['cid'])->setField('client_id',$_POST['mail']);
+				$is_ok3 = $zone->where('id='.$_POST['id'])->setField('client_id',$_POST['mail']);
+				if($is_ok===false || $is_ok3===false){
+					$this->ajaxReturn('域名授权失败，请联系管理员','error',0);
+				}else{
+					$this->ajaxReturn($vo['level'],'success',1);
+				}
+			}
+		}
+		
+	}
+	
 	public function empower(){
 		if(isset($_POST['vip']) && !empty($_POST['domain'])){
 			
@@ -95,6 +144,7 @@ class DomainmgrAction extends BaseAction {
 		$client = M('client',Null,'DB_NEWS'); 
 		import('ORG.Util.Page');// 导入分页类
 		$map['level'] = array('egt','8');
+		$map['internal'] = 0;
 		if(!empty($_GET['domain'])){
 			$map["domain"] = array('like','%'.$_GET['domain'].'%');
 			$this->assign('domain',$_GET['domain']);

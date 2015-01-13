@@ -58,24 +58,6 @@
 				showInfo('请输入正确的邮箱格式，例如：zhangsan@163.com');
 				return false;
 			}
-			$.ajax({
-				url:'__APP__/Index/checkUser',
-				type:'post',
-				async:false,
-				data:{'eamil':mail},
-				success:function(data){
-					if(data.info=='error'){
-						$("#fm-regist-email").focus();
-						showInfo('['+mail+']  账户已存在，<a href="__APP__/Index/login">登陆</a> | <a href="__APP__/Index/forget.html">忘记密码？</a>');
-						return false;
-					}else{
-						$("#regist-error").hide();	
-					}
-				},
-				error:function(data){
-					showInfo(data.statusText);
-				}
-			});
 			if(!pwd){
 				$("#fm-regist-password").focus();
 				$("#fm-regist-password").next().show();

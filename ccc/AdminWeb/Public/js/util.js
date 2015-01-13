@@ -78,3 +78,19 @@ function checkMask(mask){
          return true; //"合法"
     } 
 }
+function checkemail(val){
+	var reg =/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+		if(!reg.test(val)){
+			return false;
+		}
+	return true;
+}
+
+
+var stopPropagation = function(e) {
+	if(e && e.stopPropagation){         //W3C取消冒泡事件         
+		e.stopPropagation();     
+	}else{         //IE取消冒泡事件         
+		window.event.cancelBubble = true;     
+	} 
+};

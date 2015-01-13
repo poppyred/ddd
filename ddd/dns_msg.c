@@ -938,7 +938,6 @@ int dns_msg_cache_analyze(char *msg)
             if (id_js)
             {
                 msg_id = atoi(id_js);
-                //printf("msgid %u %s\n",msg_id, id_js);
                 free(id_js);
             }
         }

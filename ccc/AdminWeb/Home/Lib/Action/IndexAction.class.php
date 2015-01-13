@@ -31,7 +31,11 @@ class IndexAction extends Action {
 							header("Location: ".__APP__."/Clientmgr/");
 						}else{
 						*/
-						header("Location: ".__APP__."/FlowChart/");
+						if($rslt["level"]==0 || $rslt["level"]==1){
+							header("Location: ".__APP__."/FlowChart/");
+						}else{
+							header("Location: ".__APP__."/Clientmgr/");
+						}
 						//}
 					} else {
 						//$this->success("用户名或密码输入错误，请核对后再试！",U("/Index/login"));

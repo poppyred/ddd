@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding:UTF-8 -*-
 
+if ():
+    print 'aaa'
+
 str_class = '3.16.10.10.in-addr.arpa'.partition('.in-')
 print repr(str_class)
 

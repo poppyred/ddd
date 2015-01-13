@@ -93,6 +93,15 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 #sideMenu .bd li span,#sideMenu1 .bd li span,#sideMenu2 .bd li span { color:#999; margin-right:5px; }
 
 
+/******操作******/
+.opt_div a{
+	height:25px;
+	line-height:25px;
+	display:inline-block;
+	width:60px;
+	text-align:center;
+}
+
 
 /* Tab切换 */
 .slideTxtBox { float:left;  width:100%; height:100%; overflow:hidden;  padding:0 0 0 10px; background:#fff;  text-align:left;  }
@@ -138,3 +147,16 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 
 .footer a {color: #666;}
 .footer {text-align: center;line-height: 25px;background: url(../img/foot.gif) 0 bottom repeat-x #eee;border-top: solid 1px #dbdee1;padding: 25px 0;}
+
+
+.caret {
+display: inline-block;
+width: 0;
+height: 0;
+margin-left: 2px;
+vertical-align: middle;
+border-top: 4px solid;
+border-right: 4px solid transparent;
+border-left: 4px solid transparent;
+}
+

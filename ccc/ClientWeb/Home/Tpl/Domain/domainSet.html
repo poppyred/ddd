@@ -36,7 +36,7 @@
 				textHint: true, //提示文字自动隐藏 
 			}); 	
 		}
-		function showLog(obj){
+		/*function showLog(obj){
 			$.layer({
 				type : 2,
 				title : ['查看域名操作日志',true],
@@ -44,7 +44,7 @@
 				area : ['750px' , '466px'],
 				offset : ['100px','']
 			});
-		}
+		}*/
 		function addUser(obj){
 			if($("#txt_is_lock").val()==0){
 				if($('.addUserInput').length<5){
@@ -296,6 +296,74 @@
 				});
 			}
 		}
+		function closeMsg(zone,obj){
+			if(confirm("确定关闭实时通知功能？")){
+				$.ajax({
+					url:'__APP__/Domain/closeMsg',
+					type:'post',
+					data:{'zone':zone},
+					success:function(data){
+						if(data.info=="success"){
+							$(obj).parent().html('<a href="javascript:void(0);" onClick="openMsg(this)">开启</a>');
+						}else{
+							messageBox('aqsz_msg',data.data);
+						}
+					},error:function(data){
+						messageBox('aqsz_msg',data.data);
+					}
+				});
+			}
+		}
+		function openMsg(obj){
+			if($(".openMsg").length==0){
+				var phone = '{$entity.link_phone}',
+					mail = '{$entity.mail}';
+				$(obj).parent().parent().after('<tr class="openMsg"><td colspan="3" style="padding-left:62px;" >手机号码:<input style="width:150px;margin:0px 10px" id="txt_phone" class="ui-ipt-txt" value="'+phone+'" />电子邮箱:<input style="width:150px;margin:0px 10px" id="txt_mail" class="ui-ipt-txt" value="'+mail+'" /><a href="javascript:void(0);" onClick="addMessage(this)">确定</a></td></tr>');
+			}else{
+				messageBox('aqsz_msg',"请填入通知信息");
+				$("#txt_phone").focus();
+			}
+			window.scrollTo(0, 99999);
+		}
+		function addMessage(obj){
+			var phone = $("#txt_phone").val(),
+				mail = $("#txt_mail").val(),
+				phone_reg = /^1\d{10}$/,
+				zone = '{$zone.domain}';
+				
+			if(!phone){
+				$("#txt_phone").focus();
+				return ;
+			}
+			if(!phone_reg.test(phone)){
+				messageBox('aqsz_msg',"输入的手机格式不正确");
+				return ;
+			}
+			if(!mail){
+				$("#txt_mail").focus();
+				return ;
+			}
+			if(!checkemail(mail)){
+				messageBox('aqsz_msg',"输入的邮箱格式不正确");
+				return ;
+			}
+			$.ajax({
+				url:'__APP__/Domain/addMessage',
+				type:'post',
+				data:{'phone':phone,'mail':mail,'zone':zone},
+				success:function(data){
+					if(data.info=="success"){
+						$(obj).parent().parent().prev().find("td:eq(1)").html('<a href="javascript:void(0);" onClick="closeMsg(\''+zone+'\',this)">关闭</a>');
+						$(obj).parent().parent().remove();						
+					}else{
+						messageBox('aqsz_msg',data.data);
+					}
+				},error:function(data){					
+					messageBox('aqsz_msg',data.statusText);
+				}
+			});
+			
+		}
     </script>
 </head>
 <body class="page-dns">
@@ -435,7 +503,7 @@
 					</tr>
 					<tr class="data">
 					    <td class="laber">操作日志</td> 	
-					    <td class="edit"><a href="javascript:" onclick="showLog();">查看</a></td>
+					    <td class="edit"><a href="__APP__/Optlog/index?zone={$zone.domain}">查看</a></td>
 					    <td class="info">关注域名操作日志，保障域名正常服务</td>  
 					</tr>
 					<tr class="data">
@@ -447,6 +515,17 @@
 					    <td class="laber">自助诊断</td> 	
 					    <td class="edit"><a href="http://www.eflydns.com/index/Help/tools?domain={$zone.domain}" target="_blank">诊断</a></td>
 					    <td class="info">对域名进行全方位诊断，保障域名正常服务</td>  
+					</tr>
+					<tr class="data">
+					    <td class="laber">实时通知</td> 	
+					    <td class="edit">
+                        <if condition="$status == 0">
+                        	<a href="javascript:void(0);" onClick="openMsg(this)">开启</a>
+                            <else/>
+                        	<a href="javascript:void(0);" onClick="closeMsg('{$zone.domain}',this)">关闭</a>
+                        </if>
+                        </td>
+					    <td class="info">对域名开启消息通知，保障域名安全性</td>  
 					</tr>
 				</tbody> 
 			</table>

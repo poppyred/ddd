@@ -5,6 +5,7 @@ class ClientmgrAction extends BaseAction {
 	public function index(){
 		$list = M('client',Null,'DB_NEWS'); 
 		$map["type"] = 0;
+		$map['internal'] = 0;
 		if(!empty($_GET['mail'])){
 			$map["mail"] = array('like','%'.$_GET['mail'].'%');
 			$this->assign('mail',$_GET['mail']);
@@ -36,7 +37,31 @@ class ClientmgrAction extends BaseAction {
 			$this->ajaxReturn('修改用户密码成功','success',1);
 		}
 	}
-	
+	public function resetPwd(){
+		if(!empty($_POST['id'])){
+			$client	= M('client',Null,'DB_NEWS'); 
+			$is_ok = $client->where("id=".$_POST['id'])->setField('pwd',md5("123456"));
+			if($is_ok === false){
+				$this->ajaxReturn('重置密码失败，请联系管理员','error',0);
+			}
+			$this->ajaxReturn("重置密码成功",'success',1);
+		}
+	}
+	public function addClient(){
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
+			$this->display();
+		}else{
+			if(!empty($_POST['mail']) && !empty($_POST['pwd']) && !empty($_POST['type'])){
+			
+				$data = file_get_contents(C('API_URL')."/user.php?opt=insert&mail=".$_POST['mail']."&pwd=".$_POST['pwd']."&type=".$_POST['type']);				
+				$result = json_decode($data,true);	
+				if($result['ret']!=0){
+					$this->ajaxReturn($result['error'],'error',0);
+				}				
+				$this->ajaxReturn('添加用户成功','success',1);
+			}
+		}
+	}
 	public function setInfo(){		
 		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
 			if(!empty($_GET['id'])){
@@ -64,7 +89,8 @@ class ClientmgrAction extends BaseAction {
 	}
 	public function vip(){
 		$list = M('client',Null,'DB_NEWS'); 
-		$map["type"] = 1;		
+		$map["type"] = 1;	
+		$map['internal'] = 0;	
 		if(!empty($_GET['mail'])){
 			$map["mail"] = array('like','%'.$_GET['mail'].'%');
 			$this->assign('mail',$_GET['mail']);

@@ -240,6 +240,11 @@ class IndexAction extends Action {
 				if(md5(trim($_POST['code'])) != $_SESSION['myverify']){
 					$this->ajaxReturn('验证码错误，请输入正确的验证码！', 'error',0);
 				}else{
+					$vo = $client->where('mail="'.trim($_POST['mail']).'"')->find();			
+					if(!empty($vo)){
+						$this->ajaxReturn('['.$_POST['mail'].']  账户已存在，<a href="./login">登陆</a> | <a href="./forget.html">忘记密码？</a>','error',0);
+					}
+					
 					$data['type'] = 0;
 					$data['mail'] = trim($_POST['mail']);
 					$data['pwd'] = md5(trim($_POST['pwd']));
@@ -272,6 +277,10 @@ class IndexAction extends Action {
 				if(md5(trim($_POST['code'])) != $_SESSION['myverify']){
 					$this->ajaxReturn('验证码错误，请输入正确的验证码！', 'error',0);
 				}else{
+					$vo = $client->where('mail="'.trim($_POST['mail']).'"')->find();			
+					if(!empty($vo)){
+						$this->ajaxReturn('['.$_POST['mail'].']  账户已存在，<a href="./login">登陆</a> | <a href="./forget.html">忘记密码？</a>','error',0);
+					}
 					$data['type'] = 1;
 					$data['mail'] = trim($_POST['mail']);
 					$data['pwd'] = md5(trim($_POST['pwd']));
@@ -292,18 +301,6 @@ class IndexAction extends Action {
 			}
 		}
 	}
-	public function checkUser(){
-		if(!empty($_POST['eamil'])){
-			$client = M('client');
-			$vo = $client->where('mail="'.trim($_POST['eamil']).'"')->select();
-			if($vo){
-				$this->ajaxReturn(0,'error',0);
-			}else{
-				$this->ajaxReturn(1,'success',1);
-			}
-		}
-	}
-	
 	public function forget(){
 		if($_SERVER['REQUEST_METHOD'] == 'GET'){
 			$this->display();	

@@ -152,9 +152,9 @@
 		$(".zoneRow").hover(function(){
 			str = $($(this).find('.remark')).html();
 			if($(this).attr("level") == 0){
-				$($(this).find('.remark')).html("<a href='javascript:void(0);'>升级套餐</a>");
+				$($(this).find('.remark')).html("<a href='javascript:void(0);'>升级套餐</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
 			}else{
-				$($(this).find('.remark')).html("<a href='javascript:void(0);'>续费(3个月后到期)</a>");
+				$($(this).find('.remark')).html("<a href='javascript:void(0);'>续费(3个月后到期)</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
 			}
 			//$($(this).find(".icon-add")).show();
 			$($(this).find(".icon-manage")).show();
@@ -929,7 +929,7 @@
 		}
 		return str;
 	}
-	function refreshStatus(){
+	function refreshStatus(zone){
 		var d = new Date(new Date().getTime());
 		nowtime = (d.getHours()<10 ? "0" + d.getHours():d.getHours())+""+(d.getMinutes()<10 ? "0" + d.getMinutes():d.getMinutes());
 		//
@@ -943,15 +943,16 @@
 			title: false,
 			shift: 'left', //从左动画弹出
 			page: {
-				html: '<img style="margin:20px 0px 0px 100px;" src="__ROOT__/Public/img/loading.gif" />'
+				html: '<div style="width:300px;height:110px;"><img style="margin:20px 0px 0px 100px;" src="__ROOT__/Public/img/loading.gif" /></div>'
 			}
-		});	
+		});
 		setInterval(function (){
 			layer.close(loading);	
 		},3000);
 		$.ajax({
 			url:'__APP__/Domain/refreshStatus',
 			type:'post',
+			data:{'zone':zone},
 			success:function(data){
 				if(data.info=='success'){
 					window.location.href = "__APP__/Domain/domainList?nowtime=" + nowtime ;
@@ -1086,7 +1087,7 @@
                                 </select-->
                                 <!--button class="ui-btn-grey btn-batch-log">导出解析记录</button-->                                
                                 
-                                <a href="javascript:void(0)" onClick="refreshStatus()" title="刷新" class="refresh"></a>
+                                <!--a href="javascript:void(0)" onClick="refreshStatus()" title="刷新" class="refresh"></a-->
                                 <button class="ui-btn-grey btn-batch-log">添加到域名监控</button>
                                 <button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="group_btn" onClick="optGroup(this)">分组
                                     <span class="caret"></span>

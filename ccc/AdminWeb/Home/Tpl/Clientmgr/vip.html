@@ -29,6 +29,7 @@
 			<ul>
 				<li><a href="__APP__/Clientmgr/">个人客户管理</a></li>
 				<li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/Clientmgr/vip">企业客户管理</a></li>
+				<li><a href="__APP__/Clientmgr/addClient">添加个人/企业用户</a></li>
 			</ul>
 		</div>
 		<!--div class="hd">
@@ -81,10 +82,14 @@
 								<td class="iop">{$s_vo.login_time}</td> 
 								<td class="rr" style="text-align:left;width:240px;">{$s_vo.reg_time}</td>
 								<td class="iop">
-									<a title="查看其他信息" href="javascript:void(0);" onclick="readClient({$s_vo.id},this);">详情</a>
-									<a title="管理" href="__APP__/Clientmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}" target="_blank">管理</a>
-									<a title="删除" href="javascript:void(0);" onclick="deleteClient({$s_vo.id},this)">删除</a>
-									<a title="设置" href="__APP__/Clientmgr/setInfo?id={$s_vo.id}">设置</a>
+									<a title="展开" href="javascript:void(0);" onclick="showOpt(this)">展开<span class="caret"></span></a>
+                                    <div style=" position:absolute;width:60px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">
+                                    	<a title="查看其他信息" href="javascript:void(0);" onclick="readClient({$s_vo.id},this);">详情</a>
+                                        <a title="管理" href="__APP__/Clientmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}" target="_blank">管理</a>
+                                        <a title="删除" href="javascript:void(0);" onclick="deleteClient({$s_vo.id},this)">删除</a>
+                                        <a title="设置" href="__APP__/Clientmgr/setInfo?id={$s_vo.id}">设置</a>
+                                        <a title="重置密码" href="javascript:void(0);" onClick="resetPwd({$s_vo.id})">重置密码</a>
+                                    </div>
 								</td>
 							</tr>
 							<tr style="background:#fff;display:none;"><td colspan="6" style="text-align:left"></td></tr>
@@ -100,6 +105,29 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	function resetPwd(id){
+		if(confirm("确认重置密码？")){
+			$.ajax({
+				url:'__APP__/Clientmgr/resetPwd',
+				type:'post',
+				data:{'id':id},
+				success:function(data){
+					if(data.info=="success"){					
+						alert(data.data);
+						setInterval(function(){window.location.reload();}, 1000);					
+					}else{
+						alert(data.data);
+					}
+				},
+				error:function(){
+					alert(data.statusText);
+				}
+			});
+		}
+	}
+	function showOpt(obj){		
+		$(obj).next().slideToggle();		
+	}
 	function seach(obj){
 		var val = $(obj).prev().val();
 		if(!val){
@@ -134,8 +162,8 @@
 			type: "post",
 			data:{id:id},
 			success: function (data) {
-				$($(evt).parent().parent().next().find("td").get(0)).empty();
-				$($(evt).parent().parent().next().find("td").get(0)).append("<div>"+
+				$($(evt).parent().parent().parent().next().find("td").get(0)).empty();
+				$($(evt).parent().parent().parent().next().find("td").get(0)).append("<div>"+
 								"<strong>联系电话：</strong><span>"+data.data.link_phone+"</span><br/>"+
 								"<strong>绑定微信：</strong><span>"+data.data.link_weixin+"</span><br/>"+
 								"<strong>公司名称：</strong><span>"+data.data.org_name+"</span><br/>"+
@@ -144,13 +172,13 @@
 								"<strong>注册时间：</strong><span>"+data.data.reg_time+"</span><br/>"+
 								"</div>");
 				if($(evt).html() == "详情"){
-					$(evt).parent().parent().next().show();
+					$(evt).parent().parent().parent().next().show();
 					$(evt).html("收起");
-					$(evt).parent().parent().addClass("bgcolor");
+					$(evt).parent().parent().parent().addClass("bgcolor");
 				}else{
-					$(evt).parent().parent().next().hide();
+					$(evt).parent().parent().parent().next().hide();
 					$(evt).html("详情");
-					$(evt).parent().parent().removeClass("bgcolor");
+					$(evt).parent().parent().parent().removeClass("bgcolor");
 				}
 			},
 			error: function (data) {

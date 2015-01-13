@@ -8,65 +8,68 @@ class DomainAction extends BaseAction {
 			$client_domain = M("client_domain");
 			$z = M("zone");
 			$domain = M("domain");
-			$zone = $z->where('domain="'.$_GET['d'].'"')->find();
-
-			//查询是否存在可以编辑的记录
-			$rcd = $client_domain->query('select * from client_domain a left join domain b on b.id=a.domain_id  where a.zone_id=%d and client_id=%d and is_edit=1',$zone["id"],$_SESSION['id']);  
-			//$rcd = $client_domain->query('select * from client_domain a left join domain b on b.id=a.domain_id  where a.zone_id=%d and client_id=%d and b.type!=\'NS\'',$zone["id"],$_SESSION['id']);
-			if(empty($rcd)){ //没有可编辑的记录
-				$this->assign('is_new', "true");
-			}
-			
-			$tem = $z->where('id='.$zone["id"])->select();
-			$this->assign('level', $tem[0]['level']);
-			//$this->assign('is_on', $tem[0]['is_on']);
-			$view = M('view');
-			$viewList = $view->select();
-			$this->assign('viewList', $viewList);
-			$page = 1;
-			if(!empty($_GET['p'])){
-				$page = $_GET['p'];
-			}
-			$orderBy = " order by a.id desc";
-			if(!empty($_GET['o'])){
-				$orderBy = $_GET['o'];
-			}
-			//$dmList = $domain->where(array("cd.zone_id"=>$vo['id'],"cd.client_id"=>$_SESSION['id'],"d.host"=>array("like","%".$_POST['val']."%")))->query("select * from client_domain cd left join domain d on cd.domain_id=d.id %WHERE%",true);
-			$where = "";
-			if(!empty($_GET['t'])){
-				$where = " and b.type='".$_GET['t']."' ";
-			}
-			if(!empty($_GET['h'])){
-				$where .= " and b.host like '%".$_GET['h']."%' ";
-			}
-			if(!empty($_GET['v'])){
-				$where .= " and b.view=" . $_GET['v'] . " ";
-			}
-			
-			$record = $domain->query('select * from client_domain a left join domain b on b.id=a.domain_id where a.zone_id='.$zone["id"].' and client_id='.$_SESSION['id'].' '. $where . $orderBy . ' limit '. ($page-1) * 50 .',50');
-			$count = $domain->query('select count(*) as count from client_domain a left join domain b on b.id=a.domain_id where a.zone_id='.$zone["id"].' and client_id='.$_SESSION['id'] . $where . '  order by a.id desc');
-			if($count[0]['count']<=50){
-				$pageCount = 1;
-			}else{
-				if($count[0]['count'] % 50 == 0){
-					$pageCount = $count[0]['count'] / 50;
-				}else{
-					$pageCount = ($count[0]['count'] - $count[0]['count'] % 50) / 50 + 1;
+			$zone = $z->where('client_id='.$_SESSION['id'].' and  domain="'.$_GET['d'].'"')->find();
+			if(!empty($zone)){
+				//查询是否存在可以编辑的记录
+				$rcd = $client_domain->query('select * from client_domain a left join domain b on b.id=a.domain_id  where a.zone_id=%d and client_id=%d and is_edit=1',$zone["id"],$_SESSION['id']);  
+				//$rcd = $client_domain->query('select * from client_domain a left join domain b on b.id=a.domain_id  where a.zone_id=%d and client_id=%d and b.type!=\'NS\'',$zone["id"],$_SESSION['id']);
+				if(empty($rcd)){ //没有可编辑的记录
+					$this->assign('is_new', "true");
 				}
+			
+				$tem = $z->where('id='.$zone["id"])->select();
+				$this->assign('level', $tem[0]['level']);
+				//$this->assign('is_on', $tem[0]['is_on']);
+				$view = M('view');
+				$viewList = $view->select();
+				$this->assign('viewList', $viewList);
+				$page = 1;
+				if(!empty($_GET['p'])){
+					$page = $_GET['p'];
+				}
+				$orderBy = " order by a.id desc";
+				if(!empty($_GET['o'])){
+					$orderBy = $_GET['o'];
+				}
+				//$dmList = $domain->where(array("cd.zone_id"=>$vo['id'],"cd.client_id"=>$_SESSION['id'],"d.host"=>array("like","%".$_POST['val']."%")))->query("select * from client_domain cd left join domain d on cd.domain_id=d.id %WHERE%",true);
+				$where = "";
+				if(!empty($_GET['t'])){
+					$where = " and b.type='".$_GET['t']."' ";
+				}
+				if(!empty($_GET['h'])){
+					$where .= " and b.host like '%".$_GET['h']."%' ";
+				}
+				if(!empty($_GET['v'])){
+					$where .= " and b.view=" . $_GET['v'] . " ";
+				}
+			
+				$record = $domain->query('select * from client_domain a left join domain b on b.id=a.domain_id where a.zone_id='.$zone["id"].' and client_id='.$_SESSION['id'].' '. $where . $orderBy . ' limit '. ($page-1) * 50 .',50');
+				$count = $domain->query('select count(*) as count from client_domain a left join domain b on b.id=a.domain_id where a.zone_id='.$zone["id"].' and client_id='.$_SESSION['id'] . $where . '  order by a.id desc');
+				if($count[0]['count']<=50){
+					$pageCount = 1;
+				}else{
+					if($count[0]['count'] % 50 == 0){
+						$pageCount = $count[0]['count'] / 50;
+					}else{
+						$pageCount = ($count[0]['count'] - $count[0]['count'] % 50) / 50 + 1;
+					}
+				}
+				$this->assign('sum',$count[0]['count']);
+				$this->assign('type',$_GET['t']);
+				$this->assign('host',$_GET['h']);
+				$this->assign('view',$_GET['v']);
+				$this->assign('orderBy',$orderBy);
+				$this->assign('page',$page);
+				$this->assign('recordlist', $record);
+				$this->assign('pageCount',$pageCount);
+				$this->assign('is_lock',$zone['is_lock']);
+				$this->assign('default_ttl',$zone['default_ttl']);
+				$this->assign('zone', $_GET['d']);
+				$this->assign('count', count($record));					
+				$this->display();
+			}else{
+				header("Location: ".__APP__."/Domain/domainList");	
 			}
-			$this->assign('sum',$count[0]['count']);
-			$this->assign('type',$_GET['t']);
-			$this->assign('host',$_GET['h']);
-			$this->assign('view',$_GET['v']);
-			$this->assign('orderBy',$orderBy);
-			$this->assign('page',$page);
-			$this->assign('recordlist', $record);
-			$this->assign('pageCount',$pageCount);
-			$this->assign('is_lock',$zone['is_lock']);
-			$this->assign('default_ttl',$zone['default_ttl']);
-			$this->assign('zone', $_GET['d']);
-			$this->assign('count', count($record));					
-			$this->display();
 		}
 	}
 	
@@ -109,16 +112,55 @@ class DomainAction extends BaseAction {
 			}
 		}
 	}
+	public function addMessage(){
+		if(!empty($_POST['zone']) && !empty($_POST['phone']) && !empty($_POST['mail']))	{
+			$zone = M('zone');
+			$message = M('message');
+			$vo = $zone->where("domain='".$_POST['zone']."'")->find();
+			$data['zone_id'] = $vo['id'];
+			$data['client_id'] = $_SESSION['id'];
+			$data['phone'] = $_POST['phone'];
+			$data['mail'] = $_POST['mail'];
+			$is_ok = $message->add($data);
+			if($is_ok === false){
+				$this->ajaxReturn('开启实时通知失败，请联系管理员。','error',0);
+			}
+			$this->ajaxReturn(1,'success',1);
+		}
+	}
+	public function closeMsg(){
+		if(!empty($_POST['zone'])){
+			$zone = M('zone');
+			$message = M('message');
+			$vo = $zone->where("domain='".$_POST['zone']."'")->find();
+			$is_ok = $message->where('client_id='.$_SESSION['id'].' and zone_id='.$vo['id'])->delete();
+			if($is_ok === false){
+				$this->ajaxReturn('关闭实时通知失败，请联系管理员。','error',0);
+			}
+			$this->ajaxReturn(1,'success',1);
+		}
+	}
 	
 	public function domainSet(){
 		if(!empty($_GET['d'])){
 			$z = M("zone");
 			$cd = M('client_domain');
+			$client = M('client');
+			$message = M('message');
 			$zone = $z->where('domain="'.$_GET['d'].'"')->find();
 			$l = M("zone_level");
 			$level = $l->where('zone_id="'.$zone['id'].'"')->find();	
 			$tem = $cd->query('select * from client_domain cd left join client c on cd.client_id=c.id where zone_id=%d group by client_id ',$zone['id']);
 			
+			$vo = $message->where('client_id='.$_SESSION['id'].' and zone_id='.$zone['id'])->find();
+			if(empty($vo)){				
+				$this->assign('status', 0);		
+			}else{
+				$this->assign('status', 1);		
+			}
+			$client = M('client');
+			$entity = $client->where('id='.$_SESSION['id'])->find();
+			$this->assign('entity', $entity);
 			$this->assign('user', $tem);
 			$this->assign('userCount', count($tem));
 			$this->assign('level', $level);			
@@ -216,7 +258,7 @@ class DomainAction extends BaseAction {
 			if($span >= 5){
 				//$param = array("id"=>$ret["id"]);
 				//http_post(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php", $param);
-				file_get_contents(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php?id=".$ret["id"]);
+				file_get_contents(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php?domain=".$_POST['zone']);
 				//print(C('NS_CHECH_URL')."/script/eflydns_client_domain_check.php?id=".$ret["id"]);exit;	
 			}
 //			print(123);
@@ -288,9 +330,11 @@ class DomainAction extends BaseAction {
 	//添加域名
 	public function addZone(){
 		if(!empty($_POST['zone'])){
+			
+			//普通用户限制50条
 			$rowCount = $this->selectZoneCount();
 			if($rowCount == C('ZONE_LIMIT')){
-				$this->ajaxReturn(0,'域名已经上限，最多10条域名记录',0);
+				$this->ajaxReturn(0,'域名已经上限，最多50条域名记录',0);
 			}
 			
 			$zone = M('zone');
@@ -560,12 +604,8 @@ class DomainAction extends BaseAction {
 		$zone = M('zone');
 		$client_domain = M('client_domain');
 		$vo = $zone->where('domain="'.$_POST['zone'].'"')->select();
-		if($vo[0]['level']==0){
+		if($vo[0]['level']<8){
 			if($this->selectDomainCount($vo[0]['id']) == C('DOMAIN_LIMIT')){
-				$this->ajaxReturn(0,'记录已经上限，最多10条解析记录',0);
-			}
-		}else{
-			if($this->selectDomainCount($vo[0]['id']) == C('VIP_LIMIT')){
 				$this->ajaxReturn(0,'记录已经上限，最多50条解析记录',0);
 			}
 		}
@@ -617,6 +657,11 @@ class DomainAction extends BaseAction {
 				$data1['zone_id'] = $vo[0]['id'];
 				$data1['domain_id'] = $is_ok;
 				$client_domain->add($data1);
+				
+				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20添加了记录值".$_POST['val']."的".$_POST['type']."记录");				
+				$history_list = json_decode($history,true);
+				
 				$this->ajaxReturn($is_ok,'解析记录添加成功',1);
 			}
 		}else{
@@ -657,6 +702,10 @@ class DomainAction extends BaseAction {
 		$data['ttl'] = $_POST['ttl'];
 		$data['up_time'] = date("Y-m-d H:i:s");
 		
+		
+		$brfore_update_entity = $domain->where('id='.$_POST['id'])->find();
+		$str = $_POST['zone']."%20将记录值".$brfore_update_entity['val']."的".$brfore_update_entity['type']."记录%20修改为记录值".$_POST['val']."的".$_POST['type']."记录";
+		
 		//$datae = json_encode(array("data" => $data['val']));
 		//$data_url = http_build_query ($datae);
 		//print_r($data_url);exit; 
@@ -685,6 +734,13 @@ class DomainAction extends BaseAction {
 			if($is_ok===false){
 				$this->ajaxReturn($data,'error',0);
 			}
+			
+			print_r($str);
+			$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$str);				
+			
+			print_r(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$str);exit;
+			$history_list = json_decode($history,true);
+			
 			$this->ajaxReturn($is_ok,'success',1);
 		}else{
 			$this->ajaxReturn($rslt["error"],'error',0);
@@ -735,10 +791,13 @@ class DomainAction extends BaseAction {
 					$retnum += 1;
 					$error = $ret["content"];//$rslt["error"];
 				}
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20删除了记录值".$data['val']."的".$data['type']."记录");				
+				$history_list = json_decode($history,true);
 			}
 			if($retnum > 0){
 				$this->ajaxReturn(0,$error,0);
 			}else{
+				
 				$this->ajaxReturn(1,'success',1);
 			}
 		}
@@ -1036,7 +1095,9 @@ class DomainAction extends BaseAction {
 				
 				if($rslt["ret"] != 0){
 					$this->ajaxReturn($rslt["error"],'error',0);
-				}
+				}				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20启用了记录值".$data['val']."的".$data['type']."记录");				
+				$history_list = json_decode($history,true);
 			}
 			//是否有别名
 			for($i=0;$i<count($arr);$i++){
@@ -1065,7 +1126,9 @@ class DomainAction extends BaseAction {
 				
 				if($rslt["ret"] != 0){
 					$this->ajaxReturn($rslt["error"],'error',0);
-				}
+				}				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20停用了记录值".$data['val']."的".$data['type']."记录");				
+				$history_list = json_decode($history,true);
 			}
 			//是否有别名
 			for($i=0;$i<count($arr);$i++){

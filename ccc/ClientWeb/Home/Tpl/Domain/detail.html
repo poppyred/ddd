@@ -229,20 +229,20 @@
 				if(type=='A'){
 					if(!CheckIp(val)){
 						tr.find("#val").focus();	
-						messageBox('message','记录值的格式不正确');
+						layer.msg('记录值的格式不正确',2,5);
 						return;
 					}
 				}
 				if(type=='CNAME' || type=='MX' || type=='NS'){
 					if(!checkDomain(val)){
 						tr.find("#val").focus();				
-						messageBox('message','记录值的格式不正确');
+						layer.msg('记录值的格式不正确',2,5);
 						return;
 					}
 				}else if(type=='AAAA'){
 					if(!checkIpv6(val)){
 						tr.find("#val").focus();
-						messageBox('message','记录值的格式不正确');			
+						layer.msg('记录值的格式不正确',2,5);	
 						return;
 					}
 				}
@@ -260,7 +260,11 @@
 					success:function(data){
 						//alert(data.info);
 						id = data.data;
-						messageBox('message',data.info);
+						if(data.status==1){
+							layer.msg(data.info,2,1);
+						}else{
+							layer.msg(data.info,2,5);
+						}
 						if(data.status!=0){
 							tr.attr("class","data");
 							//清空
@@ -274,8 +278,8 @@
 							tr.empty();
 						}
 					},
-					error:function(data){
-						messageBox('message','添加失败，网络错误代码：'+data.statusText);
+					error:function(data){						
+						layer.msg('添加失败，网络错误代码：'+data.statusText,2,5);
 					}
 				});
 				
@@ -289,9 +293,9 @@
 					success:function(data){
 						//id = data.data;	
 						if(data.info=='error'){
-							messageBox('message',data.data);
+							layer.msg(data.data,2,5);
 						}else{							
-							messageBox('message','解析记录修改成功。');
+							layer.msg('解析记录修改成功。',2,1);
 							tr.attr("class","data");
 							//清空
 							tr.empty();
@@ -302,7 +306,7 @@
 						
 					},
 					error:function(data){
-						messageBox('message','修改失败，网络错误代码：'+data.statusText);
+						layer.msg('修改失败，网络错误代码：'+data.statusText,2,5);
 					}
 				});
 			}
@@ -408,7 +412,7 @@
 						trnext.show();
 					}
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//切换消息
@@ -547,10 +551,10 @@
 						}
 					});
 				}else{
-					messageBox('message','您有正在编辑的解析尚未保存。');
+					layer.msg('您有正在编辑的解析尚未保存。',2,5);
 				}
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//取消添加
@@ -596,7 +600,7 @@
 				//$(tr).next().next().find('textarea').val(desc);
 				$(tr).next().next().show();					
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//取消保存备注
@@ -620,14 +624,14 @@
 				data:{'id':id,'desc':desc},
 				success:function(data){
 					if(data.info=='success'){
-						messageBox('message','解析记录备注修改成功。');
+						layer.msg('解析记录备注修改成功。',2,1);
 					}else{
-						messageBox('message','修改备注失败，请联系管理员。');
+						layer.msg('修改备注失败，请联系管理员。',2,5);
 					}
 					cancelEditDesc(obj);
 				},
 				error:function(data){
-					messageBox('message','修改失败，网络错误代码：'+data.statusText);
+					layer.msg('修改失败，网络错误代码：'+data.statusText,2,5);
 				}
 			});
 			
@@ -657,16 +661,16 @@
 								data:{'id':id,'zone':$("#txt_zone").val()},
 								success:function(data){
 									if(data.info=='success'){									
-										messageBox('message','解析记录启用成功。');
+										layer.msg('解析记录启用成功。',2,1);
 										for(var i=0;i<chk.length;i++){
 											$(chk[i]).parent().parent().find('.status').html('');
 										}										
 									}else{
-										messageBox('message','解析记录启用失败，请联系管理员。');	
+										layer.msg('解析记录启用失败，请联系管理员。',2,5);	
 									}
 								},
 								error:function(data){
-									messageBox('message','启用失败，网络错误代码：'+data.statusText);
+									layer.msg('启用失败，网络错误代码：'+data.statusText,2,5);
 								}
 							});
 						},
@@ -674,10 +678,10 @@
 						cancel:true
 					}).lock();
 				}else{
-					messageBox('message','请先选择一条要启用的解析记录');
+					layer.msg('请先选择一条要启用的解析记录',2,5);
 				}
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//停用
@@ -705,16 +709,16 @@
 								data:{'id':id,'zone':$("#txt_zone").val()},
 								success:function(data){
 									if(data.info=='success'){									
-										messageBox('message','解析记录停用成功。');
+										layer.msg('解析记录停用成功。',2,1);
 										for(var i=0;i<chk.length;i++){
 											$(chk[i]).parent().parent().find('.status').html('<img src="__ROOT__/Public/img/Pause.png"/>');
 										}
 									}else{
-										messageBox('message','解析记录停用失败，请联系管理员。');	
+										layer.msg('解析记录停用失败，请联系管理员。',2,5);	
 									}
 								},
 								error:function(data){
-									messageBox('message','停用失败，网络错误代码：'+data.statusText);
+									layer.msg('停用失败，网络错误代码：'+data.statusText,2,5);
 								}
 							});
 						},
@@ -722,10 +726,10 @@
 						cancel:true
 					}).lock();
 				}else{
-					messageBox('message','请先选择一条要停用的解析记录');
+					layer.msg('请先选择一条要停用的解析记录',2,5);
 				}
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//删除
@@ -762,14 +766,14 @@
 										//tableObj = $("#myData .data");
 										//mydata=$("#myData").html();
 										//bindseach();
-										messageBox('message','解析记录删除成功。');
+										layer.msg('解析记录删除成功。',2,1);
 										selectByWhere();
 									}else{
-										messageBox('message','解析记录删除失败，请联系管理员。');	
+										layer.msg('解析记录删除失败，请联系管理员。',2,5);	
 									}
 								},
 								error:function(data){
-									messageBox('message','删除失败，网络错误代码：'+data.statusText);
+									layer.msg('删除失败，网络错误代码：'+data.statusText,2,5);
 								}
 							});
 						},
@@ -777,10 +781,10 @@
 						cancel:true
 					}).lock();
 				}else{
-					messageBox('message','请先选择要删除的解析记录');
+					layer.msg('请先选择要删除的解析记录',2,5);
 				}
 			}else{
-				messageBox('message','['+$("#txt_zone").val()+']域名锁定，不能进行该操作');	
+				layer.msg('['+$("#txt_zone").val()+']域名锁定，不能进行该操作',2,7);	
 			}
 		}
 		//解析记录排序
@@ -822,7 +826,7 @@
 					}
 				},
 				error:function(data){
-					messageBox('message','排序失败，网络错误代码：'+data.statusText);
+					layer.msg('排序失败，网络错误代码：'+data.statusText,2,5);
 				}
 			});
 		}
@@ -987,12 +991,13 @@
 					<button class="ui-btn-grey" style="" onClick="startDns()">启用</button>
 					<button class="ui-btn-grey" style="" onClick="stopDns()">暂停</button>
 					<button class="ui-btn-grey" style="" onClick="deleteDns()">删除</button>
+					<a class="icon icon-log" href="__APP__/Optlog/index?zone={$zone}">解析记录日志</a>
 				</div>
 			<!-- 消息提示 -->
                 <div class="ui-pop-box small-con-box" id="message" style="float:left; margin-left:10px; display:none;width:auto;height:auto;">
                     <div style="position: relative;background-color: #fff;border: solid 1px #999; height:20px;line-height:20px; padding:2px 10px 2px 10px">这里是提示信息</div>
-                </div>
-				<div class="rf">
+                </div> 
+				<div class="rf">                	
                 	<select class="ui-select" id="sel_type" onChange="selectByWhere()">
                     	<option value="">所有类型</option>
                     	<option value="A">A</option>
@@ -1014,12 +1019,6 @@
                     <button class="ui-btn-grey" onClick="selectBy(this)">查找</button>
                     <button class="ui-btn-grey" onClick="pageReload(1)">重置</button>
 				</div>
-				<!--div class="rf"> 
-					<a class="icon icon-log" href="__APP__/Optlog">解析记录日志</a>
-					<a class="icon icon-export" href="javascript:void(0);" target="_blank">导出解析记录</a> 
-					<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" type="text" placeholder="请输入关键字词">
-					<button class="ui-btn-grey">搜索</button> 	
-				</div--> 
 				<select id="viewOpt" style="display:none;">
                     <!--optgroup label="运营商"-->
                     <volist name="viewList" id="rl">
