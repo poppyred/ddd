@@ -7,8 +7,10 @@
 <meta name="Description" content="DNSPro DNS 域名解析">
 <title>EflyDNS管理后台</title>
 <link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<link rel="shortcut icon" href="__ROOT__/eflydns.ico" />
 <script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
 <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 <!--[if lt IE 9]>
     <script src="./js/html5.js"></script>
@@ -82,13 +84,28 @@
 								<td class="iop">{$s_vo.login_time}</td> 
 								<td class="rr" style="text-align:left;width:240px;">{$s_vo.reg_time}</td>
 								<td class="iop">
-									<a title="展开" href="javascript:void(0);" onclick="showOpt(this)">展开<span class="caret"></span></a>
-                                    <div style=" position:absolute;width:60px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">
+									<a title="展开" href="javascript:void(0);" onclick="showOpt(this,event)">展开<span class="caret"></span></a>
+                                    <div style=" position:absolute;width:100px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">
                                     	<a title="查看其他信息" href="javascript:void(0);" onclick="readClient({$s_vo.id},this);">详情</a>
                                         <a title="管理" href="__APP__/Clientmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}" target="_blank">管理</a>
-                                        <a title="删除" href="javascript:void(0);" onclick="deleteClient({$s_vo.id},this)">删除</a>
-                                        <a title="设置" href="__APP__/Clientmgr/setInfo?id={$s_vo.id}">设置</a>
-                                        <a title="重置密码" href="javascript:void(0);" onClick="resetPwd({$s_vo.id})">重置密码</a>
+                                        <if condition="$_SESSION[level] == 1 ">
+	                                        <a title="删除" href="javascript:void(0);" onclick="deleteClient({$s_vo.id},this)">删除</a>
+                                            <else/>
+                                        </if>
+                                        <if condition="$s_vo[status] == 0 ">
+	                                        <a title="冻结" href="javascript:void(0);" onclick="updateClientStatus({$s_vo.id},this)">冻结</a>
+                                            <else/>
+	                                        <a title="解冻" href="javascript:void(0);" onclick="updateClientStatus({$s_vo.id},this)">解冻</a>
+                                        </if>
+                                        <a title="修改信息" href="__APP__/Clientmgr/setInfo?id={$s_vo.id}">修改信息</a>
+                                        <a title="重置密码" href="__APP__/Clientmgr/resetPwd?id={$s_vo.id}">重置密码</a>
+                                        <if condition="$_SESSION[level] == 1">
+                                        	<if condition="$s_vo[internal] == 0">
+                                       		<a title="设置内部账户" href="javascript:void(0);">设置内部账户</a>                                            
+                                            <else/>
+                                       		<a title="设置外部账户" href="javascript:void(0);">设置外部账户</a>
+                                            </if>
+                                        </if>
                                     </div>
 								</td>
 							</tr>
@@ -105,6 +122,70 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	function updateInternalClient(id,obj){
+		var val = $(obj).html(),internal = "";
+		if(val == "设置内部账户"){
+			internal = 1 ;
+		}else{
+			internal = 	0 ;
+		}
+		$.ajax({
+			url:'__APP__/Clientmgr/updateInternalClient',
+			type:'post',
+			data:{'id':id,'internal':internal},
+			success:function(data){						
+				if(data.info=="success"){
+					alert(data.data);
+					window.location.reload();
+				}else{
+					alert(data.data);
+				}
+			},
+			error:function(data){
+				alert(data.statusText);	
+			}
+		});
+	}
+	function updateClientStatus(id,obj){
+		var val = $(obj).html();
+		if(val == "冻结"){
+			if(confirm("确认冻结该账户？")){
+				$.ajax({
+					url:'__APP__/Clientmgr/updateInternalClient',
+					type:'post',
+					data:{'id':id,'status':1},
+					success:function(data){						
+						if(data.info=="success"){
+							alert(data.data);
+							window.location.reload();
+						}else{
+							alert(data.data);
+						}
+					},
+					error:function(data){
+						alert(data.statusText);	
+					}
+				});
+			}
+		}else{
+			$.ajax({
+					url:'__APP__/Clientmgr/updateClientStatus',
+					type:'post',
+					data:{'id':id,'status':0},
+					success:function(data){
+						if(data.info=="success"){
+							alert(data.data);
+							window.location.reload();
+						}else{
+							alert(data.data);
+						}
+					},
+					error:function(data){
+						alert(data.statusText);	
+					}
+				});
+		}
+	}
 	function resetPwd(id){
 		if(confirm("确认重置密码？")){
 			$.ajax({
@@ -125,8 +206,9 @@
 			});
 		}
 	}
-	function showOpt(obj){		
-		$(obj).next().slideToggle();		
+	function showOpt(obj,e){		
+		$(obj).next().slideToggle();
+		stopPropagation(e);		
 	}
 	function seach(obj){
 		var val = $(obj).prev().val();
@@ -186,6 +268,11 @@
 			}
 		});
 	}
+	$(function(){
+		$('html').bind('click',function(e){
+			$(".opt_div").slideUp();
+		});	
+	});
 	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
 	/*jQuery(".navBar").slide({ 
 		titCell:".nav .m", // 鼠标触发对象

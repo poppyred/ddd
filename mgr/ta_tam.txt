@@ -124,13 +124,13 @@ BEGIN
     END */$$
 DELIMITER ;
 
-/* Procedure structure for procedure `tam` */
+/* Procedure structure for procedure `ta_mx` */
 
-/*!50003 DROP PROCEDURE IF EXISTS  `tam` */;
+/*!50003 DROP PROCEDURE IF EXISTS  `ta_mx` */;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `tam`(
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `ta_mx`(
 	IN str_name VARCHAR(255),
 	IN str_main VARCHAR(255),
 	IN n_view INT,
@@ -214,13 +214,13 @@ DELIMITER ;
 
 
 
-/* Procedure structure for procedure `taptr` */
+/* Procedure structure for procedure `ta_ptr` */
 
-/*!50003 DROP PROCEDURE IF EXISTS  `taptr` */;
+/*!50003 DROP PROCEDURE IF EXISTS  `ta_ptr` */;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `taptr`(
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `ta_ptr`(
 	IN str_ip VARCHAR(255),
 	IN str_domain VARCHAR(255),
 	IN n_view INT,
@@ -299,6 +299,53 @@ BEGIN
     END */$$
 DELIMITER ;
 
+
+
+
+/* Procedure structure for procedure `ta_del_a_record` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `ta_del_a_record` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `ta_del_a_record`(IN `tab_name` VARCHAR(255), IN `n_rid` INT)
+BEGIN
+	SET @oname = NULL;
+	SET @oview = NULL;
+	SET @ozid = NULL;
+	SET @sqlcmd = CONCAT("SELECT ar.name,ze.view,ar.zone into @oname,@oview,@ozid FROM ",tab_name,
+		" ar LEFT JOIN zone ze ON ar.zone=ze.id WHERE ar.enable=1 AND ar.rid=",n_rid," LIMIT 1");
+	PREPARE stmt FROM @sqlcmd;
+	EXECUTE stmt;
+	
+	SET @sqlcmd = CONCAT('delete from ',tab_name,' WHERE rid=',n_rid);
+	PREPARE stmt FROM @sqlcmd;
+	EXECUTE stmt;
+	
+	SET @same_dn_cnt = 0;	
+	if @oname is not null and @ozid IS NOT NULL then
+		SET @sqlcmd = CONCAT("SELECT count(*) into @same_dn_cnt FROM ",tab_name,
+			" WHERE `name`='",@oname,"' AND `zone`=",@ozid," AND `enable`=1");
+		PREPARE stmt FROM @sqlcmd;
+		EXECUTE stmt;
+	end if;
+	
+	DEALLOCATE PREPARE stmt;
+	
+	if @ozid is not null then
+		update zone set update_time=NOW() where id=@ozid;
+	end if;
+    
+	if @oview is not null and @oname is not null then
+		if @same_dn_cnt > 0 then
+			CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 1);
+		else
+			CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), @oview, @oname, 0, 2);
+		end if;
+	end if;
+	-- SELECT @oname,@oview,@same_dn_cnt;
+    END */$$
+DELIMITER ;
 
 
 

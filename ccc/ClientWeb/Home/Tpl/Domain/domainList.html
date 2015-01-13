@@ -1089,10 +1089,10 @@
                                 
                                 <!--a href="javascript:void(0)" onClick="refreshStatus()" title="刷新" class="refresh"></a-->
                                 <button class="ui-btn-grey btn-batch-log">添加到域名监控</button>
-                                <button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="group_btn" onClick="optGroup(this)">分组
+                                <button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="group_btn" onClick="optGroup(event)">分组
                                     <span class="caret"></span>
                                 </button> 
-                                <ul class="dropdown-menu" style="margin-left:144px;width:126px;" id="opt_group">
+                                <ul class="dropdown-menu" style="margin-left:115px;width:126px;" id="opt_group">
                                     <li><a href="javascript:" onClick="groupBy('经常修改')">移动到<font>经常修改</font></a></li>
                                     <li><a href="javascript:" onClick="groupBy('很少修改')">移动到<font>很少修改</font></a></li>
                                     <li><a href="javascript:" onClick="groupBy('即将到期')">移动到<font>即将到期</font></a></li>
@@ -1105,10 +1105,10 @@
                                     </volist>
                                     <li ><a href="javascript:void(0);" style="border-top:1px solid #ccc;" onClick="addGroup()">新建分组</a></li>
                                 </ul>
-                                <button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onClick="optSelect(this)">更多
+                                <button class="ui-btn-grey btn-batch-remove" style=" position:relative" id="opt_btn" onClick="optSelect(event)">更多
                                     <span class="caret"></span>
                                 </button> 
-                                <ul class="dropdown-menu" style="margin-left:210px;" id="opt_sel">
+                                <ul class="dropdown-menu" style="margin-left:183px;" id="opt_sel">
                                     <li><a id="disable-domain" href="javascript:" onClick="stopDomain()">停用</a></li>
                                     <li><a id="enable-domain" href="javascript:" onClick="startDomain()">启用</a></li>
                                     <li><a id="delete-domain" href="javascript:" onClick="deleteDomain()">删除</a></li>
