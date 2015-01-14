@@ -83,25 +83,25 @@ class req_handler(object):
                 continue
             for row in result:
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add))
-        #发送一些先，防止收到多个init
-        worker.dbcon.query(msg.g_init_sql_inittask_dns_limit1)
-        result = worker.dbcon.show()
-        if result:
-            row = result[0]
-            msg.g_init_maxid = int(row[0])
-            worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
-            print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
-            msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
-            count += 1
-            cur_cnt += 1
-            expect_cnt += 1
-            if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
-                req_handler.lockdb = False
-                return
-            cur_cnt = 0
-            del msgobj[:]
-        msg.g_init_resp_expect = count
-        print >> sys.stderr, ("sent first some %d records" % (count,));
+        #发送一些先，防止收到多个init here for release clean
+        #worker.dbcon.query(msg.g_init_sql_inittask_dns_limit1)
+        #result = worker.dbcon.show()
+        #if result:
+        #    row = result[0]
+        #    msg.g_init_maxid = int(row[0])
+        #    worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
+        #    print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
+        #    msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
+        #    count += 1
+        #    cur_cnt += 1
+        #    expect_cnt += 1
+        #    if worker.sendto_(msgobj, addr, msg.g_pack_head_init_dns, mgr_conf.g_reply_port) != True:
+        #        req_handler.lockdb = False
+        #        return
+        #    cur_cnt = 0
+        #    del msgobj[:]
+        #msg.g_init_resp_expect = count
+        #print >> sys.stderr, ("sent first some %d records" % (count,));
 
         #生成任务 mask
         worker.dbcon.query(msg.g_init_sql_view)
