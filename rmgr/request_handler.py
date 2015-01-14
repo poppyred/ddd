@@ -70,6 +70,9 @@ class req_handler(object):
         req_handler.lockdb = True
         worker.dbcon.query(msg.g_sql_clean_snd_req)
 
+        msgobj = {'initing':1}
+        worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
+
         msgobj = []
         count = 0
         cur_cnt = 0
