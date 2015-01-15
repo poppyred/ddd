@@ -24,12 +24,25 @@ USE `dnspro_core`;
 
 DELIMITER $$
 
-/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `ta`(IN `tab_name` VARCHAR(255), IN `str_name` VARCHAR(255), IN `str_main` VARCHAR(255), IN `n_view` INT, IN `n_ttl` INT, IN `str_data` VARCHAR(255), IN `n_state` INT, IN `n_enable` INT, IN `n_rid` INT)
+/*!50003 CREATE DEFINER=`root`@`%` PROCEDURE `ta`(
+	IN `tab_name` VARCHAR(255), 
+	IN `str_name` VARCHAR(255), 
+	IN `str_main` VARCHAR(255), 
+	IN `n_view` INT, 
+	IN `n_ttl` INT, 
+	IN `str_data` VARCHAR(255), 
+	IN `n_state` INT, 
+	IN `n_enable` INT, IN `n_rid` INT)
 BEGIN
+	DECLARE done INT DEFAULT 0;
 	DECLARE n_zid INT default null;
 	declare arr_tbls varchar(255);
 	declare cut_tbl varchar(255);
 	declare i int;  
+	DECLARE cname_relation VARCHAR(255) DEFAULT NULL;
+	DECLARE cursor_cname CURSOR FOR (SELECT DISTINCT cr.name FROM `cname_record` cr LEFT JOIN zone ze ON cr.zone=ze.id WHERE cr.cname=str_name AND ze.view=n_view AND cr.enable=1);
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
 	SELECT `id` INTO n_zid FROM zone WHERE domain=str_main AND `view`=n_view LIMIT 1;
 	if n_zid is null then
 		insert into zone(client_id,domain,`view`,description) values(1,str_main,n_view,'');
@@ -119,6 +132,21 @@ BEGIN
 		CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), n_view, str_name, 0, 2);
 	ELSE
 		CALL add_snd_req_new('dns', tbl_to_dnstype(tab_name), n_view, str_name, 0, 1);
+	END IF;
+	
+	IF  STRCMP(tab_name, 'a_record')=0 THEN
+		SET done = 0;
+		OPEN cursor_cname;
+		REPEAT
+			IF NOT done THEN
+				FETCH cursor_cname INTO cname_relation;
+				IF cname_relation IS NOT NULL THEN
+					CALL add_snd_req_new('dns', tbl_to_dnstype('a_record'), n_view, cname_relation, 0, 1);				
+				END IF;
+				SET cname_relation = NULL;
+			END IF;
+		UNTIL done END REPEAT;
+		CLOSE cursor_cname;
 	END IF;
 	
     END */$$
