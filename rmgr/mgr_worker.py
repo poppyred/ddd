@@ -2,6 +2,7 @@
 # -*- coding:UTF-8 -*-
 # made by likunxiang
 
+import threading
 import msg
 import mgr_conf
 from request_handler import *
@@ -17,6 +18,7 @@ class mgr_handler(object):
     m_handlers = {}
 
     def __init__(self):
+        self.lock = threading.Lock()
         self.check_thd = None
         self.proxy_addr = {}
         self.dbip = mgr_conf.g_db_ip
@@ -43,6 +45,7 @@ class mgr_handler(object):
         self.check_thd = check_thd
 
     def handler(self, data):
+        self.lock.acquire()
         if self.dbcon.conn_error:
             self.dbcon = MySQL.MySQL(self.dbip, mgr_conf.g_db_user, mgr_conf.g_db_passwd, mgr_conf.g_db_db)
         try:
@@ -106,6 +109,8 @@ class mgr_handler(object):
 
         except Exception as e:
             print >> sys.stderr,  ('inner error: ' + repr(e))
+        finally:
+            self.lock.release()
 
     def reply_echo(self, data, host, port):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
