@@ -11,23 +11,8 @@ import sys
 import select
 import threading
 import mgr_conf
+import mgr_misc
 import MySQL
-import inspect
-import ctypes
-
-def _async_raise(tid, exctype):
-    """raises the exception, performs cleanup if needed"""
-    if not inspect.isclass(exctype):
-        exctype = type(exctype)
-    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
-    if res == 0:
-        raise ValueError("invalid thread id")
-    elif res != 1:
-        # """if it returns a number greater than one, you're in trouble,
-        # and you should call it again with exc=NULL to revert the effect"""
-        ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
-        raise SystemError("PyThreadState_SetAsyncExc failed")
-
 
 class handle_init_thread(threading.Thread):
     def __init__(self, json_data, worker):
@@ -37,6 +22,7 @@ class handle_init_thread(threading.Thread):
         self.json_data = json_data
         self.worker = worker
         self.check_thd = worker.check_thd
+        self.should_stop = 0
         if self.dbcon.conn_error:
             raise Exception('[handle_init_thread] Database configure error!!!')
 
@@ -85,8 +71,7 @@ class handle_init_thread(threading.Thread):
             s.close()
 
     def stop_thread(self):
-        _async_raise(self.ident, SystemExit)
-
+        self.should_stop = 1
 
 class reply_thread(threading.Thread):
     def __init__(self, worker4init, worker, host = '', port = 54321, bufsize = 1024):

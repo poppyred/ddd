@@ -77,11 +77,13 @@ class req_handler(object):
 
         #生成任务 record
         for atbl in msg.g_list_tbl:
+            if worker.should_stop == 1: return
             worker.dbcon.query(msg.g_init_sql_dns % (atbl))
             result = worker.dbcon.show()
             if not result:
                 continue
             for row in result:
+                if worker.should_stop == 1: return
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[atbl], row[1], row[0], 0, msg.g_opt_add))
         #发送一些先，防止收到多个init here for release clean
         #worker.dbcon.query(msg.g_init_sql_inittask_dns_limit1)
@@ -104,9 +106,11 @@ class req_handler(object):
 
         #生成任务 mask
         worker.dbcon.query(msg.g_init_sql_view)
+        if worker.should_stop == 1: return
         result = worker.dbcon.show()
         if result:
             for row in result:
+                if worker.should_stop == 1: return
                 worker.dbcon.call_proc(msg.g_proc_add_task, ('view', 0, row[0], row[1], 0, msg.g_opt_add))
 
         #计算任务数量
@@ -123,10 +127,12 @@ class req_handler(object):
             return
 
         #发送通知
+        if worker.should_stop == 1: return
         worker.dbcon.query(msg.g_init_sql_inittask_dns)
         result = worker.dbcon.show()
         if result:
             for row in result:
+                if worker.should_stop == 1: return
                 worker.dbcon.query(msg.g_init_sql_inittask_dns_inited % (row[0],))
                 print >> sys.stderr,  'dns query %s res: %s' % (atbl, row)
                 msgobj.append({'id':row[0],'opt':msg.g_opt_add, 'domain':row[3], 'view':row[2], 'type':row[1]})
@@ -151,10 +157,12 @@ class req_handler(object):
         del msgobj[:]
         cur_cnt = 0
 
+        if worker.should_stop == 1: return
         worker.dbcon.query(msg.g_init_sql_inittask_view)
         result = worker.dbcon.show()
         if result:
             for row in result:
+                if worker.should_stop == 1: return
                 worker.dbcon.query(msg.g_init_sql_inittask_view_inited % (row[0],))
                 print >> sys.stderr,  row
                 msgobj.append({'id':row[0], 'opt':msg.g_opt_add, 'view':row[1], 'mask':row[2]})
