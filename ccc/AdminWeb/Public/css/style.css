@@ -98,9 +98,10 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 	height:25px;
 	line-height:25px;
 	display:inline-block;
-	width:60px;
+	width:100px;
 	text-align:center;
 }
+.opt_div a:hover{ background:#f1f1f1;}
 
 
 /* Tab切换 */

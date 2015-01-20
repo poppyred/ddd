@@ -330,6 +330,9 @@ class DomainAction extends BaseAction {
 	//添加域名
 	public function addZone(){
 		if(!empty($_POST['zone'])){
+			if(!preg_match('/^([\w-]+\.)+((com)|(net)|(org)|(gov\.cn)|(info)|(cc)|(com\.cn)|(net\.cn)|(org\.cn)|(name)|(biz)|(tv)|(cn)|(mobi)|(name)|(sh)|(ac)|(io)|(tw)|(com\.tw)|(hk)|(com\.hk)|(ws)|(travel)|(us)|(tm)|(la)|(me\.uk)|(org\.uk)|(ltd\.uk)|(plc\.uk)|(in)|(eu)|(it)|(jp)|(coop)|(edu)|(mil)|(int)|(ae)|(at)|(au)|(be)|(bg)|(br)|(bz)|(ca)|(ch)|(cl)|(cz)|(de)|(fr)|(hu)|(ie)|(il)|(ir)|(mc)|(to)|(ru)|(aero)|(nl))$/',$_POST['zone'])){ 
+				$this->ajaxReturn(0,'域名格式不正确，请填写正确的域名(例如：baidu.com)。',0);
+			}
 			
 			//普通用户限制50条
 			$rowCount = $this->selectZoneCount();

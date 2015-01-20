@@ -1,0 +1,5 @@
+#!/bin/sh
+
+find . -name "*.erl" -o -name "*.hpp" -o -name "*.lua" -o -name "*.h" -o -name "*.cpp" -o -name "*.c" -o -name "*.hinl" -o -name "*.inl" > cscope.files
+cscope -bkq -i cscope.files
+ctags -R

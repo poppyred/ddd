@@ -5,7 +5,10 @@ class ClientmgrAction extends BaseAction {
 	public function index(){
 		$list = M('client',Null,'DB_NEWS'); 
 		$map["type"] = 0;
-		$map['internal'] = 0;
+		//非管理员
+		if($_SESSION['level'] != 1){
+			$map['internal'] = 0;
+		}
 		if(!empty($_GET['mail'])){
 			$map["mail"] = array('like','%'.$_GET['mail'].'%');
 			$this->assign('mail',$_GET['mail']);
@@ -27,7 +30,7 @@ class ClientmgrAction extends BaseAction {
 		$this->display();
 	}
 	public function savePwd(){
-		if(!empty($_POST['id']) && !empty($_POST['id'])){
+		if(!empty($_POST['id']) && !empty($_POST['pwd'])){
 			$client	= M('client',Null,'DB_NEWS'); 
 			$data['pwd'] = md5($_POST['pwd']);			
 			$is_ok = $client->where('id='.$_POST['id'])->save($data);
@@ -37,14 +40,57 @@ class ClientmgrAction extends BaseAction {
 			$this->ajaxReturn('修改用户密码成功','success',1);
 		}
 	}
-	public function resetPwd(){
+	public function updateInternalClient(){
+		if(!empty($_POST['id'])){					
+			$client	= M('client',Null,'DB_NEWS'); 			
+			$is_ok = $client->where('id='.$_POST['id'])->setField('internal',$_POST['internal']);
+			if($is_ok === false){
+				if($_POST['internal'] == 1){
+					$this->ajaxReturn('设置内部账户失败，请联系管理员','error',0);
+				}else{
+					$this->ajaxReturn('设置外部账户失败，请联系管理员','error',0);
+				}
+			}
+			if($_POST['internal'] == 1){
+				$this->ajaxReturn("设置内部账户成功",'success',1);
+			}else{
+				$this->ajaxReturn("设置外部账户成功",'success',1);
+			}
+		}
+	}
+	public function updateClientStatus(){
 		if(!empty($_POST['id'])){
 			$client	= M('client',Null,'DB_NEWS'); 
-			$is_ok = $client->where("id=".$_POST['id'])->setField('pwd',md5("123456"));
+			$is_ok = $client->where("id=".$_POST['id'])->setField('status',$_POST['status']);	
 			if($is_ok === false){
-				$this->ajaxReturn('重置密码失败，请联系管理员','error',0);
+				if($_POST['status'] == 1){
+					$this->ajaxReturn('冻结账户失败，请联系管理员','error',0);
+				}else{
+					$this->ajaxReturn('解冻账户失败，请联系管理员','error',0);
+				}
 			}
-			$this->ajaxReturn("重置密码成功",'success',1);
+			if($_POST['status'] == 1){
+				$this->ajaxReturn("冻结账户成功",'success',1);
+			}else{
+				$this->ajaxReturn("解冻账户成功",'success',1);
+			}
+		}
+	}
+	public function resetPwd(){
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
+			$client = M('client',Null,'DB_NEWS'); 
+			$user = $client->where('id='.$_GET['id'])->find();
+			$this->assign('user',$user);
+			$this->display();
+		}else{
+			if(!empty($_POST['id']) && !empty($_POST['pwd'])){
+				$client	= M('client',Null,'DB_NEWS'); 
+				$is_ok = $client->where("id=".$_POST['id'])->setField('pwd',md5($_POST['pwd']));
+				if($is_ok === false){
+					$this->ajaxReturn('重置密码失败，请联系管理员','error',0);
+				}
+				$this->ajaxReturn("重置密码成功",'success',1);
+			}
 		}
 	}
 	public function addClient(){
@@ -90,7 +136,10 @@ class ClientmgrAction extends BaseAction {
 	public function vip(){
 		$list = M('client',Null,'DB_NEWS'); 
 		$map["type"] = 1;	
-		$map['internal'] = 0;	
+		//非管理员
+		if($_SESSION['level'] != 1){
+			$map['internal'] = 0;
+		}
 		if(!empty($_GET['mail'])){
 			$map["mail"] = array('like','%'.$_GET['mail'].'%');
 			$this->assign('mail',$_GET['mail']);

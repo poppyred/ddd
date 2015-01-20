@@ -238,7 +238,7 @@
 			//域名格式的提示
 			$("#warning_info").css('display','').css('color','#f51d00')
 			.css('background','url(__ROOT__/Public/img/warning.gif) 50px 12px no-repeat;')
-			.html('域名格式不正确，请填写正确的域名。');
+			.html('域名格式不正确，请填写正确的域名(例如：baidu.com)。');
 			return ;
 		}
 		$.ajax({
@@ -933,8 +933,8 @@
 		var d = new Date(new Date().getTime());
 		nowtime = (d.getHours()<10 ? "0" + d.getHours():d.getHours())+""+(d.getMinutes()<10 ? "0" + d.getMinutes():d.getMinutes());
 		//
-		if($("#refresh_time").val()!="" && parseInt(nowtime) - parseInt($("#refresh_time").val())<3){
-			messageBox('message','刷新太过频繁，请在三分钟后重试。');
+		if($("#refresh_time").val()!="" && parseInt(nowtime) - parseInt($("#refresh_time").val())<1){
+			messageBox('message','刷新太过频繁，请在一分钟后重试。');
 			return false;
 		}
 		var loading = $.layer({

@@ -80,8 +80,10 @@
 								<!--td class="iop">{$u_vo.pwd}</td--> 
                                 <if condition="$u_vo.level == 0">
                                     <td class="iop">监控员</td> 
-									<else/>
+									<elseif condition="$u_vo.level == 1"/>
                                     <td class="iop">管理员</td> 
+                                    <else/>
+                                    <td class="iop">客户支撑</td> 
                                 </if>
 								<td class="rr" style="text-align:left;width:240px;">{$u_vo.desc}</td>
 								<td class="iop">

@@ -28,8 +28,8 @@ inline void fio_stack_notify_systhread(struct fio_nic *nic, struct fio_notify_ms
     int write_systhread = 0;
     if ((write_systhread=write(*NIC_EXTRA_CONTEXT(nic)->notifyfds, msg, sizeof(struct fio_notify_msg))) < 0) 
     {
-        OD( "tid %d error %d writing notify sockpair", NIC_EXTRA_CONTEXT(nic)->me, errno);
-        assert(write_systhread>=0);
+        NOD( "tid %d error %d writing notify sockpair", NIC_EXTRA_CONTEXT(nic)->me, errno);
+        //assert(write_systhread>=0);
     }
     else
     {

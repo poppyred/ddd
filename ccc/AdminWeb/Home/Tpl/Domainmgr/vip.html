@@ -7,6 +7,7 @@
 <meta name="Description" content="DNSPro DNS 域名解析">
 <title>EflyDNS管理后台</title>
 <link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<link rel="shortcut icon" href="__ROOT__/eflydns.ico" />
 <script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
@@ -92,9 +93,12 @@
 								<td class="rr" style="width:140px;">{$s_vo.add_time}</td>
 								<td class="iop">
                                 	<a title="展开" href="javascript:void(0);" onclick="showOpt(this,event)">展开<span class="caret"></span></a>
-                                    <div style=" position:absolute;width:60px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">
+                                    <div style=" position:absolute;width:100px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">
                                         <a title="查看其他信息" href="javascript:void(0);" onclick="readZone({$s_vo.id},this);">详情</a>
-                                        <a title="删除" href="javascript:void(0);" onclick="deleteDomain({$s_vo.id},this)">删除</a>
+                                        <if condition="$_SESSION[level] == 1 ">
+                                        	<a title="删除" href="javascript:void(0);" onclick="deleteDomain({$s_vo.id},this)">删除</a>
+                                            <else/>
+                                        </if>
                                         <if condition="$s_vo[is_on] == 0">
                                             <a title="启用" href="javascript:void(0);" onclick="startOrStop({$s_vo.id},this)">启用</a>
                                             <else/>
@@ -102,7 +106,14 @@
                                         </if>
                                         <a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">管理</a>
                                         <a title="降级" href="javascript:void(0);" onClick="empower('{$s_vo.domain}',1)" >降级</a>
-                                        <a title="授权" href="__APP__/Domainmgr/transfer?id={$s_vo.id}" >授权</a>
+                                        <a title="过户" href="__APP__/Domainmgr/transfer?id={$s_vo.id}" >过户</a>
+                                        <if condition="$_SESSION[level] == 1">
+                                            <if condition="$s_vo[internal] == 0">
+                                            <a title="设置内部域名" href="javascript:void(0);" onClick="updateInternalDomain({$s_vo.id},this)">设置内部域名</a>                                            
+                                            <else/>
+                                            <a title="设置外部域名" href="javascript:void(0);" onClick="updateInternalDomain({$s_vo.id},this)">设置外部域名</a>
+                                            </if>
+                                        </if>
 									</div>
                                 </td>
 							</tr>                            
@@ -119,6 +130,30 @@
 </div>
 <include file="Public:footer" />
 <script type="text/javascript">
+	function updateInternalDomain(id,obj){
+		var val = $(obj).html(),internal = "";
+		if(val == "设置内部域名"){
+			internal = 1 ;
+		}else{
+			internal = 	0 ;
+		}
+		$.ajax({
+			url:'__APP__/Domainmgr/updateInternalDomain',
+			type:'post',
+			data:{'id':id,'internal':internal},
+			success:function(data){						
+				if(data.info=="success"){
+					alert(data.data);
+					window.location.reload();
+				}else{
+					alert(data.data);
+				}
+			},
+			error:function(data){
+				alert(data.statusText);	
+			}
+		});
+	}
 	$(function(){
 		$('html').bind('click',function(e){
 			$(".opt_div").slideUp();

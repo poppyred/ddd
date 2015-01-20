@@ -7,7 +7,10 @@ class DomainmgrAction extends BaseAction {
 		$client = M('client',Null,'DB_NEWS'); 
 		import('ORG.Util.Page');// 导入分页类
 		$map['level'] = array('lt','8');
-		$map['internal'] = 0;
+		//非管理员
+		if($_SESSION['level'] != 1){
+			$map['internal'] = 0;
+		}
 		if(!empty($_GET['domain'])){
 			$map["domain"] = array('like','%'.$_GET['domain'].'%');
 			$this->assign('domain',$_GET['domain']);
@@ -31,6 +34,24 @@ class DomainmgrAction extends BaseAction {
 		$this->assign('zlist', $zlist);// 赋值数据集
 		$this->assign('page',$show);// 赋值分页输出
 		$this->display();
+	}
+	public function updateInternalDomain(){
+		if(!empty($_POST['id'])){					
+			$zone	= M('zone',Null,'DB_NEWS'); 			
+			$is_ok = $zone->where('id='.$_POST['id'])->setField('internal',$_POST['internal']);
+			if($is_ok === false){
+				if($_POST['internal'] == 1){
+					$this->ajaxReturn('设置内部域名失败，请联系管理员','error',0);
+				}else{
+					$this->ajaxReturn('设置外部域名失败，请联系管理员','error',0);
+				}
+			}
+			if($_POST['internal'] == 1){
+				$this->ajaxReturn("设置内部域名成功",'success',1);
+			}else{
+				$this->ajaxReturn("设置外部域名成功",'success',1);
+			}
+		}
 	}
 	public function addDomain(){
 		if($_SERVER['REQUEST_METHOD' ] === 'GET'){			
@@ -144,7 +165,10 @@ class DomainmgrAction extends BaseAction {
 		$client = M('client',Null,'DB_NEWS'); 
 		import('ORG.Util.Page');// 导入分页类
 		$map['level'] = array('egt','8');
-		$map['internal'] = 0;
+		//非管理员
+		if($_SESSION['level'] != 1){
+			$map['internal'] = 0;
+		}
 		if(!empty($_GET['domain'])){
 			$map["domain"] = array('like','%'.$_GET['domain'].'%');
 			$this->assign('domain',$_GET['domain']);
