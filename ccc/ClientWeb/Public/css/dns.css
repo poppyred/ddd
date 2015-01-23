@@ -96,7 +96,7 @@
 .page-logs .log-date{width:160px;padding-left:30px}
 .page-logs .log-domain{width:165px}
 .page-logs .log-ip{width:115px}
-.page-logs .table-box{padding:0;width:938px;margin-top:32px}
+.page-logs .table-box{padding:0;width:938px;margin-top:32px;margin-bottom: 120px;}
 .page-logs .ui-table{padding:0 20px}
 .page-logs th{height:48px;font-weight:300;color:#999}
 .page-logs .ipt-date{height:22px;line-height:22px;}

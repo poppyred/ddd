@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
     <script type="text/javascript" src="__ROOT__/Public/js/YUI/yui-min.js"></script>
 	<script type="text/javascript">
+		var APP = "__APP__";
 		YUI({
 			modules: {
 				'trip-calendar': {
@@ -84,7 +85,7 @@
 					<input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" value="{$startTime}" readonly="" placeholder="开始时间(非必填)" id="startTime"><span class="w" style=" margin-left:15px">到</span>
 					<input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" value="{$endTime}" readonly="" placeholder="结束时间(非必填)" id="endTime"> 		
 					<input class="ui-ipt-txt ui-ipt-search J_iptSearchLog" submit-with=".J_btnQuerySubmit" value="{$val}" id="txt_val" type="text" placeholder="关键字(如：域名、IP)">
-					<button class="ui-btn-grey btn-s-l J_btnQuerySubmit" onclick="selectBy()">查询</button><button class="ui-btn-grey btn-s-l J_btnResetForm">重置</button> 	
+					<button class="ui-btn-grey btn-s-l J_btnQuerySubmit" onclick="selectBy()">查询</button><button class="ui-btn-grey btn-s-l J_btnResetForm" onclick="javascript:window.location.href='__APP__/Optlog/index?zone={$zone}'">重置</button> 	
 				</div> 
 			</div>
 			<table class="ui-table" cellpadding="0" cellspacing="0" width="100%"> 	
@@ -107,9 +108,26 @@
 					</tr> 	
 				</tfoot--> 
 			</table>
+            <div class="page">            	
+                <ul>        
+                	<li style="border:none;">总记录数：{$sum}，本页记录数：{$count}</li>
+                    <li id="first">首页</li>
+                    <li id="top" onclick="topclick()">上一页</li>
+                    <li class="xifenye" id="xifenye">
+                        <a id="xiye">{$page}</a>/<a id="mo">{$pageCount}</a>
+                        <div class="xab" id="xab" style="display:none">
+                            <ul id="uljia">                                    
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="down" onclick="downclick()">下一页</a></li>
+                    <li id="last">末页</li>
+                </ul>                
+            </div>
 		</div> 
 		<!-- footer -->
 		<include file="Public:footer" />
 	</div>
 </body>
 </html>
+<script type="text/javascript" src="__ROOT__/Public/js/page.js"></script>

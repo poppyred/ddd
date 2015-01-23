@@ -71,11 +71,11 @@
 						<tr id="tr_title">
 							<th class="chk">编号</th>
 							<th style="text-align:left;"><span class="el">域名</span></th>
-							<th><span class="el">TTL</span></th>
+							<th><span class="el">TTL(分钟)</span></th>
 							<th><span class="el">NS状态</span></th>
 							<th><span class="el">启用状态</span></th>
 							<th><span class="el">锁定状态</span></th>
-							<th><span class="el">添加时间</span></th>
+							<th><span class="el">最后操作时间</span></th>
 							<th>操作&nbsp;</th>
 						</tr>
 						</thead> 	
@@ -90,7 +90,7 @@
 								<td class="rr" style="width:80px;"><if condition="$s_vo.is_author eq 0">未修改<else/>已修改</if></td> 
 								<td class="rr" style="width:80px;"><if condition="$s_vo.is_on eq 0">禁用<else/>启用</if></td>
 								<td class="rr" style="width:80px;"><if condition="$s_vo.is_lock eq 0">未锁定<else/>锁定</if></td>
-								<td class="rr" style="width:140px;">{$s_vo.add_time}</td>
+								<td class="rr" style="width:140px;">{$s_vo.edit_time}</td>
 								<td class="iop">
                                 	<a title="展开" href="javascript:void(0);" onclick="showOpt(this,event)">展开<span class="caret"></span></a>
                                     <div style=" position:absolute;width:100px;border:1px solid #ccc; display:none; background:#fff;margin-left: -22px; padding:0;" class="opt_div">

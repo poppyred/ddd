@@ -19,7 +19,7 @@ class DomainmgrAction extends BaseAction {
 		$Page = new Page($count, 20);// 实例化分页类 传入总记录数
 		$nowPage = isset($_GET['p'])?$_GET['p']:1;
 		// 进行分页数据查询 注意page方法的参数的前面部分是当前的页数使用 $_GET[p]获取
-		$zlist = $list->order('id desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
+		$zlist = $list->order('edit_time desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
 		//print_r($list->getlastsql());exit;
 		$show = $Page->show();// 分页显示输出
 		if(empty($show)){
@@ -177,7 +177,7 @@ class DomainmgrAction extends BaseAction {
 		$Page = new Page($count, 20);// 实例化分页类 传入总记录数
 		$nowPage = isset($_GET['p'])?$_GET['p']:1;
 		// 进行分页数据查询 注意page方法的参数的前面部分是当前的页数使用 $_GET[p]获取
-		$zlist = $list->order('id desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
+		$zlist = $list->order('edit_time desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
 		//print_r($list->getlastsql());exit;
 		$show = $Page->show();// 分页显示输出
 		if(empty($show)){

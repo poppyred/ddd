@@ -23,7 +23,44 @@ class OptlogAction extends BaseAction {
 			$this->assign("count",0);	
 		}
 		
-		$this->assign("list",$list);		
+		
+//		print_r($list);exit;
+		
+		$kk = 0;
+		$i = 0;
+		$newlist = array();
+		foreach($list as $key => $val){
+			$i ++;
+			$newlist[$kk][$key] = $val;			
+			if($i==10){
+				$kk ++ ;
+			}
+		}
+			
+		$page = 1;
+		if(!empty($_GET['p'])){
+			$page = $_GET['p'];
+		}
+		
+		if(count($list)<=10){
+			$pageCount = 1;
+		}else{
+			if(count($list) % 10 == 0){
+				$pageCount = count($list) / 10;
+			}else{
+				$pageCount = (count($list) - count($list) % 10) / 10 + 1;
+			}
+		}
+		
+		
+//		print_r($page);exit;
+//		print_r($newlist);exit;
+		
+		$this->assign("list",$newlist[$page-1]);
+		$this->assign("pageCount",$pageCount);
+		$this->assign("page",$page);
+		$this->assign("sum",count($list));
+		$this->assign("count",count($newlist[$page-1]));
 		$this->assign("zone",$_GET['zone']);
 		$this->display();	
 	}

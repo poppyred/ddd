@@ -397,6 +397,11 @@ class DomainAction extends BaseAction {
 			}
 		}
 	}
+	public function updateZoneTime($id){
+		$zone = M('zone');
+		date_default_timezone_set('PRC');
+		$zone->where('id='.$id)->setField('edit_time',date('Y-m-d H:i:s',time()));
+	}
 	//查找备注
 	public function findZoneDesc(){
 		if(!empty($_POST['domain'])){
@@ -661,9 +666,12 @@ class DomainAction extends BaseAction {
 				$data1['domain_id'] = $is_ok;
 				$client_domain->add($data1);
 				
+				$v = M('view');
+				$view = $v->where('id='.$_POST['view'])->find();
 				
-				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20添加了记录值".$_POST['val']."的".$_POST['type']."记录");				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20在".$view['name']."线路%20添加了记录值".$_POST['val']."的".$_POST['type']."记录");				
 				$history_list = json_decode($history,true);
+				$this->updateZoneTime($vo[0]['id']);
 				
 				$this->ajaxReturn($is_ok,'解析记录添加成功',1);
 			}
@@ -705,9 +713,13 @@ class DomainAction extends BaseAction {
 		$data['ttl'] = $_POST['ttl'];
 		$data['up_time'] = date("Y-m-d H:i:s");
 		
+		$v = M('view');
+		$view = $v->where('id='.$_POST['view'])->find();
 		
 		$brfore_update_entity = $domain->where('id='.$_POST['id'])->find();
-		$str = $_POST['zone']."%20将记录值".$brfore_update_entity['val']."的".$brfore_update_entity['type']."记录%20修改为记录值".$_POST['val']."的".$_POST['type']."记录";
+		$old_view = $v->where('id='.$brfore_update_entity['view'])->find();
+		
+		$str = $_POST['zone']."%20将主机记录:".$brfore_update_entity['host'].",线路:".$old_view['name'].",记录值:".$brfore_update_entity['val']."的".$brfore_update_entity['type']."记录%20修改成%20主机记录:".$_POST['host'].",线路:".$view['name'].",记录值:".$_POST['val']."的".$_POST['type']."记录";
 		
 		//$datae = json_encode(array("data" => $data['val']));
 		//$data_url = http_build_query ($datae);
@@ -738,11 +750,9 @@ class DomainAction extends BaseAction {
 				$this->ajaxReturn($data,'error',0);
 			}
 			
-			print_r($str);
 			$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$str);				
-			
-			print_r(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$str);exit;
 			$history_list = json_decode($history,true);
+			$this->updateZoneTime($vo[0]['id']);
 			
 			$this->ajaxReturn($is_ok,'success',1);
 		}else{
@@ -795,7 +805,8 @@ class DomainAction extends BaseAction {
 					$error = $ret["content"];//$rslt["error"];
 				}
 				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20删除了记录值".$data['val']."的".$data['type']."记录");				
-				$history_list = json_decode($history,true);
+				$history_list = json_decode($history,true);				
+				$this->updateZoneTime($vo[0]['id']);
 			}
 			if($retnum > 0){
 				$this->ajaxReturn(0,$error,0);

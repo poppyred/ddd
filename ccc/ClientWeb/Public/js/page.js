@@ -55,6 +55,9 @@ function selectByPage(val,page,ord){
 		case url.indexOf('ReverseDomain/index')!=-1:		
 		window.location.href = APP + "/ReverseDomain/index?p=" + page;
 		break;
+		case url.indexOf('Optlog/index')!=-1:		
+		window.location.href = APP + "/Optlog/index?zone=" + url.getQuery('zone') + "&p=" + page + "&startTime=" + $("#startTime").val() + "&endTime=" + $("#endTime").val() + "&val=" + $("#txt_val").val();
+		break;
 	}
 	
 }
@@ -76,4 +79,4 @@ $("#last").bind("click",function(){
 function scrolltop(top){
 	var hei=25*top-25;
 	$("#xab").scrollTop(hei);
-	}
+}
