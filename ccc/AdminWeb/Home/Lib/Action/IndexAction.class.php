@@ -7,7 +7,11 @@ class IndexAction extends Action {
 	}
 	public function index(){
 		if(!empty($_SESSION['admin'])){
-			header("Location: ".__APP__."/Clientmgr/");
+			if($_SESSION["level"]==0 || $_SESSION["level"]==1){
+				header("Location: ".__APP__."/FlowChart/");
+			}else{
+				header("Location: ".__APP__."/Clientmgr/");
+			}
 		}else{
 			header("Location: ".__APP__."/Index/login");
 		}

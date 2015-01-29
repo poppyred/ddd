@@ -90,7 +90,7 @@ class ReverseDomainAction extends BaseAction {
 				$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
 				$rslt = json_decode($ret["content"],true);
 				if($rslt["ret"] != 0){
-					$this->ajaxReturn(0,'添加域名反解析失败，请联系管理员',0);
+					$this->ajaxReturn('添加域名反解析失败，请联系管理员','error',0);
 				}
 				
 				$this->ajaxReturn(1,'success',1);

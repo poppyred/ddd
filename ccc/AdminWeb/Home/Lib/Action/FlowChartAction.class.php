@@ -168,4 +168,68 @@ class FlowChartAction extends BaseAction {
 		$this->assign('viewList',$view_list);
 		$this->display();
 	}	
+	//实时占比图
+	public function proportion(){		
+		$url = C('API_URL')."/dns_chart_viewper.php";
+		if(!empty($_GET['ip'])){
+			$url .= "?ip=" . $_GET['ip'];
+			$this->assign('ip',$_GET['ip']);	
+		}
+		
+		$data = file_get_contents($url);
+		$list = json_decode($data,true);		
+		if($list['ret'] != 0){
+			$this->ajaxReturn("获取数据失败！",'error',0);
+		}
+		$server = M('server_list');
+		$result = $server->distinct(true)->field('ip')->where("type='proxy'")->getField('ip',true);
+		
+		$view = M('view',Null,'DB_NEWS');		
+		$value = "[";
+		foreach($list['descmap'] as $key => $val){
+			$tem = $view->where('id='.$key)->find();
+			$value .= "['".$tem['name']."',".$val."],";
+		}
+		$value = substr($value,0,-1) . "]";
+		
+		$this->assign('ipList',$result);	
+		$this->assign('value',$value);
+		$this->display();
+		
+	}
+	//历史占比图
+	public function history_proportion(){		
+		$url = C('API_URL')."/dns_chart_viewper_history.php";
+		if(empty($_GET['ip']) && empty($_GET['time'])){
+			$url .= "?timezone=today";
+		}
+		if(!empty($_GET['ip'])){
+			$url .= "?ip=" . $_GET['ip'];
+			$this->assign('ip',$_GET['ip']);	
+		}
+		if(!empty($_GET['time'])){
+			$url .= "&timezone=" . $_GET['time'];
+			$this->assign('timezone', $_GET['time']);
+		}
+		$data = file_get_contents($url);
+		$list = json_decode($data,true);		
+		if($list['ret'] != 0){
+			$this->ajaxReturn("获取数据失败！",'error',0);
+		}
+		$server = M('server_list');
+		$result = $server->distinct(true)->field('ip')->where("type='proxy'")->getField('ip',true);
+		
+		$view = M('view',Null,'DB_NEWS');		
+		$value = "[";
+		foreach($list['descmap'] as $key => $val){
+			$tem = $view->where('id='.$key)->find();
+			$value .= "['".$tem['name']."',".$val."],";
+		}
+		$value = substr($value,0,-1) . "]";
+		
+		$this->assign('ipList',$result);	
+		$this->assign('value',$value);
+		$this->display();
+		
+	}
 }

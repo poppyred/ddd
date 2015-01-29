@@ -187,26 +187,28 @@ function selectBy(){
 	<div style="float:left;width:172px;">
         <div id="sideMenu" class="side">
             <div class="hd">
-                <h3>请求总流量</h3>
+                <div style="float:left"><span style="background:url(__ROOT__/Public/img/lljk.png) no-repeat;"></span><h3>统计报表</h3></div>
             </div>
             <div class="bd">
                 <ul>
-                    <li><a href="__APP__/FlowChart/index">实时流量</a></li>
-                    <li><a href="__APP__/FlowChart/history">历史流量</a></li>
+                    <li><a href="__APP__/FlowChart/index">总流量</a></li>
+                    <li><a style="color:#1c8fdf; text-decoration:underline;" href="__APP__/FlowChart/error">无效请求</a></li>                    
+                    <li><a href="__APP__/FlowChart/proportion">流量概况</a></li>
                 </ul>
             </div>
         </div>
-        <div id="sideMenu1" class="side">
+        <!--div id="sideMenu1" class="side">
             <div class="hd">
-                <h3>未命中流量</h3>
+                <h3>历史统计</h3>
             </div>
             <div class="bd">
                 <ul>
-                    <li><a style="color:#3CADED; text-decoration:underline;" href="__APP__/FlowChart/error">实时流量</a></li>
-                    <li><a href="__APP__/FlowChart/error_history">历史流量</a></li>
+                    <li><a href="__APP__/FlowChart/history">总流量</a></li>
+                    <li><a href="__APP__/FlowChart/error_history">无效请求</a></li>
+                    <li><a href="__APP__/FlowChart/history_proportion">流量概况</a></li>
                 </ul>
             </div>
-        </div>
+        </div-->
     </div>
 	<script type="text/javascript">
 		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
@@ -220,9 +222,10 @@ function selectBy(){
 		<!-- Tab切换 S -->
 		<div class="slideTxtBox">
 			<div class="hd">
-				<h2 style="float:left;">流量图信息</h2>
+				<h2 style="float:left;">实时数据</h2>
+				<a href="__APP__/FlowChart/error_history">历史统计</a>
 			</div>
-            <div style="margin:5px 0px 0px 40px;">
+            <div style="margin:20px 0px 0px 40px;">
             	<label>选择设备：</label>
                 <select id="ip_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
                 	<option value="">全部</option>
@@ -236,9 +239,8 @@ function selectBy(){
                     <volist name="viewList" id="item">
 	                	<option value="{$item.id}">{$item.name}</option>
                     </volist>
-                </select>
-                <!--label style="margin-left:20px;">监控时间内最大并发：</label><span id="max_qps">-</span>    
-                <label style="margin-left:20px;">时间：</label><span id="max_time">-</span-->
+                </select>                
+				<a style="margin-left:20px;color:#1c8fdf;text-decoration:underline" href="__APP__/FlowChart/error_history">查看历史统计</a>
 			</div>
 			<div class="bd">
 				<div id="container" style="min-width:700px;height:400px"></div>
