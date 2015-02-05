@@ -73,8 +73,8 @@ class req_handler(object):
         worker.check_thd.del_tasknode_byname_lock(msg.g_class_inner_chk_init)
         worker.dbcon.query(msg.g_sql_clean_snd_req)
 
-        msgobj = {'initing':1}
-        worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
+        #msgobj = {'initing':1}
+        #worker.sendto_(msgobj, addr, msg.g_pack_head_init_complete, mgr_conf.g_reply_port)
 
         #query dns
         msgobj = []
