@@ -77,7 +77,7 @@ class FlowChartAction extends BaseAction {
 				$sum += $val['req'];
 			}
 		}
-		$this->assign('sum', $sum);
+		$this->assign('sum', number_format($sum));
 		$this->assign('time', trim($time,","));
 		$this->assign('num', trim($num,","));
 		$this->assign('ipList',$result);
@@ -161,7 +161,7 @@ class FlowChartAction extends BaseAction {
 				$sum += $val['req'];
 			}
 		}
-		$this->assign('sum', $sum);
+		$this->assign('sum', number_format($sum));
 		$this->assign('time', trim($time,","));
 		$this->assign('num', trim($num,","));
 		$this->assign('ipList',$result);
@@ -200,16 +200,23 @@ class FlowChartAction extends BaseAction {
 	//历史占比图
 	public function history_proportion(){		
 		$url = C('API_URL')."/dns_chart_viewper_history.php";
-		if(empty($_GET['ip']) && empty($_GET['time'])){
-			$url .= "?timezone=today";
-		}
-		if(!empty($_GET['ip'])){
-			$url .= "?ip=" . $_GET['ip'];
-			$this->assign('ip',$_GET['ip']);	
-		}
-		if(!empty($_GET['time'])){
-			$url .= "&timezone=" . $_GET['time'];
-			$this->assign('timezone', $_GET['time']);
+		switch(true){
+			case empty($_GET['ip']) && empty($_GET['time']):
+				$url .= "?timezone=today";
+			break;
+			case !empty($_GET['ip']) && !empty($_GET['time']):
+				$url .= "?ip=" . $_GET['ip'] . "&timezone=" . $_GET['time'];
+				$this->assign('ip',$_GET['ip']);	
+				$this->assign('timezone',$_GET['time']);	
+			break;
+			case !empty($_GET['ip']) && empty($_GET['time']):
+				$url .= "?ip=" . $_GET['ip'];
+				$this->assign('ip',$_GET['ip']);	
+			break;
+			case empty($_GET['ip']) && !empty($_GET['time']):
+				$url .= "?timezone=" . $_GET['time'];
+				$this->assign('timezone',$_GET['time']);	
+			break;
 		}
 		$data = file_get_contents($url);
 		$list = json_decode($data,true);		
@@ -226,7 +233,6 @@ class FlowChartAction extends BaseAction {
 			$value .= "['".$tem['name']."',".$val."],";
 		}
 		$value = substr($value,0,-1) . "]";
-		
 		$this->assign('ipList',$result);	
 		$this->assign('value',$value);
 		$this->display();

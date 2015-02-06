@@ -669,7 +669,7 @@ class DomainAction extends BaseAction {
 				$v = M('view');
 				$view = $v->where('id='.$_POST['view'])->find();
 				
-				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20在".$view['name']."线路%20添加了记录值".$_POST['val']."的".$_POST['type']."记录");				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['host'].".".$_POST['zone']."%20在".$view['name']."线路%20添加了记录值".$_POST['val']."的".$_POST['type']."记录");				
 				$history_list = json_decode($history,true);
 				$this->updateZoneTime($vo[0]['id']);
 				
@@ -719,7 +719,7 @@ class DomainAction extends BaseAction {
 		$brfore_update_entity = $domain->where('id='.$_POST['id'])->find();
 		$old_view = $v->where('id='.$brfore_update_entity['view'])->find();
 		
-		$str = $_POST['zone']."%20将主机记录:".$brfore_update_entity['host'].",线路:".$old_view['name'].",记录值:".$brfore_update_entity['val']."的".$brfore_update_entity['type']."记录%20修改成%20主机记录:".$_POST['host'].",线路:".$view['name'].",记录值:".$_POST['val']."的".$_POST['type']."记录";
+		$str = $brfore_update_entity['host'].".".$_POST['zone']."%20将线路:".$old_view['name'].",记录值:".$brfore_update_entity['val']."的".$brfore_update_entity['type']."记录%20修改成%20".$_POST['host'].$_POST['zone'].",线路:".$view['name'].",记录值:".$_POST['val']."的".$_POST['type']."记录";
 		
 		//$datae = json_encode(array("data" => $data['val']));
 		//$data_url = http_build_query ($datae);
@@ -804,7 +804,7 @@ class DomainAction extends BaseAction {
 					$retnum += 1;
 					$error = $ret["content"];//$rslt["error"];
 				}
-				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$_POST['zone']."%20删除了记录值".$data['val']."的".$data['type']."记录");				
+				$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$data['host'].".".$_POST['zone']."%20删除了记录值".$data['val']."的".$data['type']."记录");				
 				$history_list = json_decode($history,true);				
 				$this->updateZoneTime($vo[0]['id']);
 			}

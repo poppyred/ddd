@@ -122,7 +122,7 @@ img{border:none 0;display:block}
 .head-msg .btn-close{position:absolute;width:12px;height:12px;right:8px;top:13px;background:url(../img/close.gif) 0 -12px no-repeat;overflow:hidden;text-indent:-1000px}
 .head-msg .btn-close:hover{background-position:0 0}
 
-.tc-page-head{height:78px;background: #1c8fdf;}
+.tc-page-head{height:78px;background: #1c8fdf;box-shadow: 0px 2px 1px #888888;-o-box-shadow: 0px 2px 1px #888888;-moz-box-shadow: 0px 2px 1px #888888;-webkit-box-shadow: 0px 2px 1px #888888;}
 .tc-page-head .inner{width:940px;margin:0 auto;}
 .tc-page-head .logo a{color:#fff;font-weight:300;font-size:24px}
 .tc-page-head .logo a:hover{text-decoration:none}

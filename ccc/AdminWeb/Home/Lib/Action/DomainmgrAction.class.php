@@ -58,6 +58,7 @@ class DomainmgrAction extends BaseAction {
 			$client = M('client',Null,'DB_NEWS'); 
 			$list = $client->select();
 			$this->assign("list",$list);
+			$this->assign("type",$_GET['type']);
 			$this->display();		
 		}else{
 			if(isset($_POST['level']) && !empty($_POST['zone']) && !empty($_POST['mail'])){

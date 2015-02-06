@@ -29,31 +29,38 @@
 				$(".navBar ul li:eq(0)").addClass('on');
 				break;
 				case url.indexOf('System')!=-1:
-				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li:eq(1)").addClass('on');
 				break;
 			}
 		}else if(level == 1 ){
 			switch(true){
 				case url.indexOf('FlowChart')!=-1:
 				$(".navBar ul li:eq(0)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_lljk2.png');
 				break;
 				case url.indexOf('Clientmgr')!=-1:
-				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li:eq(1)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_khgl2.png');
 				break;
 				case url.indexOf('Domainmgr')!=-1:
-				$(".navBar ul li:eq(4)").addClass('on');
+				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_ymgl2.png');
 				break;
 				case url.indexOf('Runmgr')!=-1:
-				$(".navBar ul li:eq(6)").addClass('on');
+				$(".navBar ul li:eq(3)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_xlgl2.png');
 				break;
 				case url.indexOf('System/user')!=-1 || url.indexOf('System/addUser')!=-1 || url.indexOf('System/editUser')!=-1:
-				$(".navBar ul li:eq(8)").addClass('on');
+				$(".navBar ul li:eq(4)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_zhqx2.png');
 				break;
 				case url.indexOf('System')!=-1:
-				$(".navBar ul li:eq(12)").addClass('on');
+				$(".navBar ul li:eq(6)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
 				break;
 				case url.indexOf('ReverseDomain')!=-1:
-				$(".navBar ul li:eq(10)").addClass('on');
+				$(".navBar ul li:eq(5)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_fxjx2.png');
 				break;
 			}
 		}else if( level == 2 ){
@@ -62,10 +69,10 @@
 				$(".navBar ul li:eq(0)").addClass('on');
 				break;
 				case url.indexOf('Domainmgr')!=-1:
-				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li:eq(1)").addClass('on');
 				break;
 				case url.indexOf('ReverseDomain')!=-1:
-				$(".navBar ul li:eq(4)").addClass('on');
+				$(".navBar ul li:eq(2)").addClass('on');
 				break;
 			}
 		}	
@@ -84,55 +91,102 @@
 		<ul class="nav clearfix">
 			<if condition="$_SESSION['level'] == 0">
                <li class="m">
-                    <h3><a target="_self" href="__APP__/FlowChart/">流量监控</a></h3>
-                </li>
-                <li class="s">|</li>                
+               		<h3>
+                        <a target="_self" href="__APP__/FlowChart/">
+                            <img src="__ROOT__/Public/img/head_lljk.png" />
+                            <span>流量监控</span>
+                        </a>
+                    </h3>
+                </li>                
                 <li class="m">
-                    <h3><a target="_self" href="__APP__/System/">设备管理</a></h3>
+                    <h3>
+                        <a target="_self" href="__APP__/System">
+                            <img src="__ROOT__/Public/img/head_fwqgl.png" />
+                            <span>设备管理</span>
+                        </a>
+                    </h3>
                 </li>                	
 				<elseif condition="$_SESSION['level'] == 1" />
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/FlowChart/">流量监控</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/FlowChart/">
+                                <img src="__ROOT__/Public/img/head_lljk.png" />
+                                <span>流量监控</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/Clientmgr/">客户管理</a></h3>
+                        <h3>
+                            <a target="_self" href="__APP__/Clientmgr/">
+                                <img src="__ROOT__/Public/img/head_khgl.png" />
+                                <span>客户管理</span>
+                            </a>
+                        </h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/Domainmgr/">域名管理</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/Domainmgr/">
+                                <img src="__ROOT__/Public/img/head_ymgl.png" />
+                                <span>域名管理</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <!--li class="s">|</li>
-                    <li class="m">
-                        <h3><a target="_self" href="__APP__/Taocang/">套餐管理</a></h3>
-                    </li-->
-                    <li class="s">|</li>
-                    <li class="m">
-                        <h3><a target="_self" href="__APP__/Runmgr/">线路管理</a></h3>
+                    <li class="m">                    	
+                        <h3>
+	                        <a target="_self" href="__APP__/Runmgr/">
+                                <img src="__ROOT__/Public/img/head_xlgl.png" />
+                                <span>线路管理</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/System/user">账号权限</a></h3>
+                    	<h3>
+	                        <a target="_self" href="__APP__/System/user">
+                                <img src="__ROOT__/Public/img/head_zhqx.png" />
+                                <span>账号权限</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/ReverseDomain">反向解析</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/ReverseDomain">
+                                <img src="__ROOT__/Public/img/head_fxjx.png" />
+                                <span>反向解析</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/System/">设备管理</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/System">
+                                <img src="__ROOT__/Public/img/head_fwqgl.png" />
+                                <span>设备管理</span>
+                            </a>
+                       	</h3>
                     </li>
                 <elseif condition="$_SESSION['level'] == 2" />
                 	<li class="m">
-                        <h3><a target="_self" href="__APP__/Clientmgr/">客户管理</a></h3>
+                        <h3>
+                            <a target="_self" href="__APP__/Clientmgr/">
+                                <img src="__ROOT__/Public/img/head_khgl.png" />
+                                <span>客户管理</span>
+                            </a>
+                        </h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/Domainmgr/">域名管理</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/Domainmgr/">
+                                <img src="__ROOT__/Public/img/head_ymgl.png" />
+                                <span>域名管理</span>
+                            </a>
+                       	</h3>
                     </li>
-                    <li class="s">|</li>
                     <li class="m">
-                        <h3><a target="_self" href="__APP__/ReverseDomain">反向解析</a></h3>
+                        <h3>
+	                        <a target="_self" href="__APP__/ReverseDomain">
+                                <img src="__ROOT__/Public/img/head_fxjx.png" />
+                                <span>反向解析</span>
+                            </a>
+                       	</h3>
                     </li>
             </if>
 			<div>

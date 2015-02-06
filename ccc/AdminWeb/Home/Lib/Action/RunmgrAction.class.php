@@ -470,6 +470,7 @@ class RunmgrAction extends BaseAction {
 			$list = M('view',Null,'DB_NEWS'); 
 			$rlist = $list->select();
 			$this->assign('vlist', $rlist);// 赋值数据集
+			$this->assign('type', $_GET['type']);// 赋值数据集
 			$this->display();
 		}else{
 			if(isset($_POST['val']) && isset($_POST['level']) && isset($_POST['ttl']) && isset($_POST['view'])){

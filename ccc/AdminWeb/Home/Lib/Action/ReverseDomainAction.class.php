@@ -39,7 +39,7 @@ class ReverseDomainAction extends BaseAction {
 	}	
 	public function deleteReverse(){
 		if(!empty($_POST['id']) && !empty($_POST['cid'])){
-			$reverse = M('reverse_domain',Null,'DB_NEWS');
+			$reverse = M('reverse_domain',Null,'DB_NEWS');			
 			$data = $reverse->where('id='.$_POST['id'])->find();			
 			$val = array("rid"=>(int)$_POST['id'], 'PTR'=>$data['domain']);
 			$user = array("cid"=>$_POST['cid'], "level"=>0, "info"=>"");

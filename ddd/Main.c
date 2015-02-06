@@ -157,7 +157,7 @@ static void dns_deal_ptr_answer(struct fio_nic *src,struct fio_rxdata *rxdata,
 		//dns_lcllog_cache_viewcount(view_id);
         
         //hyb_debug("Rarp Answer =>[%s] to user[%s:%d]\n",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
-        dns_rsyslog("Rarp Answer =>[%s] to user[%s:%d]",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
+        dns_rsyslog("Rarp Answer =>[%s][12] to user[%s:%d]",domain,inet_ntoa(*(struct in_addr *)&client->sin_addr.s_addr),ntohs(client->sin_port));
 
    // }
     
@@ -440,7 +440,7 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 		//dns_pktlog_cache(log_t,dst->sin_addr.s_addr,view_id,domain,len,NIC_EXTRA_CONTEXT(log_t)->me,dst->sin_port);
 
         //hyb_debug("Cache Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
-        dns_rsyslog("Cache Answer [view:%d]=>[%s] to user[%s:%d]",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
+        dns_rsyslog("Cache Answer [view:%d]=>[%s][%d] to user[%s:%d]",view_id,domain,type,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
 
         dns_lcllog_reqcnt_log(domain,len,view_id,NIC_EXTRA_CONTEXT(src)->me);
 		return 0;
@@ -468,7 +468,7 @@ static int dns_cache_answer_check(struct fio_nic *src,struct fio_txdata *txdata,
 		//dns_pktlog_cache(log_t,dst->sin_addr.s_addr,view_id,domain,len,NIC_EXTRA_CONTEXT(log_t)->me,dst->sin_port);
 
         //hyb_debug("Extche Answer [view:%d]=>[%s] to user[%s:%d]\n",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
-        dns_rsyslog("Extche Answer [view:%d]=>[%s] to user[%s:%d]",view_id,domain,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
+        dns_rsyslog("Extche Answer [view:%d]=>[%s][%d] to user[%s:%d]",view_id,domain,type,inet_ntoa(*(struct in_addr *)&dst->sin_addr.s_addr),ntohs(dst->sin_port));
 
 		return 0;
 

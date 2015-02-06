@@ -15,9 +15,101 @@
 <!--[if lt IE 9]>
     <script src="./js/html5.js"></script>
 <![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->   
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd">
+                <div style="float:left"><span style="background:url(__ROOT__/Public/img/lljk.png) no-repeat;"></span><h3>统计报表</h3></div>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a class="active" href="__APP__/FlowChart/index">总流量</a></li>
+                    <li><a href="__APP__/FlowChart/error">无效请求</a></li>                    
+                    <li><a href="__APP__/FlowChart/proportion">流量概况</a></li>
+                </ul>
+            </div>
+        </div>
+        <!--div id="sideMenu1" class="side">
+            <div class="hd">
+                <h3>历史统计</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/FlowChart/history">总流量</a></li>
+                    <li><a href="__APP__/FlowChart/error_history">无效请求</a></li>
+                    <li><a href="__APP__/FlowChart/history_proportion">流量概况</a></li>
+                </ul>
+            </div>
+        </div-->
+    </div>
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd",  trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd",  trigger:"click" });
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+    		
+		<!-- Tab切换 S -->
+		<div class="slideTxtBox">
+			<div class="hd">
+				<h2 style="float:left;">实时数据</h2>
+				<a href="__APP__/FlowChart/history">历史数据</a>
+			</div>
+            <div style="margin:20px 0px 0px 40px;">
+            	<label>选择设备：</label>
+                <select id="ip_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
+                	<option value="">全部</option>
+                    <volist name="ipList" id="item">
+	                	<option value="{$item}">{$item}</option>
+                    </volist>
+                </select>
+                <label>选择视图：</label>
+                <select id="view_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
+	                <option value="">全部</option>
+                    <volist name="viewList" id="item">
+	                	<option value="{$item.id}">{$item.name}</option>
+                    </volist>
+                </select>
+                <label style="margin-left:20px;">监控时间内最大并发：</label><span id="max_qps">-</span>    
+                <label style="margin-left:20px;">时间：</label><span id="max_time">-</span>                
+				<a style="margin-left:20px;color:#1c8fdf;text-decoration:underline" href="__APP__/FlowChart/history">查看历史数据</a>
+			</div>
+			<div class="bd">
+				<div id="container" style="min-width:700px;height:400px"></div>
+			</div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">	
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>
+<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.js"></script>
 <script type="text/javascript">
-var chart, last_query = "",result,max_num = 0, max_time = "";
-$(function(){
+var chart, last_query = "",result,max_num = 0, max_time = "",load_layer;
+$(function () {
+	load_layer = layer.load('正在加载数据...',2);
+	setInterval(function (){layer.close(load_layer);},2000);
 	var IP = '{$ip}',VIEW = '{$view}';
 	$("#ip_list").val(IP);	
 	$("#view_list").val(VIEW);	
@@ -206,92 +298,3 @@ function selectBy(){
 	window.location.href = url;
 }		
 </script>
-</head>
-<body>
-<!-- 头部 S -->
-<include file="Public:header" />
-<!-- 头部 e -->
-<div class="clear"></div>
-<div class="content"><!-- 内容 -->
-	<!-- left菜单 S -->   
-    <div style="float:left;width:172px;">
-        <div id="sideMenu" class="side">
-            <div class="hd">
-                <div style="float:left"><span style="background:url(__ROOT__/Public/img/lljk.png) no-repeat;"></span><h3>统计报表</h3></div>
-            </div>
-            <div class="bd">
-                <ul>
-                    <li><a style="color:#1c8fdf; text-decoration:underline;" href="__APP__/FlowChart/index">总流量</a></li>
-                    <li><a href="__APP__/FlowChart/error">无效请求</a></li>                    
-                    <li><a href="__APP__/FlowChart/proportion">流量概况</a></li>
-                </ul>
-            </div>
-        </div>
-        <!--div id="sideMenu1" class="side">
-            <div class="hd">
-                <h3>历史统计</h3>
-            </div>
-            <div class="bd">
-                <ul>
-                    <li><a href="__APP__/FlowChart/history">总流量</a></li>
-                    <li><a href="__APP__/FlowChart/error_history">无效请求</a></li>
-                    <li><a href="__APP__/FlowChart/history_proportion">流量概况</a></li>
-                </ul>
-            </div>
-        </div-->
-    </div>
-	<script type="text/javascript">
-		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
-		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
-    </script>
-	<!-- left菜单 E -->
-	
-	<!-- mainContent s -->
-	<div class="mainContent">
-    		
-		<!-- Tab切换 S -->
-		<div class="slideTxtBox">
-			<div class="hd">
-				<h2 style="float:left;">实时数据</h2>
-				<a href="__APP__/FlowChart/history">历史统计</a>
-			</div>
-            <div style="margin:20px 0px 0px 40px;">
-            	<label>选择设备：</label>
-                <select id="ip_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
-                	<option value="">全部</option>
-                    <volist name="ipList" id="item">
-	                	<option value="{$item}">{$item}</option>
-                    </volist>
-                </select>
-                <label>选择视图：</label>
-                <select id="view_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
-	                <option value="">全部</option>
-                    <volist name="viewList" id="item">
-	                	<option value="{$item.id}">{$item.name}</option>
-                    </volist>
-                </select>
-                <label style="margin-left:20px;">监控时间内最大并发：</label><span id="max_qps">-</span>    
-                <label style="margin-left:20px;">时间：</label><span id="max_time">-</span>                
-				<a style="margin-left:20px;color:#1c8fdf;text-decoration:underline" href="__APP__/FlowChart/history">查看历史统计</a>
-			</div>
-			<div class="bd">
-				<div id="container" style="min-width:700px;height:400px"></div>
-			</div>
-		</div>
-		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
-		<!-- Tab切换 E -->
-	</div>
-</div>
-<include file="Public:footer" />
-<script type="text/javascript">	
-	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
-	/*jQuery(".navBar").slide({ 
-		titCell:".nav .m", // 鼠标触发对象
-		mainCell:".subNav", // 切换对象包裹层
-		delayTime:0, // 效果时间
-		triggerTime:0, //鼠标延迟触发时间
-		returnDefault:true  //返回默认状态
-	});*/
-</script> 
-</body>
-</html>

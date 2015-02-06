@@ -29,9 +29,9 @@
 		</div>
 		<div class="bd">
 			<ul>
-				<li><a href="__APP__/Domainmgr/">免费域名列表</a></li>
-				<li><a href="__APP__/Domainmgr/vip">VIP域名列表</a></li>
-				<li><a style="color:#1c8fdf; text-decoration:underline;" href="__APP__/Domainmgr/addDomain">添加免费/VIP域名</a></li>
+				<li><a href="__APP__/Domainmgr/">免费域名</a></li>
+				<li><a href="__APP__/Domainmgr/vip">VIP域名</a></li>
+				<!--li><a class="active" href="__APP__/Domainmgr/addDomain">添加免费/VIP域名</a></li-->
 			</ul>
 		</div>
 		<!--div class="hd">
@@ -44,7 +44,7 @@
 			</ul>
 		</div-->
 	</div>
-	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });</script>
+	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd",  trigger:"click" });</script>
 	<!-- left菜单 E -->
 	
 	<!-- mainContent s -->
@@ -93,7 +93,7 @@
                                     </volist>
                                 </select>
                                  *</td>
-                                <td class="info">请选择账户</td>
+                                <td class="info">请选择类型</td>
                             </tr>
                             <tr>
                                 <td class="laber"></td> 	
@@ -147,7 +147,15 @@
 			}
 		});
 	}
-	
+	$(function(){
+		if('{$type}'==1){
+			$("#sideMenu .bd ul li a:eq(0)").addClass('active');
+			$("#sel_level").val(0);
+		}else{
+			$("#sideMenu .bd ul li a:eq(1)").addClass('active');
+			$("#sel_level").val(8);
+		}
+	});
 	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
 	/*jQuery(".navBar").slide({ 
 		titCell:".nav .m", // 鼠标触发对象

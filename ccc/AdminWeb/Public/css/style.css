@@ -51,16 +51,24 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 .logoBar h2{ margin-left: 158px; margin-top: -30px; width:80px; font-size: 17px;color:#666; border-bottom: 1px solid #666;}
 
 /* css */
-.navBar{  position:relative; width:100%; margin:0 auto; position:relative; z-index:1;  background:#1c8fdf; color:#fff; height:40px; line-height:40px;   }
+.navBar{  position:relative; width:100%; margin:0 auto; position:relative; z-index:1;  background:#1c8fdf; color:#fff; height:115px; }
+.navBar img{ float:left;width:60px; margin:-2px 9px;}
+.nav .m span{float:left; margin:-12px 0px; text-align:center; width:80px;}
 .navBar ul { width:1200px; margin:0 auto;}
 .nav{ overflow:hidden; zoom:1; }
 .nav .m{ float:left;  padding:0 10px; display:inline;  }
-.nav h3{ float:left;  font-size:100%; font-weight:normal; font-size:14px;  }
+.nav h3{ float:left;  font-size:100%; font-weight:normal; font-size:16px;width: 86px;}
 .nav .s{ float:left; width:3px; text-align:center; color:#75c7f2;   }
-.nav h3 a{ float:left;  display:block; padding:0 10px; color:#fff;   }
-.nav .on h3 a{ height:36px; line-height:36px; background:#fff; margin-top:4px;  color:#1c8fdf; text-decoration:none;  }
+.nav h3 a{ float:left;  display:block; color:#fff; margin-top:24px;height: 72px;width: 80px;line-height:36px;}
+.nav .on h3 a{ height: 75px; width:80px; line-height:36px; background:#fff; margin-top:24px;  color:#1c8fdf; text-decoration:none;border-radius:4px;-o-border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;}
+.navIco{  position:relative; width:100%; margin:0 auto; position:relative; z-index:1;  background:#1c8fdf; color:#fff; height:66px; line-height:40px;   }
+.navIco ul { width:1200px; margin:0 auto;}
+.navIco img{ height: 65px; margin:5px 15px;}
+.navIco ul li{width:104px; padding:0 !important;}
 
-.navBar ul div { float:right; padding:0px; font:normal 13px/20px "Microsoft YaHei"; }
+
+
+.navBar ul div { float:right; padding:0px; font:normal 13px/20px "Microsoft YaHei"; margin-top:50px;}
 .navBar ul div  a{ margin:0px;}
 .navBar ul div .notification{ margin-left:6px;}
 .navBar ul div .name{font-size:13px;line-height:45px;display:inline-block;float:left;}
@@ -81,6 +89,8 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 .table-toolbar button { color:#333;border:solid 1px #d0d0d0;background:#f1f1f1;padding: 0 10px;height:26px;line-height:25px;vertical-align: middle;margin:0px 4px 0px 4px;display: inline-block;overflow:hidden;cursor:pointer; }
 .table-toolbar button:hover { border: solid 1px #1c8fdf; }
 .table-toolbar .lf span, .table-toolbar .lf a {margin-left:12px;}
+.table-toolbar .addbtn{ padding:5px 10px; color:#fff; background:#1c8fdf;-o-border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;margin-left:0px !important; text-decoration:none;}
+.table-toolbar .addbtn:hover{box-shadow: 0px 0px 5px #1c8fdf;-o-box-shadow: 0px 0px 5px #1c8fdf;-webkit-box-shadow: 0px 0px 5px #1c8fdf;-moz-box-shadow: 0px 0px 5px #1c8fdf;}
 
 /* 左菜单 */
 #sideMenu,#sideMenu1,#sideMenu2 { padding:0 1px; overflow:hidden; margin-bottom:10px; border: 1px solid #f3f3f3; font: normal 14px/20px "Microsoft YaHei";color:#666;}
@@ -89,9 +99,12 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 #sideMenu .hd h3,#sideMenu1 .hd h3,#sideMenu2 .hd h3 { font-weight:bold; font-size:13px; float:left}
 #sideMenu .on,#sideMenu1 .on,#sideMenu2 .on { background:url(../img/icons.png) #1c8fdf 148px -77px no-repeat; }
 #sideMenu .on h3,#sideMenu1 .on h3,#sideMenu2 .on h3{ color:#fff; }
-#sideMenu .bd,#sideMenu1 .bd,#sideMenu2 .bd { padding:10px 0 10px 20px; overflow:hidden; display:none; }
-#sideMenu .bd a,#sideMenu1 .bd a,#sideMenu2 .bd a{ letter-spacing:1px;}
-#sideMenu .bd li,#sideMenu1 .bd li,#sideMenu2 .bd li { height:28px; line-height:28px; overflow:hidden; }
+#sideMenu .bd,#sideMenu1 .bd,#sideMenu2 .bd { /*padding:10px 0 10px 20px;*/ overflow:hidden; display:none; }
+#sideMenu .bd li,#sideMenu1 .bd li,#sideMenu2 .bd li{ margin:2px 0px 2px 0px; width:168px;height:30px; line-height:30px;}
+/*#sideMenu .bd a,#sideMenu1 .bd a,#sideMenu2 .bd a{ display:inline-block; width:136px;height:30px; margin-left:6px;border-radius:3px;-moz-border-radius:3px;-o-border-radius:3px;-webkit-border-radius:3px; padding-left:20px;}*/
+#sideMenu .bd a,#sideMenu1 .bd a,#sideMenu2 .bd a{ display:inline-block; width:142px;height:30px; padding-left:20px;border-left:3px solid #ccc; color:#999;}
+#sideMenu .bd a:hover,#sideMenu1 .bd a:hover,#sideMenu2 .bd a:hover{background:#f5f5f5; text-decoration:none;}
+#sideMenu .bd .active ,#sideMenu1 .bd .active ,#sideMenu2 .bd .active{/* background:#1c8fdf; color:#fff;*/border-left:3px solid #1c8fdf; color:#1c8fdf; background:#f5f5f5}
 #sideMenu .bd li span,#sideMenu1 .bd li span,#sideMenu2 .bd li span { color:#999; margin-right:5px; }
 
 
@@ -109,7 +122,8 @@ select { color: #333; height: 24px; line-height: 24px; border: 1px solid #eee; b
 /* Tab切换 */
 .slideTxtBox { float:left;  width:100%; height:100%; overflow:hidden;  padding:0 0 0 10px; background:#fff;  text-align:left;  }
 .slideTxtBox .hd { height:34px; line-height:34px; padding:0 0; border-bottom:2px solid #1c8fdf; font-size:14px; }
-.slideTxtBox .hd a, .slideTxtBox .hd h2{float:left;margin-left:5px;border:2px solid #1c8fdf; border-bottom:none; padding:0px 10px; cursor:pointer;}
+.slideTxtBox .hd a, .slideTxtBox .hd h2{float:left;margin-left:5px;border:2px solid #1c8fdf; border-bottom:none; padding:0px 10px; cursor:pointer; color:#999; text-decoration:none;}
+.slideTxtBox .hd a:hover{box-shadow: 0px 0px 5px #1c8fdf;-o-box-shadow: 0px 0px 5px #1c8fdf;-webkit-box-shadow: 0px 0px 5px #1c8fdf;-moz-box-shadow: 0px 0px 5px #1c8fdf;}
 .slideTxtBox .hd h2{ margin:0; background:#1c8fdf; color:#fff; font-weight:bold;}
 .slideTxtBox .hd ul { overflow:hidden; zoom:1; }
 .slideTxtBox .hd ul { float:right; }

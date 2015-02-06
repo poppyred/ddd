@@ -51,7 +51,8 @@
 			});
 			//拼凑line数据
 			for(var key in lineData){
-				var t = Date.parse(key.replace(/-/g,"/"));
+				var tem = key.replace(/-/g,"/");
+				var t = Date.parse(tem.substring(0,tem.length-2));
 				myLineData.push([t, parseInt(lineData[key])]);
 			}
 			chart_line = new Highcharts.Chart({

@@ -29,9 +29,9 @@
 		</div>
 		<div class="bd">
 			<ul>
-				<li><a href="__APP__/Clientmgr/">个人客户管理</a></li>
-				<li><a style="color:#1c8fdf; text-decoration:underline;" href="__APP__/Clientmgr/vip">企业客户管理</a></li>
-				<li><a href="__APP__/Clientmgr/addClient">添加个人/企业用户</a></li>
+				<li><a href="__APP__/Clientmgr/">个人客户</a></li>
+				<li><a class="active" href="__APP__/Clientmgr/vip">企业客户</a></li>
+				<!--li><a href="__APP__/Clientmgr/addClient">添加个人/企业用户</a></li-->
 			</ul>
 		</div>
 		<!--div class="hd">
@@ -44,20 +44,20 @@
 			</ul>
 		</div-->
 	</div>
-	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });</script>
+	<script type="text/javascript">jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd",  trigger:"click" });</script>
 	<!-- left菜单 E -->	
 	<!-- mainContent s -->
 	<div class="mainContent">		
 		<!-- Tab切换 S -->
 		<div class="slideTxtBox">
 			<div class="hd">
-				<h2 style="float:left;">个人客户列表</h2>
+				<h2 style="float:left;">企业客户列表</h2>
 			</div>
 			<div class="bd">
 				<ul>
 					<div class="table-toolbar">
-						<div class="lf">共
-							{$page}
+						<div class="lf">
+                        	<a class="addbtn" href="__APP__/Clientmgr/addClient?type=2">添加客户</a>
 						</div>
 						<div class="rf" style="margin-right:10px;"> 
 							<input class="ui-ipt-txt ui-ipt-search " submit-with=".J_btnSubmitSearch" value="{$mail}" type="text" placeholder="请输入关键字词">
@@ -114,7 +114,8 @@
 						</tbody> 
 					</table>
 				</ul>
-			</div>
+			</div>            
+            <div class="table-toolbar" style="border-bottom:none;border-top: solid 1px #eaeaea;"><div class="lf" >共{$page}</div></div>
 		</div>
 		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
 		<!-- Tab切换 E -->

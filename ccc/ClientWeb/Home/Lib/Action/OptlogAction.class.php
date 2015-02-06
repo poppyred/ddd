@@ -23,20 +23,16 @@ class OptlogAction extends BaseAction {
 			$this->assign("count",0);	
 		}
 		
-		
-//		print_r($list);exit;
-		
 		$kk = 0;
 		$i = 0;
 		$newlist = array();
-		foreach($list as $key => $val){
+		for($o=count($list)-1;$o>=0;$o--){
 			$i ++;
-			$newlist[$kk][$key] = $val;			
-			if($i==10){
+			$newlist[$kk][$i] = $list[$o];
+			if($i % 10 == 0){
 				$kk ++ ;
 			}
 		}
-			
 		$page = 1;
 		if(!empty($_GET['p'])){
 			$page = $_GET['p'];

@@ -94,7 +94,8 @@ class ClientmgrAction extends BaseAction {
 		}
 	}
 	public function addClient(){
-		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){			
+			$this->assign('type',$_GET['type']);
 			$this->display();
 		}else{
 			if(!empty($_POST['mail']) && !empty($_POST['pwd']) && !empty($_POST['type'])){

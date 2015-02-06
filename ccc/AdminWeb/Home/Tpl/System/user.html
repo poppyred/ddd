@@ -29,8 +29,8 @@
             </div>
             <div class="bd">
                 <ul>
-                    <li><a style="color:#1c8fdf; text-decoration:underline;" href="__APP__/System/user">系统用户列表</a></li>
-                    <li><a href="__APP__/System/addUser">添加系统用户</a></li>
+                    <li><a class="active" href="__APP__/System/user">系统用户列表</a></li>
+                    <!--li><a href="__APP__/System/addUser">添加系统用户</a></li-->
                 </ul>
             </div>
         </div>
@@ -45,7 +45,7 @@
 			</ul>
 		</div-->
 	<script type="text/javascript">
-		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", effect:"slideDown", trigger:"click" });
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", trigger:"click" });
     </script>
 	<!-- left菜单 E -->
 	
@@ -59,6 +59,11 @@
 			</div>
 			<div class="bd">
 				<ul>
+                	<div class="table-toolbar">
+						<div class="lf">                        
+                        	<a class="addbtn" href="__APP__/System/addUser">添加用户</a>
+						</div>
+                    </div>
 					<table class="ui-table" cellpadding="0" cellspacing="0" width="100%" id="mytab">
 						<thead>
 						<tr id="tr_title">
