@@ -233,7 +233,7 @@
 						return;
 					}
 				}
-				if(type=='CNAME' || type=='MX' || type=='NS'){
+				if(type=='CNAME' || type=='MX' || type=='NS' || type=='FORWARD_URL'){
 					if(!checkDomain(val)){
 						tr.find("#val").focus();				
 						layer.msg('记录值的格式不正确',2,5);
@@ -276,6 +276,7 @@
 							trnext.hide();
 						}else{
 							tr.empty();
+							trnext.hide();
 						}
 					},
 					error:function(data){						
@@ -337,6 +338,9 @@
 			}else{
 				status = '';
 			}
+			if(type=="FORWARD_URL"){
+				type = "URL转发";
+			}
 			var str = '<td class="chk"><input type="checkbox" class="data_chk" value="'+id+'"></td><td class="status">'+status+'</td><td class="rr" onclick="editTable(this)">'+ rr +'</td><td class="type" onclick="editTable(this)">'+ type +'</td><td class="route" onclick="editTable(this)">'+ route +'</td><td class="val" onclick="editTable(this)">'+ val +'</td><td class="mx" onclick="editTable(this)">'+ mx +'</td><td class="ttl" onclick="editTable(this)">'+ ttl +'</td><td class="iop"><a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a><a class="icon-add" title="编辑备注" href="javascript:void(0);" onClick="editDesc(this,'+ id +');"></a></td>'	;
 			return str;
 		}
@@ -351,17 +355,16 @@
 					tr = $(obj).parent();
 				}
 				var trnext=$(tr).next(),				
-					type = tr.find(".type").html(),			//记录类型
-					rr = tr.find(".rr").html(),				//主机记录
-					route = tr.find(".route").html(),		//解析线路
-					val = tr.find(".val").html(),			//记录值
-					mx = tr.find(".mx").html(),				//MX优先级
-					ttl = tr.find(".ttl").html(),			//TTL
-					id = tr.find('input').val(),			
+					type = tr.find(".type").html().trim(),			//记录类型
+					rr = tr.find(".rr").html().trim(),				//主机记录
+					route = tr.find(".route").html().trim(),		//解析线路
+					val = tr.find(".val").html().trim(),			//记录值
+					mx = tr.find(".mx").html().trim(),				//MX优先级
+					ttl = tr.find(".ttl").html().trim(),			//TTL
+					id = tr.find('input').val().trim(),			
 					str='<select class="ui-select" style="width:40px;" id="mx" onFocus="showInfo(\'mx\',this)">',
 					img = tr.find('.status img').attr('src'),
 					spancls = "";
-					
 					tr.attr("class","row-opened");
 					if(type=='MX'){
 						for(var i=0;i<10;i++){
@@ -390,9 +393,17 @@
 					}else{
 						str_status = 'start';
 					}
-					tr.html('<td class="chk"><input type="hidden" value="'+id+'" id="id"/></td><td class="status"><input id="status" type="hidden" value="'+str_status+'"/></td><td class="rr"><input value="'+ rr +'" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+zone+'">.'+zone+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="'+ val +'" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">'+ str +'</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'update\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelOpt(this,'+id+',\''+ type +'\',\''+ rr +'\',\''+ route +'\',\''+ val +'\',\''+ mx +'\',\''+ ttl +'\',\''+ str_status +'\')">取消</button><span id="icon_open_close" class="'+spancls+'" onclick="slideInfo(this)"></span></td>');
+					if(type=="URL转发"){
+						type = "FORWARD_URL";
+					}
+					tr.html('<td class="chk"><input type="hidden" value="'+id+'" id="id"/></td><td class="status"><input id="status" type="hidden" value="'+str_status+'"/></td><td class="rr"><input value="'+ rr +'" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+zone+'">.'+zone+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="'+ val +'" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">'+ str +'</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'update\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelOpt(this,'+id+',\''+ type +'\',\''+ rr +'\',\''+ route +'\',\''+ val +'\',\''+ mx +'\',\''+ ttl +'\',\''+ str_status +'\')">取消</button><span id="icon_open_close" class="'+spancls+'" onclick="slideInfo(this)"></span></td>');
 					//绑定下拉框值
 					tr.find("#type").val(type);
+					/* :option").each(function(){
+						if($(this).val()==type){
+							$(this).val(type);
+						}
+					})*/
 					tr.find("#route option").each(function(){
 						if($(this).text()==route){
 							$(this).attr('selected','selected');
@@ -539,7 +550,7 @@
 				if(!$("#add_row").html()){
 				var option = $("#viewOpt").html();// + returnOptStr();
 				//option = option + add_str;
-					$('#myData').prepend('<tr class="row-opened" id="add_row"><td class="chk"></td><td class="status"></td><td class="rr"><input value="" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+$("#txt_zone").val()+'">.'+$("#txt_zone").val()+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">--</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'add\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelAdd()">取消</button><span id="icon_open_close" class="ui-help J_btnToggleHelp ui-help-opened" onclick="slideInfo(this)"></span></td></tr><tr class="msg_info" id="tx_0"><td colspan="9" class="expand-outer">'+info_val+'</td></tr>');
+					$('#myData').prepend('<tr class="row-opened" id="add_row"><td class="chk"></td><td class="status"></td><td class="rr"><input value="" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+$("#txt_zone").val()+'">.'+$("#txt_zone").val()+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">--</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'add\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelAdd()">取消</button><span id="icon_open_close" class="ui-help J_btnToggleHelp ui-help-opened" onclick="slideInfo(this)"></span></td></tr><tr class="msg_info" id="tx_0"><td colspan="9" class="expand-outer">'+info_val+'</td></tr>');
 					//$("#add_row").after();
 					//$("#add_row").next().children().html(info_val);			
 					var tr = $("#add_row");
@@ -841,6 +852,9 @@
 			}else{
 				str_isEdit = 'data';
 			}
+			if(type=="FORWARD_URL"){
+				type = "URL转发"	;
+			}
 			$('#myData').prepend('<tr class="'+str_isEdit+'"><td class="chk"><input type="checkbox" '+dis+' class="data_chk" value="'+id+'"></td><td class="status">'+str_ison+'</td><td class="rr" onclick="editTable(this)">'+host+'</td><td class="type" onclick="editTable(this)">'+type+'</td><td class="route" onclick="editTable(this)">'+bindRoute(route)+'</td><td class="val" onclick="editTable(this)">'+val+'</td><td class="mx" onclick="editTable(this)">'+mx+'</td><td class="ttl" onclick="editTable(this)">'+ttl+'</td><td class="iop"><a class="icon-manage" title="编辑" href="javascript:void(0);" onClick="editTable(this);"></a><a class="icon-add" title="编辑备注" href="javascript:void(0);" onClick="editDesc(this,'+id+');"></a></td></tr><tr style="display:none" class="msg_info" id="tx_'+id+'"><td colspan="9" class="expand-outer">'+info_val+'</td></tr><tr style="display:none" class="edit_desc"><td colspan="9" class="expand-outer fix"><div style="position: relative;"><div class="patch-left"></div><div class="patch-right"></div><div class="expand-box"><b class="expand-box-arr">◆<b class="expand-box-arr-in">◆</b></b><div class="remark-box fix J_remarkBox"><label class="lbl">备注：</label><textarea class="ui-textarea J_remarkTextarea" rows="3" maxlength="200" onKeyUp="wordsLimit(this)">'+desc+'</textarea><div class="btm"><span class="info J_countInfo">最多还可写<b>200</b>个字</span><button class="ui-btn-blue btn-add J_btnSubmitRemark" onClick="saveEditDesc(this)">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleRemark" onClick="cancelEditDesc(this)">取消</button></div></div></div></div></td></tr>');
 		}
 		//字数限制
@@ -900,7 +914,7 @@
 				});*/
 				selectByWhere();
 			}else{
-				messageBox('message','请输入主机记录（支持模糊查询）');
+				layer.msg('请输入主机记录（支持模糊查询）',2,5);
 				//pageReload(0);
 			}
 		}
@@ -1006,6 +1020,7 @@
                         <option value="NS">NS</option>
                         <option value="TXT">TXT</option>
                         <option value="AAAA">AAAA</option>
+                        <option value="FORWARD_URL">URL转发</option>
                     </select>
                     <select class="ui-select" id="sel_view" onChange="selectByWhere()">
                     	<option value="">所有线路</option>
@@ -1078,7 +1093,13 @@
                                 <else/><td class="status"></td>
                             </if>
 						    <td class="rr" onclick="editTable(this)">{$record.host}</td>
-						    <td class="type" onclick="editTable(this)">{$record.type}</td>
+						    <td class="type" onclick="editTable(this)">
+                            	<if condition="$record[type] == 'FORWARD_URL' ">
+                                    URL转发
+                                    <else/>
+                                    {$record[type]}
+                                </if>
+                            </td>
 						    <if condition="$record[view] == 0">
 							<td class="route" onclick="editTable(this)">默认</td>
 							<else/>

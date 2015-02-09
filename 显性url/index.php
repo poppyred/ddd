@@ -17,22 +17,29 @@ $sql = "select * from `http_ref` where `src` = '$request' ";
 	$num_rows = mysql_num_rows($result);
 	if ($num_rows == NULL)
     {
-        echo "数据为空";
+        jump('');
         exit;
     }
 	while( ($row = mysql_fetch_array($result)) ) 
 	{
 		#print_r($row);
 		$dst = $row['dst']; 
+		jump($dst);
 	}
 	
-	
-$url = "http://".$dst;
-#$url="http://www.eflydns.com"; 
-echo "<script language=\"javascript\">"; 
-echo "window.location= \"$url\"";
-echo "</script>"
 
+function jump($dst)
+{
+	if (!$dst)
+	{
+		$dst = "www.eflydns.com";
+	}
+	$url = "http://".$dst;
+	#$url="http://www.eflydns.com"; 
+	echo "<script language=\"javascript\">"; 
+	echo "window.location= \"$url\"";
+	echo "</script>";
+}
 ?>
 
 

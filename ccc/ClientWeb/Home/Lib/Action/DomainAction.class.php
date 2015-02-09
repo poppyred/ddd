@@ -639,12 +639,33 @@ class DomainAction extends BaseAction {
 		//////
 		$is_ok = $domain->add($data);
 		if($is_ok){
+			//URL转发
+			if($data['type']=='FORWARD_URL'){
+				//推送后台添加固定CNAME记录  cname.eflydns.com
+				$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, 'CNAME'=>rawurlencode(strtolower("cname.eflydns.com")), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+				$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+				$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+				$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+				$rslt = json_decode($ret["content"],true);
+				if($rslt['ret']!=0){
+					$this->ajaxReturn(0,'添加失败，联系管理员',0);
+				}
+				$forward = file_get_contents("http://dnspro-url/dns_http_ref.php?opt=add&src=".strtolower($data['host']).".".$_POST['zone']."&dst=".$data['val']);
+				$list = json_decode($forward,true);
+				if($list['ret']!=0){
+					$this->ajaxReturn(0,'添加的URL地址已存在，请重新输入。',0);
+				}
+			}else{			
 			//域名添加记录
-			$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
-			$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
-			$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
-			$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
-			$rslt = json_decode($ret["content"],true);
+				$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+				$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+				$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+				$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+				$rslt = json_decode($ret["content"],true);
+				if($rslt['ret']!=0){
+					$this->ajaxReturn(0,'添加失败，联系管理员',0);
+				}
+			}
 			//别名添加记录
 			$bmlist = $zone->query("select * from zone_name zn left join zone z on z.id=zn.zone_id where z.domain='".$_POST['zone']."'");
 			if(!empty($bmlist)){
@@ -692,7 +713,7 @@ class DomainAction extends BaseAction {
 		$domain = M('domain');
 		$zone = M('zone');
 		//时间间隔
-		$up_time = $domain->where('id='.$_POST['id'])->getField('up_time');
+		$up_time = $domain->where('id='.$_POST['id'])->getField('up_time');		
 		if(strtotime(date("Y-m-d H:i:s"))-strtotime($up_time)<10){
 			$this->ajaxReturn('请不要频繁修改解析记录。','error',0);
 		}
@@ -724,16 +745,36 @@ class DomainAction extends BaseAction {
 		//$datae = json_encode(array("data" => $data['val']));
 		//$data_url = http_build_query ($datae);
 		//print_r($data_url);exit; 
-		
-		$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$_POST['id'], $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
-		$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
-		$param = array("type"=>"record", "opt"=>"set", "data"=>$val,"user"=>$user);
-		$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
-		$rslt = json_decode($ret["content"],true);
+		//URL转发
+		if($data['type']=='FORWARD_URL'){
+			//推送后台添加固定CNAME记录  cname.eflydns.com
+			$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, 'CNAME'=>rawurlencode(strtolower("cname.eflydns.com")), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+			$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+			$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+			$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+			$rslt = json_decode($ret["content"],true);
+			if($rslt['ret']!=0){
+				$this->ajaxReturn(0,'修改失败，联系管理员',0);
+			}
+			$forward = file_get_contents("http://dnspro-url/dns_http_ref.php?opt=edit&src=".strtolower($data['host']).".".$_POST['zone']."&dst=".$data['val']."&oldsrc=".$brfore_update_entity['host'].".".$_POST['zone']."&olddst=".$brfore_update_entity['val']);				
+			$list = json_decode($forward,true);
+			if($list['ret']!=0){
+				$this->ajaxReturn(0,'修改的URL地址已存在，请重新输入。',0);
+			}
+		}else{
+			$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$_POST['id'], $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+			$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+			$param = array("type"=>"record", "opt"=>"set", "data"=>$val,"user"=>$user);
+			$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+			$rslt = json_decode($ret["content"],true);
+			if($rslt['ret']!=0){
+				$this->ajaxReturn(0,'修改失败，联系管理员',0);
+			}
+		}
 		//别名修改记录
 		$bmlist = $zone->query("select * from zone_name zn left join zone z on z.id=zn.zone_id where z.domain='".$_POST['zone']."'");
 		if(!empty($bmlist)){
-			foreach($bmlist as $value){
+			foreach($bmlist as $value){				
 				$val = array("name"=>strtolower($data['host']).".".$val['name'], "main"=>$val['name'], "rid"=>(int)$_POST['id'] + (int)str_pad(1,17,'0',STR_PAD_RIGHT), $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
 				$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
 				$param = array("type"=>"record", "opt"=>"set", "data"=>$val,"user"=>$user);
@@ -770,13 +811,31 @@ class DomainAction extends BaseAction {
 			$vo = $zone->where('domain="'.$_POST['zone'].'"')->select();
 			$retnum = 0; $error = "";
 			for($i=0;$i<count($arr);$i++){
-				//域名删除记录
 				$data = $domain->where('id='.$arr[$i])->find();
-				$val = array("rid"=>(int)$arr[$i], $data['type']=>$data['val']);
-				$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
-				$param = array("type"=>"record", "opt"=>"del", "data"=>$val,"user"=>$user);
-				$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
-				$rslt = json_decode($ret["content"],true);
+				if($data['type']=='FORWARD_URL'){
+					//url转发
+					$val = array("rid"=>(int)$arr[$i], "CNAME"=>strtolower($data['val']));
+					$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+					$param = array("type"=>"record", "opt"=>"del", "data"=>$val,"user"=>$user);
+					$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+					$rslt = json_decode($ret["content"],true);
+					if($rslt['ret']!=0){
+						$this->ajaxReturn(0,'删除失败，联系管理员',0);
+					}
+					$forward = file_get_contents("http://dnspro-url/dns_http_ref.php?opt=del&src=".strtolower($data['host']).".".$_POST['zone']."&dst=".$data['val']);				
+					$list = json_decode($forward,true);					
+					if($list['ret']!=0){
+						$this->ajaxReturn(0,'删除失败，联系管理员',0);
+					}
+				}else{				
+					//域名删除记录
+					$data = $domain->where('id='.$arr[$i])->find();
+					$val = array("rid"=>(int)$arr[$i], $data['type']=>$data['val']);
+					$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+					$param = array("type"=>"record", "opt"=>"del", "data"=>$val,"user"=>$user);
+					$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+					$rslt = json_decode($ret["content"],true);
+				}
 				//别名删除记录
 				$bmlist = $zone->query("select * from zone_name zn left join zone z on z.id=zn.zone_id where z.domain='".$_POST['zone']."'");
 				if(!empty($bmlist)){

@@ -12,11 +12,22 @@
 	$(function(){		
 		$(".navBar ul li").hover(function(){
 			$(".navBar ul li").removeClass('on');
+			$(".navBar ul li").each(function(){
+				var src = $(this).find('img').attr('src');
+				src = src.replace(/2.png/,'.png');
+				$(this).find('img').attr('src',src);
+			});
 			$(this).addClass('on');
+			$(this).find('img').attr('src',$(this).find('img').attr('src').replace(/.png/,"2.png"));
 		},function(){
 			$(this).removeClass('on');			
 		});
 		$(".navBar ul li").mouseleave(function(){
+			$(".navBar ul li").each(function(){
+				var src = $(this).find('img').attr('src');
+				src = src.replace(/2.png/,'.png');
+				$(this).find('img').attr('src',src);
+			});
 			showOrHide();
 		});
 		showOrHide();
@@ -27,9 +38,11 @@
 			switch(true){
 				case url.indexOf('FlowChart')!=-1:
 				$(".navBar ul li:eq(0)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_lljk2.png');
 				break;
 				case url.indexOf('System')!=-1:
 				$(".navBar ul li:eq(1)").addClass('on');
+				$(".navBar ul li a:eq(1)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
 				break;
 			}
 		}else if(level == 1 ){
@@ -40,39 +53,42 @@
 				break;
 				case url.indexOf('Clientmgr')!=-1:
 				$(".navBar ul li:eq(1)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_khgl2.png');
+				$(".navBar ul li a:eq(1)").find('img').attr('src','__ROOT__/Public/img/head_khgl2.png');
 				break;
 				case url.indexOf('Domainmgr')!=-1:
 				$(".navBar ul li:eq(2)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_ymgl2.png');
+				$(".navBar ul li a:eq(2)").find('img').attr('src','__ROOT__/Public/img/head_ymgl2.png');
 				break;
 				case url.indexOf('Runmgr')!=-1:
 				$(".navBar ul li:eq(3)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_xlgl2.png');
+				$(".navBar ul li a:eq(3)").find('img').attr('src','__ROOT__/Public/img/head_xlgl2.png');
 				break;
 				case url.indexOf('System/user')!=-1 || url.indexOf('System/addUser')!=-1 || url.indexOf('System/editUser')!=-1:
 				$(".navBar ul li:eq(4)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_zhqx2.png');
+				$(".navBar ul li a:eq(4)").find('img').attr('src','__ROOT__/Public/img/head_zhqx2.png');
 				break;
 				case url.indexOf('System')!=-1:
 				$(".navBar ul li:eq(6)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
+				$(".navBar ul li a:eq(6)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
 				break;
 				case url.indexOf('ReverseDomain')!=-1:
 				$(".navBar ul li:eq(5)").addClass('on');
-				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_fxjx2.png');
+				$(".navBar ul li a:eq(5)").find('img').attr('src','__ROOT__/Public/img/head_fxjx2.png');
 				break;
 			}
 		}else if( level == 2 ){
 			switch(true){
 				case url.indexOf('Clientmgr')!=-1:
 				$(".navBar ul li:eq(0)").addClass('on');
+				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_khgl2.png');
 				break;
 				case url.indexOf('Domainmgr')!=-1:
 				$(".navBar ul li:eq(1)").addClass('on');
+				$(".navBar ul li a:eq(1)").find('img').attr('src','__ROOT__/Public/img/head_ymgl2.png');
 				break;
 				case url.indexOf('ReverseDomain')!=-1:
 				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li a:eq(2)").find('img').attr('src','__ROOT__/Public/img/head_fxjx2.png');
 				break;
 			}
 		}	
