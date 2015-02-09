@@ -1,0 +1,64 @@
+#	$Id: 2013-05-23 likunxiang$
+#
+
+FIONAME =exe/run_fio
+ZKNAME =exe/zk_snd
+
+CLEANFILES = $(FIONAME) $(ZKNAME) exe/*.o 
+INCLUPATH = -I ../sys -I inc -I libcommon/inc
+CFLAGS = -pipe 
+#CFLAGS += -O2
+CFLAGS += -g
+#CFLAGS += -Werror 
+CFLAGS += -Wall
+#CFLAGS += -Wextra 
+ifeq (${MYRELVAL},)
+CFLAGS   += -D__FIO_RELEASE__ -DUSE_BF_OCCUPY
+else ifeq (${MYRELVAL}, 1)
+CFLAGS   += -D__FIO_RELEASE__ -DUSE_BF_OCCUPY
+endif
+
+LIBPATH = -L ./
+
+LDFLAGS += -lfio_as
+LDFLAGS += -lrt -lpthread
+
+SUBDIR = src
+
+FIOOBJS = exe/fio.o 
+ZKOBJS = exe/zk_snd.o 
+
+
+%.o:	%.c
+	$(CC) $(CFLAGS) $(INCLUPATH) -c -o $@ $<
+
+all: $(FIONAME)
+
+zk: $(ZKNAME)
+
+odr: run_fio_odr
+
+$(FIONAME): $(FIOOBJS)
+	for dir in $(SUBDIR); \
+		do $(MAKE) -C $$dir || exit 1; \
+		done
+	$(CC) $(CFLAGS) -o $@ $^  $(LIBPATH) $(LDFLAGS)
+
+$(ZKNAME): $(ZKOBJS)
+	for dir in $(SUBDIR); \
+		do $(MAKE) -C $$dir || exit 1; \
+		done
+	$(CC) $(CFLAGS) -o $@ $^  $(LIBPATH) $(LDFLAGS)
+
+run_fio_odr: $(FIOOBJS)
+	for dir in $(SUBDIR); \
+		do $(MAKE) -f Makefile_odr -C $$dir || exit 1; \
+		done
+	$(CC) $(CFLAGS) -o $(FIONAME) $^  $(LIBPATH) $(LDFLAGS)
+
+clean:
+	-@rm -rf $(CLEANFILES)
+	for dir in $(SUBDIR); \
+		do $(MAKE) -C $$dir clean || exit 1; \
+		done
+
