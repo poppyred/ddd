@@ -961,8 +961,6 @@ int fio_send(struct fio_nic *dnic, uint16_t data_len, struct fio_txdata *txd, in
     struct pktudp *ppkt = (struct pktudp*)txd->pbuf;
     struct ether_header *eh = &ppkt->eh;
 	
-	//稳定后要置0
-
     struct ip *ip = &ppkt->ip;
     struct udphdr *udp = &ppkt->udp;
     int pkt_size = g_payload_offset+ntohs(data_len);
@@ -970,12 +968,15 @@ int fio_send(struct fio_nic *dnic, uint16_t data_len, struct fio_txdata *txd, in
     if (!txd->dmac)
     {
         if (0 != fio_route_find(dnic, ntohl(txd->dstip), &sip, &dev_idx, &nip))
+        {
+            OD( "<ERROR> tid %d %s send pkt can't find route!", NIC_EXTRA_CONTEXT(dnic)->me, dnic->alise);
             goto err;
+        }
         if (dev_idx != dnic->type_id)
-    {
+        {
             dnic = &NIC_EXTRA_CONTEXT(dnic)->nics[dev_idx];
             chnic = 1;
-}
+        }
         get_ret = fio_mac_get_bynip(dnic, nip, &txd->dmac, sip);
         ip->ip_src.s_addr = htonl(sip);
     }
@@ -1024,8 +1025,8 @@ int fio_send(struct fio_nic *dnic, uint16_t data_len, struct fio_txdata *txd, in
         }
         else
         {
-        bcopy(txd->dmac, eh->ether_dhost, ETH_ALEN);
-        snd_ret = fio_nic_commit(dnic, txd, 1);
+            bcopy(txd->dmac, eh->ether_dhost, ETH_ALEN);
+            snd_ret = fio_nic_commit(dnic, txd, 1);
         }
     }
     else
@@ -1034,18 +1035,18 @@ int fio_send(struct fio_nic *dnic, uint16_t data_len, struct fio_txdata *txd, in
         snd_ret = fio_mac_cache_pkt(dnic, nip, txd);
     }
 #ifdef debug_dns
-        char str_sip[16];
-        char str_dip[16];
-        inet_ntop(AF_INET, &ip->ip_src.s_addr, str_sip, 16);
-        inet_ntop(AF_INET, &ip->ip_dst.s_addr, str_dip, 16);
-        OD( "tid %d %s send pkt type %d srcip %s dstip %s", 
-                NIC_EXTRA_CONTEXT(dnic)->me, dnic->alise, txd->type, str_sip, str_dip);
+    char str_sip[16];
+    char str_dip[16];
+    inet_ntop(AF_INET, &ip->ip_src.s_addr, str_sip, 16);
+    inet_ntop(AF_INET, &ip->ip_dst.s_addr, str_dip, 16);
+    OD( "tid %d %s send pkt type %d srcip %s dstip %s", 
+            NIC_EXTRA_CONTEXT(dnic)->me, dnic->alise, txd->type, str_sip, str_dip);
 #endif
 go_out:
-   return snd_ret;
+    return snd_ret;
 err:
-   snd_ret = -1; 
-   goto go_out;
+    snd_ret = -1; 
+    goto go_out;
 }
 int fio_nic_sendmsg_(struct fio_nic *nic, uint16_t data_len, struct fio_txdata *txd, int need_csum)
 { 
@@ -1059,7 +1060,7 @@ int fio_nic_sendmsg_(struct fio_nic *nic, uint16_t data_len, struct fio_txdata *
     struct ip *ip = &ppkt->ip;
     struct udphdr *udp = &ppkt->udp;
     int pkt_size = g_payload_offset+ntohs(data_len);
-    
+
     fio_nic_include_txd(&nic, txd);
 
     if (!txd->dmac)

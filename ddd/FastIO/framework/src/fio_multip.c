@@ -455,7 +455,9 @@ int fio_mp_fetchips()
             for (j = 0; j < g_mp_mgr.nic_cnt; j++)
             {
                 struct fio_mp_nicinfo *mp_nicinfo = &g_mp_mgr.mp_nicinfos[j];
-                if (/*mp_nicinfo->ip_cnt < FIO_MAX_IP_NIC &&*/ !strncmp(ifa->ifa_name, mp_nicinfo->nic_name, FIO_MAX_NAME_LEN))
+                if (/*mp_nicinfo->ip_cnt < FIO_MAX_IP_NIC &&*/
+                        ifa->ifa_name == strstr(ifa->ifa_name, mp_nicinfo->nic_name)
+                   )
                 {
                     uint32_t addr = ntohl(((struct sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr), 
                              netmask = ntohl(((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr.s_addr);
