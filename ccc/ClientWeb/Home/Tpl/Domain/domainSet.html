@@ -304,7 +304,7 @@
 					data:{'zone':zone},
 					success:function(data){
 						if(data.info=="success"){
-							$(obj).parent().html('<a href="javascript:void(0);" onClick="openMsg(this)">开启</a>');
+							$(obj).parent().html('<label>已关闭</label><a href="javascript:void(0);" onClick="openMsg(this)">开启</a>');
 						}else{
 							messageBox('aqsz_msg',data.data);
 						}
@@ -353,7 +353,7 @@
 				data:{'phone':phone,'mail':mail,'zone':zone},
 				success:function(data){
 					if(data.info=="success"){
-						$(obj).parent().parent().prev().find("td:eq(1)").html('<a href="javascript:void(0);" onClick="closeMsg(\''+zone+'\',this)">关闭</a>');
+						$(obj).parent().parent().prev().find("td:eq(1)").html('<label>已开启</label><a href="javascript:void(0);" onClick="closeMsg(\''+zone+'\',this)">关闭</a>');
 						$(obj).parent().parent().remove();						
 					}else{
 						messageBox('aqsz_msg',data.data);
@@ -520,8 +520,10 @@
 					    <td class="laber">实时通知</td> 	
 					    <td class="edit">
                         <if condition="$status == 0">
+                        	<label>已关闭</label>
                         	<a href="javascript:void(0);" onClick="openMsg(this)">开启</a>
                             <else/>
+                        	<label>已开启</label>
                         	<a href="javascript:void(0);" onClick="closeMsg('{$zone.domain}',this)">关闭</a>
                         </if>
                         </td>

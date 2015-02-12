@@ -921,6 +921,31 @@
 		function selectByWhere(){
 			window.location.href = "__APP__/Domain/detail?d=" + $("#txt_zone").val() + "&p=" + $("#xiye").html() + "&o=" + $("#orderBy").val() + "&t=" + $("#sel_type").val() + "&h=" + $("#searchTxt").val() + "&v=" + $("#sel_view").val();
 		}
+		function expExcel(zone){
+			/*var load_layer;
+			load_layer = layer.load('系统正在导出，请稍等。');
+			$.ajax({
+				url:"__APP__/Domain/expExcel?d=" + zone,
+				success:function(data){
+					layer.close(load_layer);
+				},
+				error:function(data){
+					layer.msg(data.statusText,2,5);
+				}
+			});*/
+			window.open("__APP__/Domain/expExcel?d=" + zone);
+//			layer.close(load_layer);
+		}
+		function impExcel(){
+			$.layer({
+				type: 1,
+				title:"请选择Excel文件",
+				area: ['310px', '130px'],
+				page: {
+					html:'<div style="margin:30px 10px;"><form action="__APP__/Domain/impExcel" method="post" enctype="multipart/form-data"><input type="file" name="file_stu"/><input class="ui-btn-grey" type="hidden" name="zone" value="{$zone}"/><input type="submit" value=" 导入 "/></form></div>'
+				}
+			});
+		}
     </script>
 </head>
 <body class="page-dns" style="">
@@ -1005,6 +1030,8 @@
 					<button class="ui-btn-grey" style="" onClick="startDns()">启用</button>
 					<button class="ui-btn-grey" style="" onClick="stopDns()">暂停</button>
 					<button class="ui-btn-grey" style="" onClick="deleteDns()">删除</button>
+					<button class="ui-btn-grey" style="" onClick="impExcel()">导入</button>
+					<button class="ui-btn-grey" style="" onClick="expExcel('{$zone}')">导出</button>
 					<a class="icon icon-log" href="__APP__/Optlog/index?zone={$zone}">解析记录日志</a>
 				</div>
 			<!-- 消息提示 -->

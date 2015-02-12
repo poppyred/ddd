@@ -1,6 +1,208 @@
 <?php
 // 本类由系统自动生成，仅供测试用途
 class DomainAction extends BaseAction {
+	//导出Excel
+	public function expExcel(){//导出Excel		
+		$xlsCell  = array(
+			array('id','序列'),
+			array('host','主机记录'),
+			array('type','类型'),
+			array('view','系统线路'),
+			array('route','自定义线路'),
+			array('val','记录值'),
+			array('mx','MX优先级'),
+			array('ttl','TTL值(分钟)'),
+			array('is_edit','是否修改'),
+			array('is_on','状态'),
+			array('desc','备注'),
+			array('up_time','修改时间')
+		);
+		$z = M("zone");
+		$domain = M("domain");
+		$zone = $z->where('client_id='.$_SESSION['id'].' and  domain="'.$_GET['d'].'"')->find();
+		$xlsData = $domain->query('select b.* from client_domain a left join domain b on b.id=a.domain_id where a.zone_id='.$zone["id"].' and client_id='.$_SESSION['id'].' order by a.id desc ');
+		foreach ($xlsData as $k => $v){
+			$xlsData[$k]['is_on'] = $v['is_on'] == 0 ? '暂停' : '启用';
+			$xlsData[$k]['view'] = $this->returnViewName($v['view']);
+			$xlsData[$k]['type'] = $v['type'] == "FORWARD_URL" ? "URL转发" : $v['type'];			
+			$xlsData[$k]['is_edit'] = $v['is_edit'] == 0 ? '否' : '是';
+		}
+		
+		D('Excel')->exportExcel($_GET['d']."域名下的记录",$xlsCell,$xlsData);
+	}
+	//excel导入数据
+	public function impExcel(){		
+		if (! empty ( $_FILES ['file_stu'] ['name'] )) {
+			$tmp_file = $_FILES ['file_stu'] ['tmp_name'];
+			$file_types = explode ( ".", $_FILES ['file_stu'] ['name'] );
+			$file_type = $file_types [count ( $file_types ) - 1];
+		
+			 /*判别是不是.xls文件，判别是不是excel文件*/
+			 if (strtolower ( $file_type ) != "xls"){
+			   $this->error ( '不是Excel文件，重新上传' );
+			 }
+		
+			/*设置上传路径*/
+			 $savePath = './Public/upload/';
+		
+			/*以时间来命名上传的文件*/
+			 $str = date ( 'Ymdhis' ); 
+			 $file_name = $str . "." . $file_type;
+		
+			 /*是否上传成功*/
+			 if (! copy ( $tmp_file, $savePath . $file_name )){
+				$this->error ( '上传失败' );
+			}
+		}
+			
+		$data = D('Excel')->import( $savePath . $file_name );
+		$res = array();  //声明数组
+		$kk = 0 ;
+		$o = 0 ;
+		//获取信息状态
+		foreach($data as $i => $val){
+			if($i % 8 == 0){
+				$kk ++;	
+			}
+			if($o==8){
+				$o = 0 ;
+			}
+			$res[$kk][$o] = $val;
+			$o++;
+		}
+		// 添加记录
+		$domain = M('domain');		
+		$zone = M('zone');
+		$client_domain = M('client_domain');
+		$vo = $zone->where('domain="'.$_POST['zone'].'"')->select();
+		$is_succ = 0 ;
+		foreach($res as $val){
+			if($vo[0]['level']<8){
+				if($this->selectDomainCount($vo[0]['id']) == C('DOMAIN_LIMIT')){
+					echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
+					echo '<script type="text/javascript">alert("记录已经上限，最多50条解析记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';
+				}
+			}
+			
+			$data['host'] = $val[0];
+			$data['type'] = $val[1] == "URL转发" ? "FORWARD_URL" : $val[1];
+			$data['view'] = $this->returnViewId($val[2]);
+			$data['val'] = $val[4];
+			$data['mx'] = $val[5];
+			$data['ttl'] = $val[6];
+			//$data['is_edit'] = $val[7] == "是" ? 1 : 0;
+			//$data['is_on'] = $val[8] == "暂停" ? 0 : 1;
+			$data['desc'] = $val[7] == null ? "" : $val[9];
+			//验证合法
+			if($data['type']=='A'){
+				if(!preg_match('/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/',$data['val'])){ 
+					continue;
+				}
+			}
+			if($data['type']=='CNAME' || $data['type']=='MX' || $data['type']=='NS' || $data['type']=='FORWARD_URL'){
+				if(!preg_match('/^([\w-]+\.)+((com)|(net)|(org)|(gov\.cn)|(info)|(cc)|(com\.cn)|(net\.cn)|(org\.cn)|(name)|(biz)|(tv)|(cn)|(mobi)|(name)|(sh)|(ac)|(io)|(tw)|(com\.tw)|(hk)|(com\.hk)|(ws)|(travel)|(us)|(tm)|(la)|(me\.uk)|(org\.uk)|(ltd\.uk)|(plc\.uk)|(in)|(eu)|(it)|(jp)|(coop)|(edu)|(mil)|(int)|(ae)|(at)|(au)|(be)|(bg)|(br)|(bz)|(ca)|(ch)|(cl)|(cz)|(de)|(fr)|(hu)|(ie)|(il)|(ir)|(mc)|(to)|(ru)|(aero)|(nl))$/',$data['val'])){ 
+					continue;
+				}
+			}
+			if($data['type']=='AAAA'){
+				if(!validateIPv6($data['val'])){ 
+					continue;
+				}
+			}
+			
+			$entity = $domain->query("select * from domain d left join client_domain cd on d.id=cd.domain_id where host='".$data['host']."' and type='".$data['type']."' and view=".$data['view']." and val='".$data['val']."' and mx=".$data['mx']." and cd.zone_id=".$vo[0]['id']." and cd.client_id=".$_SESSION['id']);
+			
+			if(!empty($entity)){										
+				/*echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
+				echo '<script type="text/javascript">alert("请不要添加相同的解析记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';*/
+				continue;
+			}
+			$is_ok = $domain->add($data);
+			if($is_ok){
+				//URL转发
+				if($data['type']=='FORWARD_URL'){
+					//推送后台添加固定CNAME记录  cname.eflydns.com
+					$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, 'CNAME'=>rawurlencode(strtolower("cname.eflydns.com")), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+					$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+					$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+					$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+					$rslt = json_decode($ret["content"],true);
+					if($rslt['ret']!=0){
+						//$this->ajaxReturn(0,'添加失败，联系管理员',0);
+						continue;
+					}
+					$forward = file_get_contents("http://dnspro-url/dns_http_ref.php?opt=add&src=".strtolower($data['host']).".".$_POST['zone']."&dst=".$data['val']);
+					$list = json_decode($forward,true);
+					if($list['ret']!=0){
+						//$this->ajaxReturn(0,'添加的URL地址已存在，请重新输入。',0);
+						continue;
+					}
+				}else{			
+				//域名添加记录
+					$val = array("name"=>strtolower($data['host']).".".$_POST['zone'], "main"=>$_POST['zone'], "rid"=>(int)$is_ok, $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+					$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+					$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+					$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+					$rslt = json_decode($ret["content"],true);
+					if($rslt['ret']!=0){
+						//$this->ajaxReturn(0,'添加失败，联系管理员',0);
+						continue;
+					}
+				}
+				//别名添加记录
+				$bmlist = $zone->query("select * from zone_name zn left join zone z on z.id=zn.zone_id where z.domain='".$_POST['zone']."'");
+				if(!empty($bmlist)){
+					foreach($bmlist as $val){
+						$val = array("name"=>strtolower($data['host']).".".$val['name'], "main"=>$val['name'], "rid"=>(int)$is_ok + (int)str_pad(1,17,'0',STR_PAD_RIGHT), $data['type']=>rawurlencode(strtolower($data['val'])), "level"=>$data['mx'], "ttl"=>(int)($data['ttl'])*60, "viewid"=>$data['view']);
+						$user = array("cid"=>$_SESSION['id'], "level"=>0, "info"=>"");
+						$param = array("type"=>"record", "opt"=>"add", "data"=>$val,"user"=>$user);
+						$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
+						$rslt = json_decode($ret["content"],true);
+						if($rslt["ret"] != 0){
+							//$this->ajaxReturn(0,'添加失败，联系管理员',0);
+							continue;
+						}
+					}
+				}
+				if($rslt["ret"] == 0){
+					//添加client_domain信息
+					$data1['client_id'] = $_SESSION['id'];
+					$data1['zone_id'] = $vo[0]['id'];
+					$data1['domain_id'] = $is_ok;
+					$client_domain->add($data1);
+					
+					$v = M('view');
+					$view = $v->where('id='.$data['view'])->find();
+					
+					$history = file_get_contents(C('HISTORY_URL')."?opt=add&target=".$_POST['zone']."&class=domain&content=".$data['host'].".".$_POST['zone']."%20在".$view['name']."线路%20添加了记录值".$data['val']."的".$data['type']."记录");				
+					$history_list = json_decode($history,true);
+					$this->updateZoneTime($vo[0]['id']);
+					
+					$is_succ ++ ;
+				}	
+				
+			}else{
+				continue;
+			}				
+		}
+		if($is_succ==count($res)){
+			echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
+			echo '<script type="text/javascript">alert("成功添加'.$is_succ.'条记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';		
+		}else{			
+			echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
+			echo '<script type="text/javascript">alert("成功添加'.$is_succ.'条记录，请检查其他记录的合法性！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';		
+		}
+	}
+	public function returnViewName($view){
+		$v = M('view');
+		$tem = $v->where('id='.$view)->find();
+		return $tem['name'];
+	}	
+	public function returnViewId($view){
+		$v = M('view');
+		$tem = $v->where("name='".$view."'")->find();
+		return $tem['id'];
+	}
 	
 	//域名解析记录
 	public function detail(){

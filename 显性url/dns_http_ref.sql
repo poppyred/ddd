@@ -27,7 +27,7 @@ CREATE TABLE `http_ref` (
   `status` varchar(10) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `src` (`src`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 
 /*Data for the table `http_ref` */
 
