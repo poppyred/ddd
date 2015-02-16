@@ -533,7 +533,7 @@ int fio_recv_pkts(struct netmap_ring *ring, struct fio_nic *nic,
     uint8_t ip_type = 0;
     uint16_t eh_type = 0;
 
-    static int loper = 9;
+    static int loper = 200;
     static int loper_p = 0;
 
     for (cur = 0; cur < T_FIO_PKT_DISCARD; cur++)
