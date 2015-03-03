@@ -201,7 +201,7 @@
 				route = tr.find("#route").val(),		//解析线路
 				val = tr.find("#val").val().trim(),			//记录值
 				mx = '',	//MX优先级
-				ttl = tr.find("#time :selected").val(),	//TTL
+				ttl = tr.find("#time").val(),// :selected").val(),	//TTL
 				status = tr.find("#status").val(),	
 				id = tr.find("input").val();
 				//如果不是mx
@@ -249,6 +249,12 @@
 				//else if(type=='REDIRECT_URL' || type=='FORWARD_URL'){
 					//验证是否有备案号	
 				//}
+			}
+			
+			if(ttl>1440 || ttl<0 || ttl=="" || !ttl.match(new RegExp("^[0-9]+$"))){
+				tr.find("#time").focus();	
+				layer.msg('输入的TTL值不正确',2,5);	
+				return;
 			}
 			if(opt=='add'){
 				//添加解析记录
@@ -396,7 +402,7 @@
 					if(type=="URL转发"){
 						type = "FORWARD_URL";
 					}
-					tr.html('<td class="chk"><input type="hidden" value="'+id+'" id="id"/></td><td class="status"><input id="status" type="hidden" value="'+str_status+'"/></td><td class="rr"><input value="'+ rr +'" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+zone+'">.'+zone+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="'+ val +'" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">'+ str +'</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'update\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelOpt(this,'+id+',\''+ type +'\',\''+ rr +'\',\''+ route +'\',\''+ val +'\',\''+ mx +'\',\''+ ttl +'\',\''+ str_status +'\')">取消</button><span id="icon_open_close" class="'+spancls+'" onclick="slideInfo(this)"></span></td>');
+					tr.html('<td class="chk"><input type="hidden" value="'+id+'" id="id"/></td><td class="status"><input id="status" type="hidden" value="'+str_status+'"/></td><td class="rr"><input value="'+ rr +'" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+zone+'">.'+zone+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="'+ val +'" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">'+ str +'</td><td class="ttl"><input class="ui-ipt-txt" style="width:50px" id="time" value="'+ttl+'" onFocus="showInfo(\'ttl\',this)"/><!--option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select--></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'update\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelOpt(this,'+id+',\''+ type +'\',\''+ rr +'\',\''+ route +'\',\''+ val +'\',\''+ mx +'\',\''+ ttl +'\',\''+ str_status +'\')">取消</button><span id="icon_open_close" class="'+spancls+'" onclick="slideInfo(this)"></span></td>');
 					//绑定下拉框值
 					tr.find("#type").val(type);
 					/* :option").each(function(){
@@ -409,11 +415,11 @@
 							$(this).attr('selected','selected');
 						}
 					});		
-					tr.find("#time option").each(function(){
+					/*tr.find("#time option").each(function(){
 						if($(this).val()==ttl){
 							$(this).attr('selected','selected');
 						}
-					});
+					});*/
 					
 					//提示
 					if(show_hide==0){
@@ -527,7 +533,7 @@
 					$('#'+id).find('.J_helpMX').show();
 					break;
 				case 'ttl':
-					$('#'+id).find('.expand-box-arr').css('left','737px');
+					$('#'+id).find('.expand-box-arr').css('left','712px');
 					$('#'+id).find('.J_helpTTL').show();
 					break;
 			}
@@ -550,17 +556,18 @@
 				if(!$("#add_row").html()){
 				var option = $("#viewOpt").html();// + returnOptStr();
 				//option = option + add_str;
-					$('#myData').prepend('<tr class="row-opened" id="add_row"><td class="chk"></td><td class="status"></td><td class="rr"><input value="" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+$("#txt_zone").val()+'">.'+$("#txt_zone").val()+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">--</td><td class="ttl"><select class="ui-select" id="time" onFocus="showInfo(\'ttl\',this)"><option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'add\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelAdd()">取消</button><span id="icon_open_close" class="ui-help J_btnToggleHelp ui-help-opened" onclick="slideInfo(this)"></span></td></tr><tr class="msg_info" id="tx_0"><td colspan="9" class="expand-outer">'+info_val+'</td></tr>');
+					$('#myData').prepend('<tr class="row-opened" id="add_row"><td class="chk"></td><td class="status"></td><td class="rr"><input value="" class="ui-ipt-txt" id="rr" onFocus="showInfo(\'rr\',this)"/><!--span class="ui-color-grey suffix" title=".'+$("#txt_zone").val()+'">.'+$("#txt_zone").val()+'</span--></td><td class="type"><select class="ui-select" id="type" onChange="bindingMX(this)" onFocus="showInfo(\'type\',this)"><option value="A" >A</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="NS">NS</option><option value="TXT">TXT</option><option value="AAAA">AAAA</option><!--option value="SRV">SRV</option><option value="REDIRECT_URL">显性URL</option><option value="FORWARD_URL">隐性URL</option--><option value="FORWARD_URL">URL转发</option></select></td><td class="route"><select class="ui-select" id="route" onFocus="showInfo(\'route\',this)">'+option+'</select></td><td class="val"><input value="" class="ui-ipt-txt" id="val" onFocus="showInfo(\'val\',this)"/></td><td class="mx">--</td><td class="ttl"><input class="ui-ipt-txt" id="time" onFocus="showInfo(\'ttl\',this)" style="width:50px;" /><!--option value="10" >10分钟</option><option value="30">30分钟</option><option value="60">60分钟</option><option value="720">720分钟</option><option value="1440">1440分钟</option></select--></td><td class="iop"><button class="ui-btn-blue btn-update J_btnUpdateDnsRow" onclick="saveOpt(this,\'add\')">保存</button><button class="ui-btn-grey btn-cancle J_btnCancleEdit" onclick="CancelAdd()">取消</button><span id="icon_open_close" class="ui-help J_btnToggleHelp ui-help-opened" onclick="slideInfo(this)"></span></td></tr><tr class="msg_info" id="tx_0"><td colspan="9" class="expand-outer">'+info_val+'</td></tr>');
 					//$("#add_row").after();
 					//$("#add_row").next().children().html(info_val);			
 					var tr = $("#add_row");
 					$(tr).next().find('.help-tips-box div').hide();
 					$(tr).next().find('.J_helpRR_A_MX_AAAA').show();
-					$("#time option").each(function(){
+					$("#time").val($("#default_ttl").val());
+					/* option").each(function(){
 						if($(this).val()==$("#default_ttl").val()){
 							$(this).attr('selected','selected');
 						}
-					});
+					});*/
 				}else{
 					layer.msg('您有正在编辑的解析尚未保存。',2,5);
 				}
@@ -1032,7 +1039,7 @@
 					<button class="ui-btn-grey" style="" onClick="deleteDns()">删除</button>
 					<button class="ui-btn-grey" style="" onClick="impExcel()">导入</button>
 					<button class="ui-btn-grey" style="" onClick="expExcel('{$zone}')">导出</button>
-					<a class="icon icon-log" href="__APP__/Optlog/index?zone={$zone}">解析记录日志</a>
+					<a class="icon icon-log" href="__APP__/Optlog/index?zone={$zone}">记录日志</a>
 				</div>
 			<!-- 消息提示 -->
                 <div class="ui-pop-box small-con-box" id="message" style="float:left; margin-left:10px; display:none;width:auto;height:auto;">

@@ -4,7 +4,7 @@ class DomainAction extends BaseAction {
 	//导出Excel
 	public function expExcel(){//导出Excel		
 		$xlsCell  = array(
-			array('id','序列'),
+			//array('id','序列'),
 			array('host','主机记录'),
 			array('type','类型'),
 			array('view','系统线路'),
@@ -12,10 +12,10 @@ class DomainAction extends BaseAction {
 			array('val','记录值'),
 			array('mx','MX优先级'),
 			array('ttl','TTL值(分钟)'),
-			array('is_edit','是否修改'),
+//			array('is_edit','是否修改'),
 			array('is_on','状态'),
-			array('desc','备注'),
-			array('up_time','修改时间')
+			array('desc','备注')//,
+//			array('up_time','修改时间')
 		);
 		$z = M("zone");
 		$domain = M("domain");
@@ -28,10 +28,10 @@ class DomainAction extends BaseAction {
 			$xlsData[$k]['is_edit'] = $v['is_edit'] == 0 ? '否' : '是';
 		}
 		
-		D('Excel')->exportExcel($_GET['d']."域名下的记录",$xlsCell,$xlsData);
+		D('Excel')->exportExcel($_GET['d']."域名记录_".date('Y-m-d'),$xlsCell,$xlsData);
 	}
 	//excel导入数据
-	public function impExcel(){		
+	public function impExcel(){	
 		if (! empty ( $_FILES ['file_stu'] ['name'] )) {
 			$tmp_file = $_FILES ['file_stu'] ['tmp_name'];
 			$file_types = explode ( ".", $_FILES ['file_stu'] ['name'] );
@@ -54,17 +54,16 @@ class DomainAction extends BaseAction {
 				$this->error ( '上传失败' );
 			}
 		}
-			
 		$data = D('Excel')->import( $savePath . $file_name );
 		$res = array();  //声明数组
 		$kk = 0 ;
 		$o = 0 ;
 		//获取信息状态
 		foreach($data as $i => $val){
-			if($i % 8 == 0){
+			if($i % 9 == 0){
 				$kk ++;	
 			}
-			if($o==8){
+			if($o==9){
 				$o = 0 ;
 			}
 			$res[$kk][$o] = $val;
@@ -83,16 +82,16 @@ class DomainAction extends BaseAction {
 					echo '<script type="text/javascript">alert("记录已经上限，最多50条解析记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';
 				}
 			}
-			
-			$data['host'] = $val[0];
-			$data['type'] = $val[1] == "URL转发" ? "FORWARD_URL" : $val[1];
-			$data['view'] = $this->returnViewId($val[2]);
-			$data['val'] = $val[4];
-			$data['mx'] = $val[5];
-			$data['ttl'] = $val[6];
+			$data['host'] = trim($val[0]);
+			$data['type'] = trim($val[1]) == "URL转发" ? "FORWARD_URL" : trim($val[1]);
+			$data['view'] = $this->returnViewId(trim($val[2]));
+			$data['val'] = trim($val[4]);
+			$data['mx'] = trim($val[5]);
+			$data['ttl'] = trim($val[6]);
 			//$data['is_edit'] = $val[7] == "是" ? 1 : 0;
-			//$data['is_on'] = $val[8] == "暂停" ? 0 : 1;
-			$data['desc'] = $val[7] == null ? "" : $val[9];
+			$data['is_on'] = trim($val[7]) == "暂停" ? 0 : 1;
+			$data['desc'] = trim($val[8]) == null ? "" : trim($val[8]);
+			
 			//验证合法
 			if($data['type']=='A'){
 				if(!preg_match('/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/',$data['val'])){ 
@@ -108,11 +107,16 @@ class DomainAction extends BaseAction {
 				if(!validateIPv6($data['val'])){ 
 					continue;
 				}
+			}			
+			if(empty($data['view'])){
+				continue;
 			}
-			
+			if($data['ttl']>1440 || $data['ttl']<0 || $data['ttl']=="" || !preg_match('/^[0-9]+$/',$data['ttl'])){				
+				continue;
+			}
 			$entity = $domain->query("select * from domain d left join client_domain cd on d.id=cd.domain_id where host='".$data['host']."' and type='".$data['type']."' and view=".$data['view']." and val='".$data['val']."' and mx=".$data['mx']." and cd.zone_id=".$vo[0]['id']." and cd.client_id=".$_SESSION['id']);
 			
-			if(!empty($entity)){										
+			if(!empty($entity)){								
 				/*echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
 				echo '<script type="text/javascript">alert("请不要添加相同的解析记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';*/
 				continue;
@@ -185,6 +189,9 @@ class DomainAction extends BaseAction {
 				continue;
 			}				
 		}
+		//删除上传文件
+		unlink($savePath.$file_name);
+		
 		if($is_succ==count($res)){
 			echo "<meta http-equiv='Content-Type'' content='text/html; charset=utf-8'>";
 			echo '<script type="text/javascript">alert("成功添加'.$is_succ.'条记录！");window.location.href = "'.__APP__.'/Domain/detail?d='.$_POST['zone'].'";</script>';		

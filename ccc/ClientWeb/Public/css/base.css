@@ -108,7 +108,7 @@ img{border:none 0;display:block}
 .expand-box-arr-in{position:absolute;color:#f7faff;top:2px;left:0}
 
 .head-info{width:940px;margin:0 auto;padding-top:10px}
-.head-path{height:19px;padding:5px 0;line-height:19px;font-size:12px;border-bottom:solid 1px #ebe7e0; *margin-top:-48px;}
+.head-path{height:19px;padding:5px 0;line-height:19px;font-size:12px;border-bottom:solid 1px #ebe7e0;}
 .head-news,.head-path .home,.head-path .s{background:url(../img/icon_head.png) -1000px -1000px no-repeat;vertical-align:middle}
 .head-path .current,.head-path a{vertical-align:middle}
 .head-path .home{display:inline-block;width:15px;height:15px;background-position:0 -18px;overflow:hidden;font-size:0;margin-right:2px;vertical-align:text-bottom}

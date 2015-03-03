@@ -364,6 +364,21 @@
 			});
 			
 		}
+		function expExcel(zone){
+			/*var load_layer;
+			load_layer = layer.load('系统正在导出，请稍等。');
+			$.ajax({
+				url:"__APP__/Domain/expExcel?d=" + zone,
+				success:function(data){
+					layer.close(load_layer);
+				},
+				error:function(data){
+					layer.msg(data.statusText,2,5);
+				}
+			});*/
+			window.open("__APP__/Domain/expExcel?d=" + zone);
+//			layer.close(load_layer);
+		}
     </script>
 </head>
 <body class="page-dns">
@@ -508,7 +523,7 @@
 					</tr>
 					<tr class="data">
 					    <td class="laber">记录导出</td> 	
-					    <td class="edit"><a href="javascript:">导出</a></td>
+					    <td class="edit"><a href="javascript:void(0);" onClick="expExcel('{$zone.domain}')">导出</a></td>
 					    <td class="info">将所有记录导出为excel格式</td>  
 					</tr>
 					<tr class="data">
