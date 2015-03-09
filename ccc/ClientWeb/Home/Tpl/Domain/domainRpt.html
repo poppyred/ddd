@@ -47,7 +47,7 @@
 				    x: -20 //center
 				},
 				subtitle: {
-				    text: '今天请求总量：{$sum}',//1245次（统计结果延迟1小时）',
+				    text: '请求总量：{$sum}',//1245次（统计结果延迟1小时）',
 				    x: -16
 				},
 				xAxis: {					
@@ -123,6 +123,7 @@
                 <!--<a href="__APP__/Domain/domainRoute?d={$zone}">自定义路线</a>-->
 				<strong id="cur_zone" class="dname">{$zone}</strong>
 				<span class="tab nocur"><a href="javascript:void(0);">自定义路线</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainSource?d={$zone}">来源分析</a></span>
 				<span class="tab "><a href="__APP__/Domain/domainRpt?d={$zone}">解析统计</a></span>
 				<span class="tab nocur"><a href="__APP__/Domain/domainSet?d={$zone}">域名设置</a></span>
 				<span class="tab nocur"><a href="__APP__/Domain/detail?d={$zone}">记录管理</a></span>

@@ -84,7 +84,7 @@
 							<tr class="data"> 	 	
 								<td class="chk">{$i}</td>
 								<td class="val" style="text-align:left;">
-									<a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">{$s_vo.domain}</a>
+									<a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}&type=mgr" target="_blank">{$s_vo.domain}</a>
 								</td>
 								<td class="rr">{$s_vo.default_ttl}</td>
 								<td class="rr" style="width:80px;"><if condition="$s_vo.is_author eq 0">未修改<else/>已修改</if></td> 
@@ -104,9 +104,11 @@
                                             <else/>
                                             <a title="停用" href="javascript:void(0);" onclick="startOrStop({$s_vo.id},this)">停用</a>
                                         </if>
-                                        <a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}" target="_blank">管理</a>
+                                        <a title="管理" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}&type=mgr" target="_blank">管理</a>
                                         <a title="降级" href="javascript:void(0);" onClick="empower('{$s_vo.domain}',1)" >降级</a>
                                         <a title="过户" href="__APP__/Domainmgr/transfer?id={$s_vo.id}" >过户</a>
+                                        <a title="来源分析" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}&type=srcip" target="_blank">来源分析</a>
+                                        <a title="解析统计" href="__APP__/Domainmgr/mgrClient?mail={$s_vo.mail}&pwd={$s_vo.pwd}&domain={$s_vo.domain}&type=rpt" target="_blank">解析统计</a>
                                         <if condition="$_SESSION[level] == 1">
                                             <if condition="$s_vo[internal] == 0">
                                             <a title="设置内部域名" href="javascript:void(0);" onClick="updateInternalDomain({$s_vo.id},this)">设置内部域名</a>                                            

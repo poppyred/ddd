@@ -117,6 +117,7 @@ class DomainmgrAction extends BaseAction {
 		$this->assign('mail',$_GET['mail']);
 		$this->assign('pwd',$_GET['pwd']);
 		$this->assign('domain',$_GET['domain']);
+		$this->assign('type',$_GET['type']);
 		$this->display();	
 	}
 	

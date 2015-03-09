@@ -357,3 +357,16 @@
 .page ul li .xab{ float:left; position:absolute; width:39px; border:1px solid #ccc; height:123px; overflow-y: auto;overflow-x: hidden;top:-125px; background-color: #fff; display:inline;left:-1px; width:50px;}
 .page ul li .xab ul{ margin-left:0; padding-bottom:0;}
 .page ul li .xab ul li{ border:0; padding:4px 0px; color:#999; width:34px; margin-left:0px; text-align:center;}
+
+
+/********  top 30  *******/
+
+.table-box .title,.table-box .item,.table-box .time{ height:34px; line-height:34px; border-bottom:1px dashed #e5e5e5; margin-left:2px; color:#666}
+.table-box .time{ height:40px;}
+.table-box .h1{ font-size:16px; font-weight:bold; color:#666; height:40px; line-height:40px; text-indent:20px; margin-bottom:10px;}
+.table-box .title .no,.table-box .item .no{ text-indent:2em; color:#666; width:280px; display:inline-block}
+.table-box .title .name,.table-box .title .sum,.table-box .item .name,.table-box .item .sum{ text-indent:2em; color:#666; width:300px;display:inline-block}
+.table-box .item .no span{ text-indent:0em;width:18px; height:18px; line-height:16px; display:block; margin-top:9px; color:#fff; line-height:16px; background:#C0C1C3; text-align:center; margin-left:28px;}
+.table-box .item .no .hot{ background:#0066cc !important;}
+.table-box label{ color:#666}
+

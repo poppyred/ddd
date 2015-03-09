@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+	<title>EflyDNS - 解析统计</title>
+    <link rel="shortcut icon" href="__ROOT__/Public/img/eflydns.ico" />
+	<link rel="stylesheet" href="__ROOT__/Public/css/base.css">
+	<link rel="stylesheet" href="__ROOT__/Public/css/dns.css">
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/js/YUI/yui-min.js"></script>
+	<script type="text/javascript" >
+		YUI({
+			modules: {
+				'trip-calendar': {
+					fullpath: '__ROOT__/Public/js/YUI/trip-calendar.js',
+					type    : 'js',
+					requires: ['trip-calendar-css']
+				},
+				'trip-calendar-css': {
+					fullpath: '__ROOT__/Public/js/YUI/trip-calendar.css',
+					type    : 'css'
+				}
+			}
+		}).use('trip-calendar', function(Y) {
+		
+			/**
+			 * 弹出式日历实例
+			 * 将日历与指定的触发元素绑定
+			 * 日历可根据浏览器窗口大小，自动调整显示位置
+			 */
+			var oCal = new Y.TripCalendar({
+				//绑定日历的节点，支持选择器模式，可批量设置（必选）
+				triggerNode: '#startTime, #endTime'
+			});
+			
+			oCal.on('dateclick', function(e) {
+				this.getCurrentNode().setAttribute('data-date', e.date);
+			});
+			
+			//显示日历时自定义事件
+			oCal.on('show', function() {
+				var v = this.getCurrentNode().getAttribute('data-date');
+				this.set('date', v || new Date);
+				this.set('selectedDate', v).render();
+			});			
+		});
+		function selectBy(){
+			var startTime = $("#startTime").val(),
+				endTime = $("#endTime").val(),
+				t1 = new Date(startTime.replace(/\-/g, "\/")),
+				t2 = new Date(endTime.replace(/\-/g, "\/")),
+				nowTime = '{$nowTime}'; 
+			if(startTime>nowTime){
+				layer.msg('时间必须小于当天时间',2,5);
+				return;
+			}
+			if(t1>t2){
+				layer.msg('结束时间不能大于开始时间',2,5);
+				return;
+			}
+			
+			window.location.href = "__APP__/Domain/domainSource?d={$zone}&startTime=" + startTime + "&endTime=" + endTime  ;
+		}
+		$(function(){
+			$("#startTime").val('{$startTime}');
+			$("#endTime").val('{$endTime}');
+		});
+    </script>
+</head>
+<body class="page-dns">
+	<div class="J_pageWrapper">
+		<!-- header -->
+		<include file="Public:header" />
+		<input type="hidden" value="{$zone}" id="txt_zone"/>
+		<input type="hidden" value="{$is_new}" id="is_first"/>
+		<input type="hidden" value="{$time}" id="time"/>
+		<input type="hidden" value="{$num}" id="num"/>
+        
+		<div class="head-info">
+			<div class="head-path">
+				<a class="home" href="__APP__/Domain/domainList" ></a><span class="s"></span>
+				<a href="__APP__/Domain/domainList">域名列表</a><span class="s"></span>
+				<strong class="current">{$zone} 的解析统计</strong>
+			</div>
+		</div> 
+		<div class="J_singleTop">
+			<p class="domain-title">
+				<!--if condition="$is_on eq 0">
+                	<span class="dtype icon-pause"></span>
+					<else /-->
+                    <if condition="$level neq 0">
+                        <span class="dtype icon-vip"></span>
+                        <else /><span class="dtype icon-novip"></span>
+                    </if>
+                <!--<a href="__APP__/Domain/domainRoute?d={$zone}">自定义路线</a>-->
+				<strong id="cur_zone" class="dname">{$zone}</strong>
+				<span class="tab nocur"><a href="javascript:void(0);">自定义路线</a></span>
+				<span class="tab "><a href="__APP__/Domain/domainSource?d={$zone}">来源分析</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainRpt?d={$zone}">解析统计</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/domainSet?d={$zone}">域名设置</a></span>
+				<span class="tab nocur"><a href="__APP__/Domain/detail?d={$zone}">记录管理</a></span>
+			</p>
+		</div> 		
+		<div class="table-box" style="margin-bottom:100px;">
+        	<div class="h1">请求源IP地址TOP30排行</div>
+			<div class="time">            
+                <label style="margin-left:24px;">开始时间：</label>
+                <input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="开始时间(非必填)" id="startTime">	
+                <label style="margin-left:20px;">结束时间：</label>
+                <input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="结束时间(非必填)" id="endTime">
+                <button class="ui-btn-blue" style="margin-left:10px;" onclick="selectBy()">查询</button>
+            </div>
+			<div class="title">
+                <div class="no"><b>序号</b></div>
+                <div class="name"><b>IP</b></div>
+                <div class="sum"><b>次数</b></div>
+            </div>
+            <if condition="count($list)!=0">
+                <volist name="list" id="item">
+                	<if condition="count($list) lt 10">
+                    	<if condition="$i lt 4">
+                            <div class="item">
+                                <div class="no"><span class="hot">{$i}</span></div>
+                                <div class="name">{$item.name}</div>
+                                <div class="sum">{$item.sum|number_format=###}</b></div>
+                            </div>
+                            <else/>
+                            <div class="item">
+                                <div class="no"><span>{$i}</span></div>
+                                <div class="name">{$item.name}</div>
+                                <div class="sum">{$item.sum|number_format=###}</b></div>
+                            </div>
+                        </if>
+                    	<else/>
+                        <if condition="$i lt 11">
+                            <div class="item">
+                                <div class="no"><span class="hot">{$i}</span></div>
+                                <div class="name">{$item.name}</div>
+                                <div class="sum">{$item.sum|number_format=###}</b></div>
+                            </div>
+                            <else/>
+                            <div class="item">
+                                <div class="no"><span>{$i}</span></div>
+                                <div class="name">{$item.name}</div>
+                                <div class="sum">{$item.sum|number_format=###}</b></div>
+                            </div>
+                        </if>
+                    </if>
+                </volist>
+                <else/>
+                <div class="item" style="text-indent:2em;">暂无数据...</div>
+            </if>
+		</div> 
+		<!-- footer -->
+		<include file="Public:footer" />
+	</div>
+</body>
+</html>

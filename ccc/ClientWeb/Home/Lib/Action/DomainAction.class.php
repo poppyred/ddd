@@ -204,7 +204,40 @@ class DomainAction extends BaseAction {
 		$v = M('view');
 		$tem = $v->where('id='.$view)->find();
 		return $tem['name'];
-	}	
+	}
+	public function domainSource(){
+		if(!empty($_GET['d'])){
+			if(!empty($_GET['startTime'])){
+				$startTime = $_GET['startTime'];
+				$this->assign('startTime',$_GET['startTime']);
+			}else{
+				$startTime = date("Y-m-d",strtotime("-1 day"));	
+				$this->assign('startTime',$startTime);
+			}
+			if(!empty($_GET['endTime'])){
+				$endTime = $_GET['endTime'];
+				$this->assign('endTime',$_GET['endTime']);
+			}else{
+				$endTime = date("Y-m-d",strtotime("-1 day"));
+				$this->assign('endTime',$endTime);
+			}
+			
+			$url = "http://121.201.12.61/script/eflydns_client_chart_srcip.php?domain=".$_GET['d']."&begin=".$startTime."&end=".$endTime;			
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$list; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'] as $key => $val){
+					$list[$key]['name'] = $key;
+					$list[$key]['sum'] = $val;
+				}
+			}
+			$this->assign('list',$list);
+			$this->assign('nowTime',date("Y-m-d"));
+			$this->assign('zone',$_GET['d']);
+			$this->display();	
+		}
+	}
 	public function returnViewId($view){
 		$v = M('view');
 		$tem = $v->where("name='".$view."'")->find();
@@ -539,7 +572,11 @@ class DomainAction extends BaseAction {
 	//添加域名
 	public function addZone(){
 		if(!empty($_POST['zone'])){
-			if(!preg_match('/^([\w-]+\.)+((com)|(net)|(org)|(gov\.cn)|(info)|(cc)|(com\.cn)|(net\.cn)|(org\.cn)|(name)|(biz)|(tv)|(cn)|(mobi)|(name)|(sh)|(ac)|(io)|(tw)|(com\.tw)|(hk)|(com\.hk)|(ws)|(travel)|(us)|(tm)|(la)|(me\.uk)|(org\.uk)|(ltd\.uk)|(plc\.uk)|(in)|(eu)|(it)|(jp)|(coop)|(edu)|(mil)|(int)|(ae)|(at)|(au)|(be)|(bg)|(br)|(bz)|(ca)|(ch)|(cl)|(cz)|(de)|(fr)|(hu)|(ie)|(il)|(ir)|(mc)|(to)|(ru)|(aero)|(nl))$/',$_POST['zone'])){ 
+			$tem_str = substr($_POST['zone'],stripos($_POST['zone'],'.')+1);
+			//if(!preg_match('/^([\w-]+\.)+((com)|(net)|(org)|(gov\.cn)|(info)|(cc)|(com\.cn)|(net\.cn)|(org\.cn)|(name)|(biz)|(tv)|(cn)|(mobi)|(name)|(sh)|(ac)|(io)|(tw)|(com\.tw)|(hk)|(com\.hk)|(ws)|(travel)|(us)|(tm)|(la)|(me\.uk)|(org\.uk)|(ltd\.uk)|(plc\.uk)|(in)|(eu)|(it)|(jp)|(coop)|(edu)|(mil)|(int)|(ae)|(at)|(au)|(be)|(bg)|(br)|(bz)|(ca)|(ch)|(cl)|(cz)|(de)|(fr)|(hu)|(ie)|(il)|(ir)|(mc)|(to)|(ru)|(aero)|(nl))$/',$tem_str)){ 
+				//$this->ajaxReturn(0,'域名格式不正确，请填写正确的域名(例如：baidu.com)。',0);
+			//}
+			if( $tem_str !="com" || $tem_str != "net" || $tem_str != "org" || $tem_str != "gov.cn" || $tem_str != "info" || $tem_str != "cc" || $tem_str != "com.cn" || $tem_str != "net.cn" || $tem_str != "org.cn" || $tem_str != "name" || $tem_str != "biz" || $tem_str != "tv" || $tem_str != "cn" || $tem_str != "mobi" || $tem_str != "name" || $tem_str != "sh" || $tem_str != "ac" || $tem_str != "io" || $tem_str != "tw" || $tem_str != "com.tw" || $tem_str != "hk" || $tem_str != "com.hk" || $tem_str != "ws" || $tem_str != "travel" || $tem_str != "us" || $tem_str != "tm" || $tem_str != "la" || $tem_str != "me.uk" || $tem_str != "org.uk" || $tem_str != "ltd.uk" || $tem_str != "plc.uk" || $tem_str != "in" || $tem_str != "eu" || $tem_str != "it" || $tem_str != "jp" || $tem_str != "coop" || $tem_str != "edu" || $tem_str != "mil" || $tem_str != "int" || $tem_str != "ae" || $tem_str != "at" || $tem_str != "au" || $tem_str != "be" || $tem_str != "bg" || $tem_str != "br" || $tem_str != "bz" || $tem_str != "ca" || $tem_str != "ch" || $tem_str != "cl" || $tem_str != "cz" || $tem_str != "de" || $tem_str != "fr" || $tem_str != "hu" || $tem_str != "ie" || $tem_str != "il" || $tem_str != "ir" || $tem_str != "mc" || $tem_str != "to" || $tem_str != "ru" || $tem_str != "aero" || $tem_str != "nl"){
 				$this->ajaxReturn(0,'域名格式不正确，请填写正确的域名(例如：baidu.com)。',0);
 			}
 			

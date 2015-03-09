@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<link rel="shortcut icon" href="__ROOT__/eflydns.ico" />
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/YUI/yui-min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+<script type="text/javascript">
+	var APP = "__APP__";
+	YUI({
+		modules: {
+			'trip-calendar': {
+				fullpath: '__ROOT__/Public/js/YUI/trip-calendar.js',
+				type    : 'js',
+				requires: ['trip-calendar-css']
+			},
+			'trip-calendar-css': {
+				fullpath: '__ROOT__/Public/js/YUI/trip-calendar.css',
+				type    : 'css'
+			}
+		}
+	}).use('trip-calendar', function(Y) {
+	
+		/**
+		 * 弹出式日历实例
+		 * 将日历与指定的触发元素绑定
+		 * 日历可根据浏览器窗口大小，自动调整显示位置
+		 */
+		var oCal = new Y.TripCalendar({
+			//绑定日历的节点，支持选择器模式，可批量设置（必选）
+			triggerNode: '#startTime, #endTime'
+		});
+		
+		oCal.on('dateclick', function(e) {
+			this.getCurrentNode().setAttribute('data-date', e.date);
+		});
+		
+		//显示日历时自定义事件
+		oCal.on('show', function() {
+			var v = this.getCurrentNode().getAttribute('data-date');
+			this.set('date', v || new Date);
+			this.set('selectedDate', v).render();
+		});			
+	});
+	function selectBy(){
+		var startTime = $("#startTime").val(),
+			endTime = $("#endTime").val(),
+			t1 = new Date(startTime.replace(/\-/g, "\/")),
+			t2 = new Date(endTime.replace(/\-/g, "\/")),
+			nowTime = '{$nowTime}'; 
+		if(startTime>nowTime){
+			layer.msg('时间必须小于当天时间',2,5);
+			return;
+		}
+		if(t1>t2){
+			layer.msg('结束时间不能大于开始时间',2,5);
+			return;
+		}
+		
+		window.location.href = "__APP__/FlowChart/domain_request?startTime=" + startTime + "&endTime=" + endTime  ;
+	}
+	$(function(){
+		$("#startTime").val('{$startTime}');
+		$("#endTime").val('{$endTime}');
+		load_layer = layer.load('正在加载数据...',2);
+		setInterval(function (){layer.close(load_layer);},2000);
+	});
+</script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- 头部 S -->
+<include file="Public:header" />
+<!-- 头部 e -->
+<div class="clear"></div>
+<div class="content"><!-- 内容 -->
+	<!-- left菜单 S -->
+    <div style="float:left;width:172px;">
+        <div id="sideMenu" class="side">
+            <div class="hd">
+                <div style="float:left"><span style="background:url(__ROOT__/Public/img/lljk.png) no-repeat;"></span><h3>统计报表</h3></div>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/FlowChart/index">总体流量</a></li>
+                    <li><a href="__APP__/FlowChart/error">无效请求</a></li>                    
+                    <li><a href="__APP__/FlowChart/proportion">线路分布</a></li>
+                    <li><a class="active" href="__APP__/FlowChart/domain_request">域名排行</a></li>
+                    <li><a href="__APP__/FlowChart/visit_source">访问来源</a></li>                    
+                    <li><a href="__APP__/FlowChart/regional_distribution">地域分布</a></li>
+                </ul>
+            </div>
+        </div>
+        <!--div id="sideMenu1" class="side">
+            <div class="hd">
+                <h3>历史统计</h3>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/FlowChart/history">总流量</a></li>
+                    <li><a href="__APP__/FlowChart/error_history">无效请求</a></li>
+                    <li><a href="__APP__/FlowChart/history_proportion">流量概况</a></li>
+                </ul>
+            </div>
+        </div-->
+    </div>
+	<script type="text/javascript">
+		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", trigger:"click" });
+		function tab(obj){
+			var val = $(obj).html();
+			if(val == "子域名排行"){
+				$("#main_hd").hide();
+				$("#child_hd").show();
+				$("#main_div").hide();
+				$("#child_div").show();
+			}else{				
+				$("#main_hd").show();
+				$("#child_hd").hide();
+				$("#main_div").show();
+				$("#child_div").hide();
+			}
+		}
+    </script>
+	<!-- left菜单 E -->
+	
+	<!-- mainContent s -->
+	<div class="mainContent">
+    	<div class="slideTxtBox">
+            <div class="top_30">域名请求TOP30排行榜</div>
+            <div class="time">
+                <div class="table-toolbar" style="border:none; padding:0; margin:5px 0px;">
+                    <label style="margin-left: 24px;">开始时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="开始时间(非必填)" id="startTime">					
+                    <label style="margin-left:50px">结束时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="结束时间(非必填)" id="endTime">
+                    <a class="addbtn" style="margin-left:10px!important;" href="javascript:void(0);" onClick="selectBy()">查询</a>
+                </div>
+            </div>
+            <div class="hd" style="margin-top:10px;" id="main_hd">
+				<h2 style="float:left;">主域名排行</h2>
+				<a href="javascript:void(0);" onClick="tab(this)">子域名排行</a>
+			</div>
+            <div class="hd" style="margin-top:10px;display:none;" id="child_hd">
+				<h2 style="float:left;">子域名排行</h2>
+				<a href="javascript:void(0);" onClick="tab(this)">主域名排行</a>
+			</div>
+            <div class="title">
+                <div class="no"><b>序号</b></div>
+                <div class="name"><b>域名</b></div>
+                <div class="sum"><b>次数</b></div>
+            </div>
+            <div id="main_div">
+                <if condition="count($list)!=0">
+                    <volist name="list" id="item">
+                        <if condition="count($list) lt 10">
+                            <if condition="$i lt 4">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                            <else/>
+                            <if condition="$i lt 11">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                        </if>
+                    </volist>
+                    <else/>
+                    <div class="item" style="text-indent:2em;">暂无数据...</div>
+                </if>
+            </div>
+            <div id="child_div" style="display:none;">
+                <if condition="count($list2)!=0">
+                    <volist name="list2" id="item">
+                        <if condition="count($list2) lt 10">
+                            <if condition="$i lt 4">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                            <else/>
+                            <if condition="$i lt 11">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                        </if>
+                    </volist>
+                    <else/>
+                    <div class="item" style="text-indent:2em;">暂无数据...</div>
+                </if>
+            </div>
+		</div>
+		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
+		<!-- Tab切换 E -->
+	</div>
+</div>
+<include file="Public:footer" />
+<script type="text/javascript">	
+	//这种导航效果相当于Tab切换，用titCell和mainCell 处理
+	/*jQuery(".navBar").slide({ 
+		titCell:".nav .m", // 鼠标触发对象
+		mainCell:".subNav", // 切换对象包裹层
+		delayTime:0, // 效果时间
+		triggerTime:0, //鼠标延迟触发时间
+		returnDefault:true  //返回默认状态
+	});*/
+</script> 
+</body>
+</html>
+<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.js"></script>
+

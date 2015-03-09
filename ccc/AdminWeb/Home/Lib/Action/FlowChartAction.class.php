@@ -238,4 +238,72 @@ class FlowChartAction extends BaseAction {
 		$this->display();
 		
 	}
+	public function domain_request(){	
+		$this->show_top_30('eflydns_admin_chart_domain.php');
+	}
+	//public function child_domain_request(){
+	//	$this->show_top_30('eflydns_admin_chart_domain.php');
+	//}
+	public function visit_source(){
+		$this->show_top_30('eflydns_admin_chart_ip.php');
+	}
+	public function regional_distribution(){
+		$this->show_top_30('eflydns_admin_chart_area.php');
+	}
+	public function show_top_30($php){
+		if(!empty($_GET['startTime'])){
+			$startTime = $_GET['startTime'];
+			$this->assign('startTime',$_GET['startTime']);
+		}else{
+			$startTime = date("Y-m-d",strtotime("-1 day"));	
+			$this->assign('startTime',$startTime);
+		}
+		if(!empty($_GET['endTime'])){
+			$endTime = $_GET['endTime'];
+			$this->assign('endTime',$_GET['endTime']);
+		}else{
+			$endTime = date("Y-m-d",strtotime("-1 day"));
+			$this->assign('endTime',$endTime);
+		}
+		
+		if($php=="eflydns_admin_chart_domain.php"){			
+			$url = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&type=main";
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$list; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'] as $key => $val){
+					$list[$key]['name'] = $key;
+					$list[$key]['sum'] = $val;
+				}
+			}
+			$this->assign('list',$list);
+			
+			$url2 = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&type=child";		
+			$data2 = file_get_contents($url2);
+			$result2 = json_decode($data2,true);
+			$list2; 
+			if($result2['ret'] != 1){
+				foreach($result2['descmap'] as $key => $val){
+					$list2[$key]['name'] = $key;
+					$list2[$key]['sum'] = $val;
+				}
+			}			
+			$this->assign('list2',$list2);
+		}else{
+			$url = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime;
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$list; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'] as $key => $val){
+					$list[$key]['name'] = $key;
+					$list[$key]['sum'] = $val;
+				}
+			}
+			$this->assign('list',$list);
+		}		
+		$this->assign('nowTime',date("Y-m-d"));
+		$this->display();	
+	}
 }
