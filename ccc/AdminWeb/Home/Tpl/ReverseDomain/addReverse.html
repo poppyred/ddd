@@ -27,12 +27,22 @@
 		
         <div id="sideMenu" class="side">    
             <div class="hd on">                
-				<div style="float:left"><span style="background:url(__ROOT__/Public/img/fxjx.png) no-repeat;"></span><h3>反向解析管理</h3></div>
+				<div style="float:left"><span style="background:url(__ROOT__/Public/img/fxjx.png) no-repeat;"></span><h3>反解管理</h3></div>
             </div>
             <div class="bd">
                 <ul>
-                    <li><a class="active" href="__APP__/ReverseDomain">反向解析列表</a></li>
+                    <li><a class="active" href="__APP__/ReverseDomain">反解列表</a></li>
                     <!--li><a class="active" href="__APP__/ReverseDomain/addReverse">添加反向解析</a></li-->
+                </ul>
+            </div>
+        </div>
+        <div id="sideMenu1" class="side">
+            <div class="hd on">
+				<div style="float:left"><span style="background:url(__ROOT__/Public/img/fzgj.png) no-repeat;"></span><h3>辅助工具</h3></div>
+            </div>
+            <div class="bd">
+                <ul>
+                    <li><a href="__APP__/ReverseDomain/selectIP">IP反解</a></li>
                 </ul>
             </div>
         </div>
@@ -48,6 +58,7 @@
 		</div-->
 	<script type="text/javascript">
 		jQuery("#sideMenu").slide({ titCell:".hd", targetCell:".bd", trigger:"click" });
+		jQuery("#sideMenu1").slide({ titCell:".hd", targetCell:".bd", trigger:"click" });
     </script>
 	<!-- left菜单 E -->
 	

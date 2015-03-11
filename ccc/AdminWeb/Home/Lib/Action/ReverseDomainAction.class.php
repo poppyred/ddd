@@ -36,7 +36,40 @@ class ReverseDomainAction extends BaseAction {
 		$this->assign('viewList', $viewList);// 赋值数据集
 		$this->assign('page',$show);// 赋值分页输出
 		$this->display();	
-	}	
+	}
+	public function selectIP(){
+		if(!empty($_GET['ip'])){			
+			import('ORG.Util.Page');// 导入分页类
+			$map["val"] = array('like','%'.$_GET['ip'].'%');
+			$this->assign('ip',$_GET['ip']);
+		
+			$domain = M('domain',Null,'DB_NEWS');
+			$view = M('view',Null,'DB_NEWS');
+			$zone = M('zone',Null,'DB_NEWS');
+			$reverse = M('reverse_domain',Null,'DB_NEWS');
+			$count = $domain->where($map)->count();// 查询满足要求的总记录数 $map表示查询条件
+			$Page = new Page($count, 20);// 实例化分页类 传入总记录数
+			$nowPage = isset($_GET['p'])?$_GET['p']:1;
+			$dlist = $domain->order('id desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
+			foreach($dlist as $key => $val){
+				$tem = $view->where('id='.$val['view'])->find();
+				$dlist[$key]['view_name'] = $tem['name'];
+				
+				$tem2 = $zone->query('select * from client_domain cd left join zone z on z.id=cd.zone_id where cd.domain_id=%d',$val['id']);
+				$dlist[$key]['domain'] = $val['host'].".".$tem2[0]['domain'];
+				
+			}
+			$show = $Page->show();// 分页显示输出
+			if(empty($show)){
+				$show = " 0 条记录";
+			}
+			$this->assign('dlist', $dlist);
+		}else{
+			$show = " 0 条记录";
+		}
+		$this->assign('page',$show);
+		$this->display();	
+	}
 	public function deleteReverse(){
 		if(!empty($_POST['id']) && !empty($_POST['cid'])){
 			$reverse = M('reverse_domain',Null,'DB_NEWS');			
