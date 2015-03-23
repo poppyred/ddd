@@ -270,16 +270,20 @@ class FlowChartAction extends BaseAction {
 			$url = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&type=main";
 			$data = file_get_contents($url);
 			$result = json_decode($data,true);
-			$list; 
+			$list;
 			if($result['ret'] != 1){
 				foreach($result['descmap'] as $key => $val){
 					$list[$key]['name'] = $key;
 					$list[$key]['sum'] = $val;
+					$zone = M('zone',Null,'DB_NEWS');
+					$tem = $zone->query("select * from zone z left join client c on z.client_id=c.id where z.domain='".$key."'");
+					$list[$key]['mail'] = $tem[0]['mail'];
+					$list[$key]['pwd'] = $tem[0]['pwd'];
 				}
 			}
 			$this->assign('list',$list);
 			
-			$url2 = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&type=child";		
+			$url2 = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&type=child";
 			$data2 = file_get_contents($url2);
 			$result2 = json_decode($data2,true);
 			$list2; 
@@ -290,6 +294,18 @@ class FlowChartAction extends BaseAction {
 				}
 			}			
 			$this->assign('list2',$list2);
+		}else if($php=="eflydns_admin_chart_ip.php"){
+			$url = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime."&mod=top";
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$list; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'] as $key => $val){
+					$list[$key]['name'] = $key;
+					$list[$key]['sum'] = $val;
+				}
+			}
+			$this->assign('list',$list);
 		}else{
 			$url = "http://121.201.12.61/script/".$php."?begin=".$startTime."&end=".$endTime;
 			$data = file_get_contents($url);
@@ -302,8 +318,136 @@ class FlowChartAction extends BaseAction {
 				}
 			}
 			$this->assign('list',$list);
-		}		
+		}	
 		$this->assign('nowTime',date("Y-m-d"));
 		$this->display();	
+	}
+	public function show_ip_info(){
+		$url = "http://121.201.12.61/script/eflydns_admin_chart_ip.php?begin=".$_GET['startTime']."&end=".$_GET['endTime']."&mod=info&ip=".$_GET['ip'];
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$list; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'][1] as $key => $val){
+					$list[$key]['name'] = $key;
+					$list[$key]['sum'] = $val;
+				}
+				foreach($result['descmap'][0] as $key => $val){
+					$time .= $key . "时,";
+					$num .= $val .",";
+					$sum += $val;
+				}
+			}
+			$this->assign('sum', number_format($sum));
+			$this->assign('time', trim($time,","));
+			$this->assign('num', trim($num,","));
+			$this->assign('list',$list);
+		$this->display();	
+	}
+	
+	public function saveAlarm(){
+		if(!empty($_POST['type']) && isset($_POST['max']) && isset($_POST['min']) && !empty($_POST['mail']) && !empty($_POST['id'])){
+			$device_qps = M('device_qps',Null,'DB_MONITOR');
+			$data['type'] = $_POST['type'];
+			$data['maximum'] = $_POST['max'];
+			$data['minimum'] = $_POST['min'];
+			$data['to'] = $_POST['mail'];
+			
+			$is_ok = $device_qps->where('id='.$_POST['id'])->save($data);
+			if($is_ok===false){
+				$this->ajaxReturn('修改监控报警失败，请联系管理员。','error',0);	
+			}
+			$this->ajaxReturn('修改监控报警成功','success',1);	
+		}
+	}
+	
+	public function getAlarmInfo(){
+		if(!empty($_POST['type'])){
+			$map['type'] = $_POST['type'];
+			$device_qps = M('device_qps',Null,'DB_MONITOR');
+			$result = $device_qps->where($map)->find();
+			if(empty($result)){
+				$this->ajaxReturn('监控信息获取失败，请联系管理员。','error',0);	
+			}
+			$this->ajaxReturn($result,'success',1);
+		}
+	}
+	//导出Excel
+	public function expExcel(){//导出Excel		
+		if($_GET['type']=="request"){
+			$xlsCell  = array(
+				array('no','序号'),
+				array('name','域名'),
+				array('sum','次数')
+			);
+			$url = "http://121.201.12.61/script/eflydns_admin_chart_domain.php?begin=".$_GET['startTime']."&end=".$_GET['endTime']."&type=main";
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$no = 0;
+			$xlsData;
+			foreach($result['descmap'] as $key => $val){
+				$xlsData[$no]['no'] = $no + 1;
+				$xlsData[$no]['name'] = $key;
+				$xlsData[$no]['sum'] = $val;
+				$no ++;
+			}
+			D('Excel')->exportExcel("主域名请求TOP30排行榜",$xlsCell,$xlsData);
+			
+		}else if($_GET['type']=="child_request"){
+			$xlsCell  = array(
+				array('no','序号'),
+				array('name','域名'),
+				array('sum','次数')
+			);
+			$url = "http://121.201.12.61/script/eflydns_admin_chart_domain.php?begin=".$_GET['startTime']."&end=".$_GET['endTime']."&type=child";
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$no = 0;
+			$xlsData;
+			foreach($result['descmap'] as $key => $val){
+				$xlsData[$no]['no'] = $no + 1;
+				$xlsData[$no]['name'] = $key;
+				$xlsData[$no]['sum'] = $val;
+				$no ++;
+			}
+			D('Excel')->exportExcel("子域名请求TOP30排行榜",$xlsCell,$xlsData);
+			
+		}else if($_GET['type']=="source"){
+			$xlsCell  = array(
+				array('no','序号'),
+				array('name','IP'),
+				array('sum','次数')
+			);
+			$url = "http://121.201.12.61/script/eflydns_admin_chart_ip.php?begin=".$_GET['startTime']."&end=".$_GET['endTime']."&mod=top";
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$no = 0;
+			$xlsData;
+			foreach($result['descmap'] as $key => $val){
+				$xlsData[$no]['no'] = $no + 1;
+				$xlsData[$no]['name'] = $key;
+				$xlsData[$no]['sum'] = $val;
+				$no ++;
+			}
+			D('Excel')->exportExcel("访问来源TOP30排行榜",$xlsCell,$xlsData);
+		}else if($_GET['type']=="distribution"){
+			$xlsCell  = array(
+				array('no','序号'),
+				array('name','地域'),
+				array('sum','次数')
+			);
+			$url = "http://121.201.12.61/script/eflydns_admin_chart_area.php?begin=".$_GET['startTime']."&end=".$_GET['endTime'];
+			$data = file_get_contents($url);
+			$result = json_decode($data,true);
+			$no = 0;
+			$xlsData;
+			foreach($result['descmap'] as $key => $val){
+				$xlsData[$no]['no'] = $no + 1;
+				$xlsData[$no]['name'] = $key;
+				$xlsData[$no]['sum'] = $val;
+				$no ++;
+			}
+			D('Excel')->exportExcel("地域分布排行榜",$xlsCell,$xlsData);
+		}	
 	}
 }

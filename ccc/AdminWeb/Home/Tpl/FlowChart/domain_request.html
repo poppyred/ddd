@@ -132,6 +132,13 @@
 				$("#child_div").hide();
 			}
 		}
+		function doExcel(){
+			if($('#main_div').is(':visible')){
+				window.open("__APP__/FlowChart/expExcel?type=request&startTime=" + $("#startTime").val() + "&endTime=" + $("#endTime").val());	
+			}else{
+				window.open("__APP__/FlowChart/expExcel?type=child_request&startTime=" + $("#startTime").val() + "&endTime=" + $("#endTime").val());	
+			}
+		}
     </script>
 	<!-- left菜单 E -->
 	
@@ -144,6 +151,7 @@
                     <label style="margin-left: 24px;">开始时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="开始时间(非必填)" id="startTime">					
                     <label style="margin-left:50px">结束时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="结束时间(非必填)" id="endTime">
                     <a class="addbtn" style="margin-left:10px!important;" href="javascript:void(0);" onClick="selectBy()">查询</a>
+                    <a class="addbtn" style="margin-left:10px!important;" href="javascript:void(0);" onClick="doExcel()">导出Excel</a>
                 </div>
             </div>
             <div class="hd" style="margin-top:10px;" id="main_hd">
@@ -166,13 +174,17 @@
                             <if condition="$i lt 4">
                                 <div class="item">
                                     <div class="no"><span class="hot">{$i}</span></div>
-                                    <div class="name">{$item.name}</div>
+                                    <div class="name">
+	                                    <a href="__APP__/Domainmgr/mgrClient?mail={$item.mail}&pwd={$item.pwd}&domain={$item.name}&type=rpt" target="_blank">{$item.name}</a>
+                                    </div>
                                     <div class="sum">{$item.sum|number_format=###}</b></div>
                                 </div>
                                 <else/>
                                 <div class="item">
                                     <div class="no"><span>{$i}</span></div>
-                                    <div class="name">{$item.name}</div>
+                                    <div class="name">
+	                                    <a href="__APP__/Domainmgr/mgrClient?mail={$item.mail}&pwd={$item.pwd}&domain={$item.name}&type=rpt" target="_blank">{$item.name}</a>
+                                    </div>
                                     <div class="sum">{$item.sum|number_format=###}</b></div>
                                 </div>
                             </if>
@@ -180,13 +192,17 @@
                             <if condition="$i lt 11">
                                 <div class="item">
                                     <div class="no"><span class="hot">{$i}</span></div>
-                                    <div class="name">{$item.name}</div>
+                                    <div class="name">
+	                                    <a href="__APP__/Domainmgr/mgrClient?mail={$item.mail}&pwd={$item.pwd}&domain={$item.name}&type=rpt" target="_blank">{$item.name}</a>
+                                    </div>
                                     <div class="sum">{$item.sum|number_format=###}</b></div>
                                 </div>
                                 <else/>
                                 <div class="item">
                                     <div class="no"><span>{$i}</span></div>
-                                    <div class="name">{$item.name}</div>
+                                    <div class="name">
+	                                    <a href="__APP__/Domainmgr/mgrClient?mail={$item.mail}&pwd={$item.pwd}&domain={$item.name}&type=rpt" target="_blank">{$item.name}</a>
+                                    </div>
                                     <div class="sum">{$item.sum|number_format=###}</b></div>
                                 </div>
                             </if>

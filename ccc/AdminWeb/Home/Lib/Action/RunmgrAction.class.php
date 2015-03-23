@@ -94,7 +94,6 @@ class RunmgrAction extends BaseAction {
 			
 			$vo = $view->where('id='.$_GET['id'])->find();
 			$vlist = $view_mask->order('id desc')->page($nowPage.','.$Page->listRows)->where($map)->select();
-			
 			$show = $Page->show();// 分页显示输出
 			if(empty($show)){
 				$show = " 0 条记录" ;
@@ -151,8 +150,9 @@ class RunmgrAction extends BaseAction {
 				$is_ok = $view->where('id='.$_POST['id'])->save($data);
 				
 				if($is_ok===false){
-					$this->ajaxReturn('修改失败，请联系管理员','error',0);	
+					$this->ajaxReturn('error','修改失败，请联系管理员',0);	
 				}
+				/*暂时注释
 				$val = array("vid"=>(int)$_POST['id'],"vname"=>rawurldecode($_POST["name"]),"comment"=>rawurldecode($_POST["desc"]),"ttl"=>"300");
 				$user = array("cid"=>$_SESSION['id'], "level"=>2, "info"=>"");
 				$param = array("type"=>"view", "opt"=>"set", "data"=>$val,"user"=>$user);
@@ -161,6 +161,7 @@ class RunmgrAction extends BaseAction {
 				if($rslt["ret"] != 0){
 					$this->ajaxReturn(0,$rslt["content"],0);	
 				}
+				*/
 				
 				//删除view_mask
 				/*
@@ -212,6 +213,7 @@ class RunmgrAction extends BaseAction {
 		if(!empty($_POST['id'])){
 			$view = M('view',Null,'DB_NEWS');
 			$view_mask = M('view_mask',Null,'DB_NEWS');
+			/*暂时注释
 			$vmlist = $view_mask->where('viewid='.$_POST['id'])->select();
 			//删除mask
 			foreach($vmlist as $vm){
@@ -221,24 +223,25 @@ class RunmgrAction extends BaseAction {
 				$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
 				$rslt = json_decode($ret["content"],true);
 				if($rslt["ret"] != 0){
-					$this->ajaxReturn(0,$rslt["content"],0);	
+					$this->ajaxReturn($rslt["error"],'error',0);	
 				}
 			}
+			*/
 			
 			$is_ok = $view_mask->where('viewid='.$_POST['id'])->delete();
 			if($is_ok===false){
 				$this->ajaxReturn('删除路线失败，请联系管理员','error',0);
 			}
-			//
+			/*暂时注释
 			$val = array("vid"=>$_POST['id']);
 			$user = array("cid"=>$_SESSION['id'], "level"=>2, "info"=>"");
 			$param = array("type"=>"view", "opt"=>"del", "data"=>$val,"user"=>$user);
 			$ret = http_post(C('INTERFACE_URL')."/dnspro/dnsbroker/", $param);
 			$rslt = json_decode($ret["content"],true);
 			if($rslt["ret"] != 0){
-				$this->ajaxReturn(0,$rslt["content"],0);	
+				$this->ajaxReturn($rslt["error"],'error',0);
 			}
-			
+			*/
 			$is_ok2 = $view->where('id='.$_POST['id'])->delete();
 			if($is_ok2===false){
 				$this->ajaxReturn('删除路线失败，请联系管理员','error',0);
@@ -265,7 +268,7 @@ class RunmgrAction extends BaseAction {
 				$data["desc"] = trim($_POST['desc']);
 				$data["up_time"] = date('Y-m-d H:i:s');
 				$is_ok = $list->data($data)->add();
-				
+				/*暂时注释
 				$val = array("vid"=>(int)$is_ok,"vname"=>rawurldecode($data["name"]),"comment"=>rawurldecode($data["desc"]),"ttl"=>"300");
 				$user = array("cid"=>$_SESSION['id'], "level"=>2, "info"=>"");
 				$param = array("type"=>"view", "opt"=>"add", "data"=>$val,"user"=>$user);
@@ -274,7 +277,7 @@ class RunmgrAction extends BaseAction {
 				if($rslt["ret"] != 0){
 					$this->ajaxReturn(0,$rslt["content"],0);	
 				}
-				
+				*/
 				//添加成功
 				if($is_ok){
 					
@@ -288,7 +291,7 @@ class RunmgrAction extends BaseAction {
 							$mask['network'] = $arr[$i];
 							$mask['viewid'] = $is_ok;
 							$view_mask->data($mask)->add();
-							
+							/*暂时注释
 							$val = array("mask"=>$vm['network'],"vid"=>$mask["viewid"]);
 							$user = array("cid"=>$_SESSION['id'], "level"=>2, "info"=>"");
 							$param = array("type"=>"mask", "opt"=>"add", "data"=>$val,"user"=>$user);
@@ -296,8 +299,8 @@ class RunmgrAction extends BaseAction {
 							$rslt = json_decode($ret["content"],true);
 							if($rslt["ret"] != 0){
 								$this->ajaxReturn(0,$rslt["content"],0);	
-							}
-							
+							}							
+							*/
 						}
 					}
 					$this->ajaxReturn(1,'默认路线添加成功！',1); //data,info,status

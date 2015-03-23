@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta name="Keywords" content="DNSPro">
+<meta name="Description" content="DNSPro DNS 域名解析">
+<title>EflyDNS管理后台</title>
+<link type="text/css" rel="stylesheet" href="__ROOT__/Public/css/style.css">
+<link rel="shortcut icon" href="__ROOT__/eflydns.ico" />
+<script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/highcharts/exporting.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/YUI/yui-min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+<script type="text/javascript">
+	$(function () {
+		var time = $("#time").val(),
+		num = "["+$("#num").val()+"]",
+		time_arr = new Array(),
+		time_arr = time.split(",");
+		
+		Highcharts.setOptions({
+			lang: {
+				printChart:"打印图表",
+				downloadJPEG: "下载JPEG 图片" , 
+				downloadPDF: "下载PDF文档"  ,
+				downloadPNG: "下载PNG 图片"  ,
+				downloadSVG: "下载SVG 矢量图" , 
+				exportButtonTitle: "导出图片" 
+			}                                                                       
+		});
+		$('#container').highcharts({
+			title: {
+				text: 'IP访问时间曲线',
+				x: -20 //center
+			},
+			subtitle: {
+				text: '访问总量：{$sum}',
+				x: -16	
+			},
+			plotOptions: {
+				line: {
+					dataLabels: {
+						enabled: true
+					}
+				}
+			},
+			xAxis: {					
+				categories: time_arr
+			},
+			yAxis: {
+				title: {
+				text: '请求次数'
+				},
+				min: 0,
+				plotLines: [{
+				value: 0,
+				width: 1,
+				color: '#808080'
+				}]
+			},
+			tooltip: {
+				valueSuffix: '次',
+				shared: true
+			},
+			legend: {
+				enabled: true
+			},
+			series: [{
+				name: '访问量',
+				data: eval('(' + num + ')')
+			}]
+		});
+
+	});
+</script>
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+    <script src="./js/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+<div class="content show_ip_info">
+	<div class="mainContent">    
+        <input type="hidden" value="{$time}" id="time"/>
+        <input type="hidden" value="{$num}" id="num"/>
+    	<div id="container" style="width:940px;height:400px"></div>    
+    	<div class="slideTxtBox">
+            <div class="top_30">IP访问域名排行</div>
+            <div class="title">
+                <div class="no"><b>序号</b></div>
+                <div class="name" style="width:360px;"><b>IP</b></div>
+                <div class="sum" style="width:360px;"><b>次数</b></div>
+            </div>
+            <if condition="count($list)!=0">
+                <volist name="list" id="item">
+                        <if condition="count($list) lt 10">
+                            <if condition="$i lt 4">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">
+	                                    <a href="javascript:void(0);" onClick="show_ip_info(this)">{$item.name}</a>
+                                    </div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">
+	                                    <a href="javascript:void(0);" onClick="show_ip_info(this)">{$item.name}</a>
+                                    </div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                            <else/>
+                            <if condition="$i lt 11">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">
+	                                    <a href="javascript:void(0);" onClick="show_ip_info(this)">{$item.name}</a>
+                                    </div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">
+	                                    <a href="javascript:void(0);" onClick="show_ip_info(this)">{$item.name}</a>
+                                    </div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                        </if>
+                    </volist>
+                <else/>
+                <div class="item" style="text-indent:2em;">暂无数据...</div>
+            </if>
+        </div>
+	</div>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.js"></script>
+

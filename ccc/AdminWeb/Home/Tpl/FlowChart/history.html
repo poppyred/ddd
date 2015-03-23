@@ -11,6 +11,7 @@
 <script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/highcharts/exporting.js"></script>
 <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 <!--[if lt IE 9]>
     <script src="./js/html5.js"></script>
@@ -67,7 +68,7 @@
 				<h2 style="float:left;">历史数据</h2>
 				<a href="__APP__/FlowChart/index">实时数据</a>
 			</div>
-            <div style="margin:20px 0px 0px 40px;">         	
+            <div class="table-toolbar">         	
                 <input type="hidden" value="{$time}" id="time"/>
 				<input type="hidden" value="{$num}" id="num"/>
             	<label>选择设备：</label>
@@ -94,7 +95,7 @@
                     <option value="rhalf">最近半年</option>
                     <option value="ryear">最近一年</option>
                 </select>                
-				<a style="margin-left:20px;color:#1c8fdf;text-decoration:underline" href="__APP__/FlowChart/index">查看实时数据</a>
+				<a class="addbtn" style="margin-left:10px!important" href="__APP__/FlowChart/index">查看实时数据</a>
 			</div>
 			<div class="bd">
 				<div id="container" style="min-width:700px;height:400px"></div>
@@ -130,7 +131,15 @@ $(function () {
 	Highcharts.setOptions({                                                     
 		global: {                                                               
 			useUTC: false                                                       
-		}                                                                       
+		},
+		lang: {
+			printChart:"打印图表",
+			downloadJPEG: "下载JPEG 图片" , 
+			downloadPDF: "下载PDF文档"  ,
+			downloadPNG: "下载PNG 图片"  ,
+			downloadSVG: "下载SVG 矢量图" , 
+			exportButtonTitle: "导出图片" 
+		}                                                                
 	});
 	var time = $("#time").val(),
 		num = "["+$("#num").val()+"]",

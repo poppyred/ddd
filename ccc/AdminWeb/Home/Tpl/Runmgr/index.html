@@ -135,7 +135,7 @@
 			$.ajax({
 				url: '__APP__/Runmgr/deleteView',
 				type: "post",
-				data: { id: id }, 
+				data: { 'id': id }, 
 				success: function (data) {
 					if(data.info == 'success'){
 						window.location.reload();

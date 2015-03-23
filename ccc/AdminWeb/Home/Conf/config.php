@@ -23,6 +23,16 @@ return array(
 		'DB_PORT'=>'3306',
 		'DB_PREFIX'=>'',
 		'DB_NAME'=>'dnspro_client'
+	),
+	
+	'DB_MONITOR'	=>      array(
+		'DB_TYPE'=>'mysql',
+		'DB_USER'=>'root',
+		'DB_PWD'=>'rjkj@rjkj',
+		'DB_HOST'=>'121.201.12.60',
+		'DB_PORT'=>'3306',
+		'DB_PREFIX'=>'',
+		'DB_NAME'=>'dnspro_monitor'
 	)
 );
 

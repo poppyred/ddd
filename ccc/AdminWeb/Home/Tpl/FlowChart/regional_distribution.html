@@ -73,6 +73,9 @@
 		load_layer = layer.load('正在加载数据...',2);
 		setInterval(function (){layer.close(load_layer);},2000);
 	});
+	function doExcel(){			
+		window.open("__APP__/FlowChart/expExcel?type=distribution&startTime=" + $("#startTime").val() + "&endTime=" + $("#endTime").val());	
+	}
 </script>
 <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 <!--[if lt IE 9]>
@@ -130,6 +133,7 @@
                     <label style="margin-left: 24px;">开始时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="开始时间(非必填)" id="startTime">					
                     <label style="margin-left:50px">结束时间：</label><input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="结束时间(非必填)" id="endTime">
                     <a class="addbtn" style="margin-left:10px!important;" href="javascript:void(0);" onClick="selectBy()">查询</a>
+                    <a class="addbtn" style="margin-left:10px!important;" href="javascript:void(0);" onClick="doExcel()">导出Excel</a>
                 </div>
             </div>
             <div class="title">

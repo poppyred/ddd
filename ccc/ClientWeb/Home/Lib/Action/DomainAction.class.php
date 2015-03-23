@@ -432,7 +432,7 @@ class DomainAction extends BaseAction {
 			if(!empty($_GET['timezone'])){
 				$timezone = $_GET['timezone'];
 			}
-			
+			//统计图
 			$data = file_get_contents(C('NS_CHECH_URL')."/script/eflydns_client_reqcnt_chart.php?type=".$type."&domain=".$_GET['host'].".".$_GET['d']."&timezone=".$timezone);
 			$list = json_decode($data,true);
 			
@@ -444,6 +444,18 @@ class DomainAction extends BaseAction {
 				}
 			}
 			
+			//top			
+			$data2 = file_get_contents(C('NS_CHECH_URL')."/script/eflydns_client_reqcnt_chart.php?timezone=top&type=main&domain=".$_GET['d']);
+			$result = json_decode($data2,true);
+			$list2; 
+			if($result['ret'] != 1){
+				foreach($result['descmap'] as $key => $val){
+					$list2[$key]['name'] = $key;
+					$list2[$key]['sum'] = $val;
+				}
+			}
+			
+			$this->assign('list', $list2);
 			$this->assign('host', $_GET['host']);
 			$this->assign('time', trim($time,","));
 			$this->assign('num', trim($num,","));

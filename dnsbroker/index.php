@@ -7,6 +7,7 @@ $post_opt = $post['opt'];
 $post_data = $post['data'];
 
 $mod_file = 'mod_'.$post_type.'.php';
+clearstatcache();
 if( file_exists($mod_file) ) {
 	include $mod_file;
 	do_post($post);

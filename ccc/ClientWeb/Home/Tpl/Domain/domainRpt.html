@@ -12,7 +12,9 @@
 	<script type="text/javascript" src="__ROOT__/Public/js/layer/layer.min.js"></script>
 	<script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
 	<script type="text/javascript" >
-		$(function(){
+		$(function(){			
+			load_layer = layer.load('正在加载数据...',3);
+			setInterval(function (){layer.close(load_layer);},3000);
 			//绑定下拉框
 			if('{$host}'!=""){
 				$("#record").show();
@@ -212,7 +214,55 @@
 					</tr-->
 				</tbody> 
 			</table>
-		</div> 
+            	<div class="h1">本月子域名解析统计TOP20排行</div>
+                <!--div class="time">            
+                    <label style="margin-left:24px;">开始时间：</label>
+                    <input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="开始时间(非必填)" id="startTime">	
+                    <label style="margin-left:20px;">结束时间：</label>
+                    <input type="text" style="width:160px;" class="ui-ipt-txt ipt-date" readonly="" placeholder="结束时间(非必填)" id="endTime">
+                    <button class="ui-btn-blue" style="margin-left:10px;" onclick="selectBy()">查询</button>
+                </div-->
+                <div class="title">
+                    <div class="no"><b>序号</b></div>
+                    <div class="name"><b>子域名</b></div>
+                    <div class="sum"><b>次数</b></div>
+                </div>
+                <if condition="count($list)!=0">
+                    <volist name="list" id="item">
+                        <if condition="count($list) lt 10">
+                            <if condition="$i lt 4">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                            <else/>
+                            <if condition="$i lt 11">
+                                <div class="item">
+                                    <div class="no"><span class="hot">{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                                <else/>
+                                <div class="item">
+                                    <div class="no"><span>{$i}</span></div>
+                                    <div class="name">{$item.name}</div>
+                                    <div class="sum">{$item.sum|number_format=###}</b></div>
+                                </div>
+                            </if>
+                        </if>
+                    </volist>
+                <else/>
+                <div class="item" style="text-indent:2em;">暂无数据...</div>
+            </if>
+		</div>
 		<!-- footer -->
 		<include file="Public:footer" />
 	</div>
