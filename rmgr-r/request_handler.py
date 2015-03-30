@@ -382,8 +382,27 @@ class req_handler_record_a(object):
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
         print >> sys.stderr,  ('deleting name:a_record rid:' + str(data['rid']) + ' from database')
+        worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+        result = worker.dbcon.show()
+        if (len(result) > 0):
+            view_id = result[0][1]
+            domain_name = result[0][0]
+            print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+            worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+            count_result = worker.dbcon.show()
+            if (len(count_result) > 0):
+                rec_count = count_result[0][0]
+        else:
+            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
@@ -494,8 +513,27 @@ class req_handler_record_aaaa(object):
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
         print >> sys.stderr,  ('deleting name:aaaa_record rid:' + str(data['rid']) + ' from database')
+        worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+        result = worker.dbcon.show()
+        if (len(result) > 0):
+            view_id = result[0][1]
+            domain_name = result[0][0]
+            print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+            worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+            count_result = worker.dbcon.show()
+            if (len(count_result) > 0):
+                rec_count = count_result[0][0]
+        else:
+            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
@@ -549,8 +587,27 @@ class req_handler_record_cname(object):
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
         print >> sys.stderr,  ('deleting name:cname_record rid:' + str(data['rid']) + ' from database')
+        worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+        result = worker.dbcon.show()
+        if (len(result) > 0):
+            view_id = result[0][1]
+            domain_name = result[0][0]
+            print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+            worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+            count_result = worker.dbcon.show()
+            if (len(count_result) > 0):
+                rec_count = count_result[0][0]
+        else:
+            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
@@ -706,8 +763,27 @@ class req_handler_record_txt(object):
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
         print >> sys.stderr,  ('deleting name:txt_record rid:' + str(data['rid']) + ' from database')
+        worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+        result = worker.dbcon.show()
+        if (len(result) > 0):
+            view_id = result[0][1]
+            domain_name = result[0][0]
+            print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+            worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+            count_result = worker.dbcon.show()
+            if (len(count_result) > 0):
+                rec_count = count_result[0][0]
+        else:
+            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
@@ -760,8 +836,27 @@ class req_handler_record_mx(object):
         return (update_ret, True, result)
 
     def delete(self, worker, data, ali_tbl):
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
         print >> sys.stderr,  ('deleting name:mx_record rid:' + str(data['rid']) + ' from database')
+        worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+        result = worker.dbcon.show()
+        if (len(result) > 0):
+            view_id = result[0][1]
+            domain_name = result[0][0]
+            print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+            worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+            count_result = worker.dbcon.show()
+            if (len(count_result) > 0):
+                rec_count = count_result[0][0]
+        else:
+            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (True, True, result)
