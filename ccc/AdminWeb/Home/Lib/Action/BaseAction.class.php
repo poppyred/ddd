@@ -14,7 +14,7 @@ class BaseAction extends Action {
 		$url = __ACTION__;
 		//监控权限
 		if($_SESSION['level'] == 0 ){
-			if(strstr($url,"/FlowChart") || strstr($url,"/System")){
+			if(strstr($url,"/FlowChart") || strstr($url,"/System") || strstr($url,"/Domainmgr")){
 			}else{
 				header("Location: ".__APP__."/FlowChart");	
 			}

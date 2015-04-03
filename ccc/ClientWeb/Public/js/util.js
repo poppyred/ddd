@@ -10,7 +10,9 @@ function bindDomainDesc(val){
 function bindZoneDesc(val){
 	return '<tr style="display:none"><td colspan="5" class="expand-outer fix"><div style="position:relative"><div class="patch-left"></div><div class="patch-right"></div><div class="expand-box"><b class="expand-box-arr">◆<b class="expand-box-arr-in">◆</b></b><div class="remark-box fix J_remarkBox"><label class="lbl">备注：</label><textarea class="ui-textarea J_remarkTextarea" rows="3" maxlength="200" onKeyUp="wordsLimit(this)">'+val+'</textarea><div class="btm"><span class="info J_countInfo">最多还可写<b>200</b>个字</span> <button class="ui-btn-blue btn-add J_btnSubmitRemark" onClick="saveDomain(this)">保存</button> <button class="ui-btn-grey btn-cancle J_btnCancleRemark" onClick="cancelDomain(this)">取消</button></div></div></div></div></td></tr>';
 }
-
+String.prototype.trim = function () {
+	return this .replace(/^\s\s*/, '' ).replace(/\s\s*$/, '' );
+}
 //检测ip
 function CheckIp(addr){
     var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/;

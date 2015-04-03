@@ -921,7 +921,7 @@
 				});*/
 				selectByWhere();
 			}else{
-				layer.msg('请输入主机记录（支持模糊查询）',2,5);
+				layer.msg('请输入子域名（支持模糊查询）',2,5);
 				//pageReload(0);
 			}
 		}
@@ -1082,7 +1082,7 @@
 				<tr id="tr_title">
 					<th class="chk"><input type="checkbox" class="J_chkForAll" onclick="checkAll(this);" title="全选/取消全选"/></th> 
 					<th class="sortable"></th>
-					<th class="sortable" sort="rr"><span class="el" id="sort_host" onClick="sortDomain('host','{$zone}',this)">主机记录</span></th>
+					<th class="sortable" sort="rr"><span class="el" id="sort_host" onClick="sortDomain('host','{$zone}',this)">子域名</span></th>
 					<th class="sortable" sort="type"><span class="el" id="sort_type" onClick="sortDomain('type','{$zone}',this)">记录类型</span></th>
 					<th class="sortable" sort="line"><span class="el" id="sort_view" onClick="sortDomain('view','{$zone}',this)">解析线路</span></th>
 					<th><span>记录值</span></th> 		

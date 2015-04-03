@@ -450,4 +450,19 @@ class FlowChartAction extends BaseAction {
 			D('Excel')->exportExcel("地域分布排行榜",$xlsCell,$xlsData);
 		}	
 	}
+	public function report(){		
+		if($_SERVER['REQUEST_METHOD' ] === 'GET'){
+			$this->display();
+		}else{
+			if(!empty($_POST['mail'])){
+				$url = "http://121.201.12.61/script/eflydns_admin_mail.php?target=".$_POST['mail'];
+				$data = file_get_contents($url);
+				$result = json_decode($data,true);
+				if($result['ret']!=0){
+					$this->ajaxReturn($result['error'],'error',0);
+				}
+				$this->ajaxReturn($result,'success',1);
+			}
+		}
+	}
 }

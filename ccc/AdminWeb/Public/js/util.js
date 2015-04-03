@@ -87,6 +87,10 @@ function checkemail(val){
 }
 
 
+String.prototype.trim = function () {
+	return this .replace(/^\s\s*/, '' ).replace(/\s\s*$/, '' );
+}
+
 var stopPropagation = function(e) {
 	if(e && e.stopPropagation){         //W3C取消冒泡事件         
 		e.stopPropagation();     

@@ -40,9 +40,13 @@
 				$(".navBar ul li:eq(0)").addClass('on');
 				$(".navBar ul li a:eq(0)").find('img').attr('src','__ROOT__/Public/img/head_lljk2.png');
 				break;
-				case url.indexOf('System')!=-1:
+				case url.indexOf('Domainmgr')!=-1:
 				$(".navBar ul li:eq(1)").addClass('on');
-				$(".navBar ul li a:eq(1)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
+				$(".navBar ul li a:eq(1)").find('img').attr('src','__ROOT__/Public/img/head_ymgl2.png');
+				break;
+				case url.indexOf('System')!=-1:
+				$(".navBar ul li:eq(2)").addClass('on');
+				$(".navBar ul li a:eq(2)").find('img').attr('src','__ROOT__/Public/img/head_fwqgl2.png');
 				break;
 			}
 		}else if(level == 1 ){
@@ -113,7 +117,15 @@
                             <span>流量监控</span>
                         </a>
                     </h3>
-                </li>                
+                </li>      
+                <li class="m">
+                    <h3>
+                        <a target="_self" href="__APP__/Domainmgr/">
+                            <img src="__ROOT__/Public/img/head_ymgl.png" />
+                            <span>域名管理</span>
+                        </a>
+                    </h3>
+                </li>          
                 <li class="m">
                     <h3>
                         <a target="_self" href="__APP__/System">

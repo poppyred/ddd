@@ -11,7 +11,37 @@
 <script type="text/javascript" src="__ROOT__/Public/js/jquery-1.8.1.min.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/jquery.SuperSlide.2.1.js"></script>
 <script type="text/javascript" src="__ROOT__/Public/js/highcharts/highcharts.js"></script>
-<script type="text/javascript" src="__ROOT__/Public/js/highcharts/exporting.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/YUI/yui-min.js"></script>
+<script type="text/javascript" src="__ROOT__/Public/js/util.js"></script>
+<script type="text/javascript">
+	function addReport(){
+		var mail = $("#mail").val();
+		if(!mail){
+			$("#mail").focus();
+			return false;
+		}
+		if(!checkemail(mail)){
+			alert('请输入邮箱的正确格式。(例如：test@163.com)');
+			$("#mail").focus();
+			return false;
+		}
+		$.ajax({
+			url:'__APP__/FlowChart/report',
+			type:'post',
+			data:{'mail':mail},
+			success:function(data){
+				if(data.info=='success'){
+					alert('生成报告成功');
+					window.location.reload();
+				}else{
+					alert(data.data);
+				}
+			},error:function(data){
+				alert(data.statusText);	
+			}
+		});
+	}
+</script>
 <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 <!--[if lt IE 9]>
     <script src="./js/html5.js"></script>
@@ -33,11 +63,11 @@
                 <ul>
                     <li><a href="__APP__/FlowChart/index">总体流量</a></li>
                     <li><a href="__APP__/FlowChart/error">无效请求</a></li>                    
-                    <li><a class="active" href="__APP__/FlowChart/proportion">线路分布</a></li>
+                    <li><a href="__APP__/FlowChart/proportion">线路分布</a></li>
                     <li><a href="__APP__/FlowChart/domain_request">域名排行</a></li>
                     <li><a href="__APP__/FlowChart/visit_source">访问来源</a></li>                    
                     <li><a href="__APP__/FlowChart/regional_distribution">地域分布</a></li>
-                    <li><a href="__APP__/FlowChart/report">统计报告</a></li>
+                    <li><a class="active" href="__APP__/FlowChart/report">统计报告</a></li>
                 </ul>
             </div>
         </div>
@@ -62,26 +92,15 @@
 	
 	<!-- mainContent s -->
 	<div class="mainContent">
-    		
-		<!-- Tab切换 S -->
-		<div class="slideTxtBox">
-			<div class="hd">
-				<h2 style="float:left;">实时数据</h2>
-				<a href="__APP__/FlowChart/history_proportion">历史数据</a>
-			</div>
-            <div class="table-toolbar">
-            	<label>选择设备：</label>
-                <select id="ip_list" onchange="selectBy();" style="margin-bottom:0px;width:120px;">
-                	<option value="">全部</option>
-                    <volist name="ipList" id="item">
-	                	<option value="{$item}">{$item}</option>
-                    </volist>
-                </select>
-				<a class="addbtn" style="margin-left:10px!important" href="__APP__/FlowChart/history_proportion">查看历史数据</a>
-			</div>
-			<div class="bd">
-				<div id="container" style="min-width:700px;height:400px"></div>
-			</div>
+    	<div class="slideTxtBox">
+            <div class="top_30">统计报告生成</div>
+            <div class="time">
+                <div class="table-toolbar" style="border:none; padding:0; margin:5px 0px;">
+				邮箱：<input class="ui-ipt-txt" id="mail" placeholder="输入邮箱" /> 
+                <a class="addbtn" style="margin-left:10px!important" href="javascript:void(0)" onclick="addReport()">生成报告</a>
+                </div>
+            </div>
+		</div>
 		</div>
 		<script type="text/javascript">jQuery(".slideTxtBox").slide();</script>
 		<!-- Tab切换 E -->
@@ -101,64 +120,4 @@
 </body>
 </html>
 <script type="text/javascript" src="__ROOT__/Public/js/layer/layer.js"></script>
-<script type="text/javascript">
-var load_layer;
-$(function () {
-	load_layer = layer.load('正在加载数据...',2);
-	setInterval(function (){layer.close(load_layer);},2000);
-	var IP = '{$ip}';
-	$("#ip_list").val(IP);	
-	
-	Highcharts.setOptions({
-		lang: {
-			printChart:"打印图表",
-			downloadJPEG: "下载JPEG 图片" , 
-			downloadPDF: "下载PDF文档"  ,
-			downloadPNG: "下载PNG 图片"  ,
-			downloadSVG: "下载SVG 矢量图" , 
-			exportButtonTitle: "导出图片" 
-		}                                                                       
-	});
-	var value = "{$value}";
-	$('#container').highcharts({
-		chart: {
-			plotBackgroundColor: null,
-			plotBorderWidth: null,
-			plotShadow: false
-		},
-		title: {
-			text: '实时流量概况'
-		},
-		tooltip: {
-			pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-		},
-		plotOptions: {
-			pie: {
-				allowPointSelect: true,
-				cursor: 'pointer',
-				dataLabels: {
-					enabled: true,
-					color: '#000000',
-					connectorColor: '#000000',
-					format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-				}
-			}
-		},
-		series: [{
-			type: 'pie',
-			name: 'Browser share',
-			data: eval(value)
-		}]
-	});
-	
-});		
-function selectBy(){
-	var ip = $("#ip_list").val() ,url = '__APP__/FlowChart/proportion';
-	switch(true){
-		case ip!="" :
-			url += "?ip=" + ip ;
-		break;
-	}
-	window.location.href = url;
-}		
-</script>
+
