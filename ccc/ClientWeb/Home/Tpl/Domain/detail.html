@@ -975,7 +975,7 @@
 			<div class="dns-tip-box fix J_dnsTipBox">
 				<div class="lf tips">
 					<p><b class="ui-color-red">还差最后一步，即可开始使用 eflyDNS ：</b></p>
-					<p class="dot"> 点击下方的添加记录按钮完成添加，再到域名注册的地方将 DNS 修改为 ：</p>
+					<p class="dot"> 点击下方的新增解析按钮完成添加，再到域名注册的地方将 DNS 修改为 ：</p>
 					<p class="dot"> ns1.eflydns.net</p>
 					<p class="dot"> ns2.eflydns.net</p>
 					<p class="dot">注意不能同时和其他 DNS 混用，会导致解析混乱哦～！</p>
@@ -1024,7 +1024,7 @@
 			</if>
                 <!--<a href="__APP__/Domain/domainRoute?d={$zone}">自定义路线</a>-->
 				<strong id="cur_zone" class="dname">{$zone}</strong>
-				<span class="tab nocur"><a href="javascript:void(0);">自定义路线</a></span>
+				<span class="tab nocur"><a href="javascript:void(0);" onClick="javascript:layer.msg('建设中，敬请期待',3,2);">自定义路线</a></span>
 				<span class="tab nocur"><a href="__APP__/Domain/domainSource?d={$zone}">来源分析</a></span>
 				<span class="tab nocur"><a href="__APP__/Domain/domainRpt?d={$zone}">解析统计</a></span>
 				<span class="tab nocur"><a href="__APP__/Domain/domainSet?d={$zone}">域名设置</a></span>

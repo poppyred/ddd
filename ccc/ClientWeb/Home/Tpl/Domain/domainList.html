@@ -142,7 +142,9 @@
 		}
 		
 	}
-	
+	function waitCreate(){
+		layer.msg('建设中，敬请期待',2,2);	
+	}
 	//移动显示操作
 	function hoverShowOpt(){
 		//先取消绑定
@@ -152,9 +154,9 @@
 		$(".zoneRow").hover(function(){
 			str = $($(this).find('.remark')).html();
 			if($(this).attr("level") == 0){
-				$($(this).find('.remark')).html("<a href='javascript:void(0);'>升级套餐</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
+				$($(this).find('.remark')).html("<a href='javascript:void(0);' onClick='waitCreate()'>升级套餐</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
 			}else{
-				$($(this).find('.remark')).html("<a href='javascript:void(0);'>续费(3个月后到期)</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
+				$($(this).find('.remark')).html("<a href='javascript:void(0);' onClick='waitCreate()'>续费(3个月后到期)</a><a href='javascript:void(0);' onClick='refreshStatus(\""+ $(this).find(".domain_id").html() +"\")' style='margin-left:20px;'>刷新</a>");
 			}
 			//$($(this).find(".icon-add")).show();
 			$($(this).find(".icon-manage")).show();
