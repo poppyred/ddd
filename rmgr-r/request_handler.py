@@ -377,6 +377,29 @@ class req_handler_record_a(object):
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record, (http_tbl_realname[ali_tbl],
             data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data[ali_tbl], 0,
             n_enable, data['rid']))
+
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
+        if n_enable == 0:
+            #{u'2912': {u'opt': u'set', u'data': u'{"name":"kk.test.com","main":"test.com","rid":5529,"A":"2.2.2.2","level":"0","ttl":3600,"viewid":"1","enable":0}', u'type': u' record'}}
+            worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid_only  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+            result = worker.dbcon.show()
+            if (len(result) > 0):
+                view_id = result[0][1]
+                domain_name = result[0][0]
+                print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+                worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+                count_result = worker.dbcon.show()
+                if (len(count_result) > 0):
+                    rec_count = count_result[0][0]
+            else:
+                print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
+
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (update_ret, True, result)
@@ -397,10 +420,10 @@ class req_handler_record_a(object):
             if (len(count_result) > 0):
                 rec_count = count_result[0][0]
         else:
-            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+            print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
         print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
-        if rec_count > 0:
+        if rec_count > 1:
             worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
             worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
@@ -508,6 +531,29 @@ class req_handler_record_aaaa(object):
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record, (http_tbl_realname[ali_tbl],
             data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data[ali_tbl], 0,
             n_enable, data['rid']))
+
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
+        if n_enable == 0:
+            #{u'2912': {u'opt': u'set', u'data': u'{"name":"kk.test.com","main":"test.com","rid":5529,"A":"2.2.2.2","level":"0","ttl":3600,"viewid":"1","enable":0}', u'type': u' record'}}
+            worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid_only % (http_tbl_realname[ali_tbl],int(data['rid'])))
+            result = worker.dbcon.show()
+            if (len(result) > 0):
+                view_id = result[0][1]
+                domain_name = result[0][0]
+                print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+                worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+                count_result = worker.dbcon.show()
+                if (len(count_result) > 0):
+                    rec_count = count_result[0][0]
+            else:
+                print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
+
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (update_ret, True, result)
@@ -528,10 +574,10 @@ class req_handler_record_aaaa(object):
             if (len(count_result) > 0):
                 rec_count = count_result[0][0]
         else:
-            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+            print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
         print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
-        if rec_count > 0:
+        if rec_count > 1:
             worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
             worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
@@ -582,6 +628,29 @@ class req_handler_record_cname(object):
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record, (http_tbl_realname[ali_tbl],
             data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data[ali_tbl], 0,
             n_enable, data['rid']))
+
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
+        if n_enable == 0:
+            #{u'2912': {u'opt': u'set', u'data': u'{"name":"kk.test.com","main":"test.com","rid":5529,"A":"2.2.2.2","level":"0","ttl":3600,"viewid":"1","enable":0}', u'type': u' record'}}
+            worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid_only % (http_tbl_realname[ali_tbl],int(data['rid'])))
+            result = worker.dbcon.show()
+            if (len(result) > 0):
+                view_id = result[0][1]
+                domain_name = result[0][0]
+                print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+                worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+                count_result = worker.dbcon.show()
+                if (len(count_result) > 0):
+                    rec_count = count_result[0][0]
+            else:
+                print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
+
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (update_ret, True, result)
@@ -602,10 +671,10 @@ class req_handler_record_cname(object):
             if (len(count_result) > 0):
                 rec_count = count_result[0][0]
         else:
-            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+            print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
         print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
-        if rec_count > 0:
+        if rec_count > 1:
             worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
             worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
@@ -758,6 +827,29 @@ class req_handler_record_txt(object):
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_a_record, (http_tbl_realname[ali_tbl],
             data['name'].lstrip('@.'), data['main'], data['viewid'], data['ttl'], data[ali_tbl], 0,
             n_enable, data['rid']))
+
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
+        if n_enable == 0:
+            #{u'2912': {u'opt': u'set', u'data': u'{"name":"kk.test.com","main":"test.com","rid":5529,"A":"2.2.2.2","level":"0","ttl":3600,"viewid":"1","enable":0}', u'type': u' record'}}
+            worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid_only % (http_tbl_realname[ali_tbl],int(data['rid'])))
+            result = worker.dbcon.show()
+            if (len(result) > 0):
+                view_id = result[0][1]
+                domain_name = result[0][0]
+                print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+                worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+                count_result = worker.dbcon.show()
+                if (len(count_result) > 0):
+                    rec_count = count_result[0][0]
+            else:
+                print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
+
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (update_ret, True, result)
@@ -778,10 +870,10 @@ class req_handler_record_txt(object):
             if (len(count_result) > 0):
                 rec_count = count_result[0][0]
         else:
-            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+            print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
         print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
-        if rec_count > 0:
+        if rec_count > 1:
             worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
             worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
@@ -831,6 +923,29 @@ class req_handler_record_mx(object):
             n_enable = int(data['enable'])
         update_ret = worker.dbcon.call_proc(msg.g_proc_add_mx_record, (data['name'].lstrip('@.'), data['main'],
             data['viewid'], data['ttl'], data['level'], data[ali_tbl], 0, n_enable, data['rid']))
+
+        rec_count = 0
+        view_id = 0
+        domain_name = ""
+        if n_enable == 0:
+            #{u'2912': {u'opt': u'set', u'data': u'{"name":"kk.test.com","main":"test.com","rid":5529,"A":"2.2.2.2","level":"0","ttl":3600,"viewid":"1","enable":0}', u'type': u' record'}}
+            worker.dbcon.query(msg.g_init_sql_get_name_view_zone_by_rid_only  % (http_tbl_realname[ali_tbl],int(data['rid'])))
+            result = worker.dbcon.show()
+            if (len(result) > 0):
+                view_id = result[0][1]
+                domain_name = result[0][0]
+                print >> sys.stderr, ('rid %d name %s view %d zone %d' % (int(data['rid']),domain_name, view_id, result[0][2]))
+                worker.dbcon.query(msg.g_init_sql_count_by_name_zone % (http_tbl_realname[ali_tbl],result[0][0],result[0][2]))
+                count_result = worker.dbcon.show()
+                if (len(count_result) > 0):
+                    rec_count = count_result[0][0]
+            else:
+                print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
+        print >> sys.stderr, ('rec_count ' + str(rec_count))
+        if rec_count > 0:
+            worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
+            worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
+
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
         result = worker.dbcon.show()
         return (update_ret, True, result)
@@ -851,10 +966,10 @@ class req_handler_record_mx(object):
             if (len(count_result) > 0):
                 rec_count = count_result[0][0]
         else:
-            print >> sys.stderr, ('rid %d has no old info' %s (int(data['rid'],)))
+            print >> sys.stderr, ('rid %d has no old info' % (int(data['rid'],)))
         print >> sys.stderr, ('rec_count ' + str(rec_count))
         worker.dbcon.call_proc(msg.g_proc_del_a_record, (http_tbl_realname[ali_tbl], data['rid']))
-        if rec_count > 0:
+        if rec_count > 1:
             worker.dbcon.query(msg.g_init_sql_update_snd_req_dns % (msg.g_dict_type[http_tbl_realname[ali_tbl]],view_id,domain_name,msg.g_opt_del))
             worker.dbcon.call_proc(msg.g_proc_add_task, ('dns', msg.g_dict_type[http_tbl_realname[ali_tbl]], view_id, domain_name, 0, msg.g_opt_add))
         worker.dbcon.query(msg.g_init_sql_gettask_dns)
