@@ -149,11 +149,15 @@
                   //$(".outter-nav .info").show();
 
                   window.location.href = 'http://www.eflydns.com/client/Domain/domainList';
+                  //window.location.href = 'http://localhost/ClientWeb/Domain/domainList';
 
                 } else {
                   //cookie.set('loginError', data.string);
 
+                  alert('电子邮箱或密码错误，请重新输入...');
+
                   window.location.href = 'http://www.eflydns.com/client/Index/login';
+                  //window.location.href = 'http://localhost/ClientWeb/Index/login';
                 }
             }
           });

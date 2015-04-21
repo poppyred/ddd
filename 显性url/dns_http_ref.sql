@@ -27,11 +27,11 @@ CREATE TABLE `http_ref` (
   `status` varchar(10) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `src` (`src`)
-) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 
 /*Data for the table `http_ref` */
 
-insert  into `http_ref`(`id`,`src`,`dst`,`status`) values (29,'dns.eflypro.com','www.eflydns.com','true');
+insert  into `http_ref`(`id`,`src`,`dst`,`status`) values (51,'022dnaf.com','www.022dnaf.com','true'),(50,'*.google.com','eflydns.net','true'),(48,'aidaoju.com','www.aidaoju.com','true'),(29,'dns.eflypro.com','www.eflydns.com','true'),(49,'eflypro.net','www.eflypro.net','true');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

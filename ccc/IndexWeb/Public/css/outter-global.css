@@ -343,6 +343,10 @@ header .bg {
   background: transparent;
 }
 
+.outter-nav ul.account li:hover {
+  background:#0050A0;
+}
+
 .outter-nav ul.account a:hover {
     box-shadow: none;
     color: #fff;

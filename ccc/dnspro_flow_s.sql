@@ -38,7 +38,7 @@ CREATE TABLE `domain_all_conc` (
   `domain` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `domain_conc` */
 
@@ -49,7 +49,7 @@ CREATE TABLE `domain_conc` (
   `domain` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=78 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `domain_ip_conc` */
 
@@ -61,7 +61,7 @@ CREATE TABLE `domain_ip_conc` (
   `ip` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=596 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1132 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `domain_main_conc` */
 
@@ -72,7 +72,7 @@ CREATE TABLE `domain_main_conc` (
   `domain` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `error_record` */
 
@@ -100,7 +100,7 @@ CREATE TABLE `error_record_hour` (
   `domain` text CHARACTER SET utf8 NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ID`,`ip`)
-) ENGINE=MyISAM AUTO_INCREMENT=7157 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8545 DEFAULT CHARSET=latin1;
 
 /*Table structure for table `ip_conc` */
 
@@ -111,7 +111,7 @@ CREATE TABLE `ip_conc` (
   `ip` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `ip_domain_conc` */
 
@@ -123,7 +123,7 @@ CREATE TABLE `ip_domain_conc` (
   `domain` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1411 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2251 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `ip_hour_conc` */
 
@@ -135,7 +135,7 @@ CREATE TABLE `ip_hour_conc` (
   `hour` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1411 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2251 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `region_conc` */
 
@@ -146,7 +146,7 @@ CREATE TABLE `region_conc` (
   `region` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `server_list` */
 
@@ -167,7 +167,7 @@ CREATE TABLE `type_conc` (
   `type` text NOT NULL,
   `date` varchar(16) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=79 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `type_record` */
 
@@ -203,7 +203,7 @@ CREATE TABLE `type_record_hour` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(20) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`ID`,`ip`)
-) ENGINE=MyISAM AUTO_INCREMENT=7061 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8449 DEFAULT CHARSET=latin1;
 
 /*Table structure for table `view_index` */
 
@@ -256,7 +256,7 @@ CREATE TABLE `view_record_hour` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(16) NOT NULL,
   UNIQUE KEY `view_id` (`id`,`view_id`,`ip`)
-) ENGINE=MyISAM AUTO_INCREMENT=51066 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=60782 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
